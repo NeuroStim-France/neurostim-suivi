@@ -603,7 +603,7 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <div style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
         <button class="btn btn-ghost btn-sm" style="flex:1;font-size:11px;color:var(--text3)" onclick="openChangePassword(false)">🔑 Mot de passe</button>
-        <button class="btn btn-ghost btn-sm" style="flex:1;font-size:11px;color:var(--text3)" onclick="openPinSettings()">🔢 Code PIN</button>
+        <button class="btn btn-ghost btn-sm write-only" style="flex:1;font-size:11px;color:var(--text3)" onclick="openPinSettings()">🔢 Code PIN</button>
       </div>
       <div style="margin-top:4px">
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
@@ -806,8 +806,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <div id="page-lecture-welcome" class="page">
       <div style="max-width:700px;margin:0 auto;padding:20px 0">
         <div style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));border-radius:16px;padding:32px;margin-bottom:24px;border:1px solid var(--accent-light)">
-          <div style="font-size:32px;margin-bottom:12px">👋</div>
-          <div id="lecture-welcome-name" style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px">Bienvenue</div>
+          <div id="lecture-welcome-name" style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:12px">Bonjour 👋</div>
           <div style="font-size:15px;color:var(--text2);line-height:1.7">Vous accédez à la plateforme de suivi clinique NeuroStim en mode <strong>consultation</strong>. Vous pouvez naviguer dans les dossiers patients et consulter leurs données de suivi.</div>
         </div>
 
@@ -1845,7 +1844,7 @@ function showApp() {
     document.querySelectorAll('.analyse-only').forEach(el=>el.style.display='none');
     document.querySelectorAll('.saisie-only').forEach(el=>el.style.display='none');
     const welcomeEl = document.getElementById('lecture-welcome-name');
-    if(welcomeEl) welcomeEl.textContent = 'Bonjour ' + (p.displayName||'').split(' ')[0] + ' 👋';
+    if(welcomeEl) welcomeEl.textContent = 'Bonjour ' + (p.displayName||'') + ' 👋';
     setTimeout(()=>{ showPage('lecture-welcome', null); }, 100);
   } else if(p.role==='saisie') {
     document.querySelectorAll('.analyse-only').forEach(el=>el.style.display='none');
@@ -6115,6 +6114,9 @@ async function generatePDF() {
   hideLoading();
 }
 
+function goToPatients() {
+  showPage('patients', document.querySelector('.nav-item[onclick*="patients"]'));
+}
 function showPage(id,navEl) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+id); if(pg) pg.classList.add('active');
