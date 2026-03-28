@@ -332,6 +332,7 @@ body:not(.in-questionnaire):not(.patient-lock) #q-quit-btn { display:none; }
 }
 /* Role-based visibility */
 body.role-lecture .write-only { display:none !important; }
+body.role-lecture .role-lecture { display:flex !important; }
 body.role-lecture .saisie-only { display:none !important; }
 body.role-lecture .analyse-only { display:none !important; }
 body.role-saisie .analyse-only { display:none !important; }
@@ -542,6 +543,10 @@ body.role-saisie .analyse-only { display:none !important; }
         <div class="nav-item saisie-only active" onclick="showPage('dashboard',this)">
           <svg viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg>
           Tableau de bord <span class="nav-badge" id="nav-badge">0</span>
+        </div>
+        <div class="nav-item role-lecture" onclick="showPage('lecture-welcome',this)" style="display:none">
+          <svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-6h4v6h5V7z"/></svg>
+          Accueil
         </div>
         <div class="nav-item" onclick="showPage('patients',this)">
           <svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3"/><path d="M4 18c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
@@ -796,6 +801,72 @@ body.role-saisie .analyse-only { display:none !important; }
       <div id="tc-historique" class="tab-content" style="display:none">
         <div id="hist-content"><div class="empty"><p>Chargement…</p></div></div>
       </div>
+
+    <!-- LECTURE WELCOME -->
+    <div id="page-lecture-welcome" class="page">
+      <div style="max-width:700px;margin:0 auto;padding:20px 0">
+        <div style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));border-radius:16px;padding:32px;margin-bottom:24px;border:1px solid var(--accent-light)">
+          <div style="font-size:32px;margin-bottom:12px">👋</div>
+          <div id="lecture-welcome-name" style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:8px">Bienvenue</div>
+          <div style="font-size:15px;color:var(--text2);line-height:1.7">Vous accédez à la plateforme de suivi clinique NeuroStim en mode <strong>consultation</strong>. Vous pouvez naviguer dans les dossiers patients et consulter leurs données de suivi.</div>
+        </div>
+
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">Comment utiliser cette application</div>
+
+        <div style="display:grid;gap:12px">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#e8f4fd;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔍</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Rechercher un patient</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">Utilisez la barre de recherche en haut à gauche ou naviguez dans la liste des patients. Cliquez sur un patient pour ouvrir son dossier complet.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#eafaf1;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📋</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Consulter le suivi</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">Dans chaque dossier, l'onglet <strong>Suivi</strong> affiche la timeline de la cure avec les questionnaires complétés. Cliquez sur un score pour voir le détail des réponses.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#fef9e7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📊</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Voir l'évolution des scores</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Scores</strong> affiche les graphiques d'évolution de chaque questionnaire au fil du temps, permettant de visualiser la progression du patient.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#f4ecf7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🕐</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Parcours complet dans Historique</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Historique</strong> présente une timeline visuelle du parcours complet — du consentement initial jusqu'à la fin de cure, avec tous les jalons et questionnaires.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#fdeaea;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📄</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Générer un compte-rendu</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">Le bouton <strong>Compte-rendu</strong> en haut du dossier patient génère un PDF de synthèse avec la timeline et les graphiques d'évolution, à partager avec le médecin référent.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text3);display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">ℹ️</span>
+          <span>En mode consultation, vous ne pouvez pas modifier les données patients. Pour toute question, contactez l'équipe NeuroStim.</span>
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+          <button class="btn btn-primary" onclick="showPage('patients',document.querySelector('[onclick*="patients"]'))">
+            Accéder à la liste des patients →
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- COHORTE -->
     <div id="page-cohorte" class="page">
@@ -1992,7 +2063,7 @@ function renderTimeline() {
   const tod=todayStr();
   let html='';
   (p.schedule||[]).forEach(s=>{
-    const done=s.done||[], qs=s.questionnaires||[], het=s.hetero||[];
+    const done=s.done||[], qs=s.questionnaires||[], het=s.hetero||[], ign=s.ignored||[];
     const isToday=s.date===tod, isPast=s.date<tod;
     const rem=qs.filter(q=>!done.includes(q));
     const allDone=rem.length===0&&qs.length>0;
@@ -2011,11 +2082,15 @@ function renderTimeline() {
         const lbl=resp?sLabel(q,resp.score):'';
         return '<div class="tl-item '+(isDone?'done':isPast?'overdue':'pending')+(isHet?' hetero':'')+'">'
           +'<div class="tl-item-name">'+qLabel(q)+'</div>'
-          +(isDone&&resp&&resp.score!==undefined
+          +(ign.includes(q)
+            ?'<div class="tl-item-status" style="font-size:11px;color:var(--text3)">— Ignoré</div>'
+            :isDone&&q==='Consentement rTMS'&&resp
+            ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
+            :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
             ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+resp.score+'/'+(qi&&qi.maxScore||'?')+' — '+lbl+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
-          +(isDone&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
+          +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
           +(!isDone&&(isToday||isPast)&&NS.userProfile&&NS.userProfile.role!=='lecture'?'<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
               +'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>'
               +(isPast?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Ignorer">✕ Ignorer</button>':'')
