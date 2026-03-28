@@ -1844,7 +1844,9 @@ function showApp() {
   if(p.role==='lecture') {
     document.querySelectorAll('.analyse-only').forEach(el=>el.style.display='none');
     document.querySelectorAll('.saisie-only').forEach(el=>el.style.display='none');
-    setTimeout(()=>{ showPage('patients', document.querySelector('.nav-item[onclick*="patients"]')); }, 100);
+    const welcomeEl = document.getElementById('lecture-welcome-name');
+    if(welcomeEl) welcomeEl.textContent = 'Bonjour ' + (p.displayName||'').split(' ')[0] + ' 👋';
+    setTimeout(()=>{ showPage('lecture-welcome', null); }, 100);
   } else if(p.role==='saisie') {
     document.querySelectorAll('.analyse-only').forEach(el=>el.style.display='none');
   }
