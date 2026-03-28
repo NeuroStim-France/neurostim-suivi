@@ -3119,7 +3119,8 @@ async function openEditUser(uid) {
   document.getElementById('edit-user-uid').value = uid;
   document.getElementById('edit-user-name').value = u.displayName||'';
   document.getElementById('edit-user-role').value = u.role||'saisie';
-  document.getElementById('edit-user-pwd').value = '';
+  const confirm = document.getElementById('reset-pwd-confirm');
+  if(confirm) confirm.style.display = 'none';
   document.querySelectorAll('.edit-cabinet-check').forEach(cb=>{
     cb.checked = (u.cabinets||[]).includes(cb.value);
   });
