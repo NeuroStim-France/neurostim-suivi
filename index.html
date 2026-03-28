@@ -3136,6 +3136,21 @@ async function saveEditUser() {
   logAccess('edit_user', uid);
   closeModal('m-edit-user');
   loadUsersList();
+  showError('Utilisateur mis à jour.', 2000);
+}
+
+async function sendPasswordReset() {
+  const uid = document.getElementById('edit-user-uid').value;
+  try {
+    const snap = await db.doc('users/'+uid).get();
+    const email = snap.data()?.email;
+    if(!email) { showError('Email introuvable.', 3000); return; }
+    await firebase.auth().sendPasswordResetEmail(email);
+    const confirm = document.getElementById('reset-pwd-confirm');
+    if(confirm) confirm.style.display = 'block';
+  } catch(e) {
+    showError('Erreur: '+e.message, 4000);
+  }
 }
 
 // ════════════════════════════════════════════════
@@ -6312,7 +6327,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="edit-cabinet-check" value="NeuroStim Étoile"> NeuroStim Étoile</label>
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="edit-cabinet-check" value="NeuroStim Luxembourg"> NeuroStim Luxembourg</label>
       <div class="divider"></div>
-      <div class="fg"><label>Nouveau mot de passe (laisser vide pour ne pas changer)</label><input type="password" id="edit-user-pwd" placeholder="••••••••"></div>
+      <div style="background:var(--surface2);border-radius:var(--r-sm);padding:12px;font-size:13px;color:var(--text2)">
+        <div style="font-weight:600;margin-bottom:6px">Réinitialisation du mot de passe</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Un email sera envoyé à l'utilisateur avec un lien pour définir un nouveau mot de passe.</div>
+        <button class="btn btn-secondary btn-sm" onclick="sendPasswordReset()" type="button">📧 Envoyer un email de réinitialisation</button>
+        <div id="reset-pwd-confirm" style="display:none;color:var(--green);font-size:12px;margin-top:8px">✓ Email envoyé !</div>
+      </div>
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-user')">Annuler</button>
