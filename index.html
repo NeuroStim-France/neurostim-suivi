@@ -2178,7 +2178,9 @@ function renderScores() {
   const byQRaw = {};
   Object.entries(p.responses||{}).forEach(([key,resp])=>{
     if(!resp||resp.score===undefined||resp.score===null) return;
-    const q = resp.questionnaire; const d = resp.date||key.split('_')[0];
+    const q = resp.questionnaire;
+    if(q === 'Consentement rTMS') return; // pas de graphique pour le consentement
+    const d = resp.date||key.split('_')[0];
     if(!byQRaw[q]) byQRaw[q]={};
     byQRaw[q][d] = {date:d, score:resp.score, answers:resp.answers, key};
   });
@@ -5839,7 +5841,8 @@ async function generatePDF() {
       const day = getDay(s.date);
       if(day.qs.some(function(q){return q.name===qn;})) return;
       const r = responses[s.date+'_'+qn];
-      const score = (r&&r.score!==undefined)?r.score:null;
+      const score = (r&&r.score!==undefined&&r.score!==null)?r.score:null;
+      if(score===null && qn!=='Consentement rTMS') return; // skip unanswered questionnaires
       const qi = QUESTIONNAIRES[qn];
       const interp = (score!==null&&qi&&qi.interpret)?qi.interpret(score):null;
       day.qs.push({name:qn, score:score, qi:qi, interp:interp});
