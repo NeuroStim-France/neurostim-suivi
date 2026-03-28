@@ -3028,6 +3028,8 @@ async function pqFinish() {
   } catch(e) { console.error('Save error:', e); pqState.remainingQs = []; }
   // Show done screen — no score shown to patient
   document.getElementById('pq-body').style.display='none';
+  const closeBtn = document.getElementById('pq-close-btn');
+  if(closeBtn) closeBtn.style.display='block';
   const doneScreen = document.getElementById('pq-done-screen');
   doneScreen.style.display='block';
   // Show "next questionnaire" button if there are more
@@ -6320,16 +6322,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="pq-options" id="pq-options"></div>
     <div class="pq-nav">
       <button class="btn btn-secondary" id="pq-prev" onclick="pqPrev()" style="display:none">← Précédent</button>
-      <button class="btn btn-primary" id="pq-next" onclick="pqNext()">Suivant →</button>
+      <button class="btn btn-primary" id="pq-next" onclick="pqNext()" style="margin-left:auto">Suivant →</button>
     </div>
   </div>
   <!-- Done screen -->
-  <div id="pq-done-screen" style="display:none" class="pq-done">
+  <div id="pq-done-screen" style="display:none;text-align:center;align-items:center" class="pq-done">
     <div class="pq-done-icon">✅</div>
     <div class="pq-done-title">Merci !</div>
     <div class="pq-done-sub">Votre questionnaire a bien été enregistré.<br>Le médecin prendra connaissance de vos résultats.</div>
     <button id="pq-next-q-btn" onclick="pqStartNext()" style="display:none;margin-top:20px;padding:14px 28px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;width:90%;max-width:320px">Questionnaire suivant →</button>
-    <div id="pq-pin-area" style="margin-top:28px;padding:20px;background:rgba(0,0,0,.05);border-radius:var(--r);width:90%;max-width:320px">
+    <button id="pq-close-btn" onclick="window.close();history.back();" style="display:none;margin-top:12px;padding:14px 28px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;width:90%;max-width:320px">✕ Fermer la page</button>
+    <div id="pq-pin-area" style="margin-top:28px;padding:20px;background:rgba(0,0,0,.05);border-radius:var(--r);width:90%;max-width:320px;margin-left:auto;margin-right:auto">
       <div style="font-size:14px;color:var(--text2);margin-bottom:12px">Code PIN soignant pour sortir</div>
       <div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px">
         <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);transition:background .2s" id="pq-pin-d0"></div>
