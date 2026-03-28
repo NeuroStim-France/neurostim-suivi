@@ -805,6 +805,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <!-- LECTURE WELCOME -->
     <div id="page-lecture-welcome" class="page">
       <div style="max-width:700px;margin:0 auto;padding:20px 0">
+
         <div style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));border-radius:16px;padding:32px;margin-bottom:24px;border:1px solid var(--accent-light)">
           <div id="lecture-welcome-name" style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:12px">Bonjour 👋</div>
           <div style="font-size:15px;color:var(--text2);line-height:1.7">Vous accédez à la plateforme de suivi clinique NeuroStim en mode <strong>consultation</strong>. Vous pouvez naviguer dans les dossiers patients et consulter leurs données de suivi.</div>
@@ -813,11 +814,12 @@ body.role-saisie .analyse-only { display:none !important; }
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">Comment utiliser cette application</div>
 
         <div style="display:grid;gap:12px">
+
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
             <div style="width:44px;height:44px;border-radius:12px;background:#e8f4fd;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔍</div>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Rechercher un patient</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.6">Utilisez la barre de recherche en haut à gauche ou naviguez dans la liste des patients. Cliquez sur un patient pour ouvrir son dossier complet.</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">Utilisez le menu <strong>Patients</strong> à gauche pour accéder à la liste. Cliquez sur un patient pour ouvrir son dossier complet.</div>
             </div>
           </div>
 
@@ -838,10 +840,18 @@ body.role-saisie .analyse-only { display:none !important; }
           </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
-            <div style="width:44px;height:44px;border-radius:12px;background:#f4ecf7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🕐</div>
+            <div style="width:44px;height:44px;border-radius:12px;background:#f4ecf7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🕜</div>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Parcours complet dans Historique</div>
               <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Historique</strong> présente une timeline visuelle du parcours complet — du consentement initial jusqu'à la fin de cure, avec tous les jalons et questionnaires.</div>
+            </div>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#e8f8f5;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📝</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Notes cliniques</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Notes</strong> contient les observations cliniques rédigées par l'équipe soignante : évolutions observées, événements notables, informations de suivi. La dernière note en date est affichée en encadré orange en haut du dossier patient.</div>
             </div>
           </div>
 
@@ -852,18 +862,22 @@ body.role-saisie .analyse-only { display:none !important; }
               <div style="font-size:13px;color:var(--text2);line-height:1.6">Le bouton <strong>Compte-rendu</strong> en haut du dossier patient génère un PDF de synthèse avec la timeline et les graphiques d'évolution, à partager avec le médecin référent.</div>
             </div>
           </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:16px;align-items:flex-start">
+            <div style="width:44px;height:44px;border-radius:12px;background:#eaf2f8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🔒</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Confidentialité et anonymisation</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">Les patients sont identifiés par un code anonyme. Les questionnaires sont remplis par les patients eux-mêmes sur tablette lors de leurs séances, sous la supervision des infirmiers. Aucun nom complet n'est visible dans cette plateforme.</div>
+            </div>
+          </div>
+
         </div>
 
-        <div style="margin-top:24px;padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text3);display:flex;align-items:center;gap:10px">
-          <span style="font-size:20px">ℹ️</span>
+        <div style="margin-top:20px;padding:16px 20px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--text3);display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">ℹ️</span>
           <span>En mode consultation, vous ne pouvez pas modifier les données patients. Pour toute question, contactez l'équipe NeuroStim.</span>
         </div>
 
-        <div style="text-align:center;margin-top:24px">
-          <button class="btn btn-primary" onclick="showPage('patients',document.querySelector('[onclick*="patients"]'))">
-            Accéder à la liste des patients →
-          </button>
-        </div>
       </div>
     </div>
 
