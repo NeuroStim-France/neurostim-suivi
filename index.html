@@ -6258,6 +6258,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(e.target!==o) return;
       // Block close if questionnaire is active
       if(o.id==='m-questionnaire' && (document.body.classList.contains('in-questionnaire')||document.body.classList.contains('patient-lock'))) return;
+      // Block outside click for modals with data entry
+      const noClickClose = ['m-add-patient','m-edit-patient','m-adjust-dates','m-add-single-q','m-consolidation'];
+      if(noClickClose.includes(o.id)) return;
       o.classList.remove('open');
     });
   });
