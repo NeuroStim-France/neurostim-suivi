@@ -3408,6 +3408,8 @@ async function uploadExcelConfig(input) {
           });
         });
 
+        console.log('phaseMap depression end:', JSON.stringify(phaseMap['depression'] && phaseMap['depression'].end));
+        console.log('phaseMap depression weekly:', JSON.stringify(phaseMap['depression'] && phaseMap['depression'].weekly));
         // Build final config
         const protocols = {};
         Object.entries(protocolMap).forEach(([name, key]) => {
