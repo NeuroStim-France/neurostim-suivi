@@ -6052,6 +6052,7 @@ async function generatePDF() {
 
       // Milestones
       day.ms.forEach(function(m) {
+        if(y > H-20) { doc.addPage(); y = margin; }
         const col = m.cls==='red'?[160,50,50]:blue;
         const bgCol = m.cls==='red'?[255,240,240]:lightBlue;
         doc.setFillColor(...bgCol);
@@ -6069,6 +6070,8 @@ async function generatePDF() {
         const chunks = [];
         for(let ci=0; ci<day.qs.length; ci+=maxPerRow) chunks.push(day.qs.slice(ci,ci+maxPerRow));
         chunks.forEach(function(row) {
+          // Page break before each pill row
+          if(y > H-20) { doc.addPage(); y = margin; }
           const rowTotalW = row.length*pillW + (row.length-1)*pillGap;
           let xStart = W/2 - rowTotalW/2;
           row.forEach(function(q) {
