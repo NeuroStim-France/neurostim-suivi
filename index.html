@@ -460,6 +460,9 @@ body.role-saisie .analyse-only { display:none !important; }
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEeElEQVR4nMVXO0hcWxRd58ydG0eDiYK/QlEyhdoMCOIPRBTUJthoDMQiiIWxiBKstLCzsBDERtFCRButFEESPyMBC7E1WkSiVgqKToxJwHvPWa/Im5v5qPNB3lvVZc7se9ZZe6999xEkif8RRjJBJKG1BgAIISClTJqAeAwFSEIIkVRsQtRJgiR+/PiB/v5+vH79Gru7uxBCOIokDCYA27ZJkr29vQRAAMzLy+Pl5SW11tRaJ/I6kmRSydvf3wcAGIaB09NTXF1dQQiBpLKZjAIbGxvMysqilJI9PT3UWlMpldDJtda0bZsJEQglsbi4yNbWVpJMePNQxGVDRlS51hrp6el4/vy5U5gJKA4hBL5+/YqVlZX4XBBpMSklbNuGbdsJ2y9I9uLiAh8+fIiPwPn5eVhwrA2UUlBKPWhN0zSRmZl5PwGlFABgeXkZ2dnZ8Pv9EELAsixorWEYBlwuV1hXBP6o5XK54HK5HuyQP3/+RFNT0/0EgtJ6vV60t7djbm4OR0dHSElJgZQSgUAANzc3EELA7XY7Kbm+vsb79+/x6tUrHBwcAMCdSpBESkpK/Dbc399nd3c319bW2NfXx/T0dJqmyfr6eh4eHjr/GxoacppUVVUVSYY1qKBjtra2+Pbt29g21FrTsiyS5M3NDSsqKpwNhBAEwIqKCn769IljY2Osqalx1svLy2MSiFmEQggn92lpafj9+zeklE7+DcPAzs4OPn/+jNraWiwuLqKrqwsvX77E9PS0I/e9iDyxbdtUSjmdKhRHR0d8+vQppZSUUlIIQSklAfD4+DiuVEYqENWIXC5X1PPGxgbm5ubw7ds3lJeXw+/3hxVTcXExpqam4PV60dDQgPz8fGc92CtC3xuKKAJLS0soKipCTk4OZmdnsbq6CtM00dLSgtHRUWRkZODNmzdYXl6GUgr5+fnw+/148uQJ1tfXMTExAdM0UV1djZqaGqSmpj6YYiPI0jAMTE5Ooru7Gx6PBz6fD2VlZRgeHkZlZWVYkM/nw+DgINxuNzo7O+HxePDs2TO0tbWhra0NBwcH2NzcxNbWFpRS8Hq96OrqutOOBvDX82lpaQCAzMxMLCwsOFKShG3bcLvdODk5gWVZKC0tBQAUFRVhfn4e7969w+3tLUzTRElJCUpKSmBZFsbHx3F8fHzn6YUQ0UW4vb3Nk5MTkqRlWVRKOUV5dnbGnJwcDgwMOJ/gtbU1NjY2hhXYXQUcWYSbm5vs6OiItmF1dTUKCgoci0kpHStKKVFQUIDCwkJHtbq6Onz//h1fvnxBMJ2hRRf8LkTC4/EgNzc3eihVSsU96QZrZ3h4GIFAACMjIzFjgtBa/yEWl3n/RXDuC3a20OHE4/GwubmZe3t7YVLHQsITUSSZX79+8cWLF077ra2tjZuA1jq5oTQIIQSUUri6unJ+CwQCzlo88UkrEHrKmZkZ5ubmsrCwkB8/fiTJe10QiUe5GQHA9fU1DMOI2fmiVHgMAlprxzWhz/8ZAeDvJzfRITWp2/FdSPZy+g/mK9ExQ3mQGQAAAABJRU5ErkJggg==">
+<link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABxElEQVR4nKWTv64xURTF13ZkitFKTDPReQIqnUajUqm9hsZDaKakkImGiUblT0RFFCQqHgChUGBmzN5fIXeu4d7c4lvlOZPf3rPWOiQigv9Q7LcLz/MwGAxwPp8BAL/OkTf5vi8iIo7jCACp1WqR81cxs/wICIJADoeDlMtlWSwWIiISBMEHQEQ+Aa9qt9vium44jZkjMMuyJPSAmQEArVYLu90uPFNKAQCICEQU+f3j8fhtIhFBRJBKpTCfzzGdTtHpdDCZTBAEAarVKkqlUsTMdDqN+JfDzAwiQrFYBAAYhoH9fo/RaATHceD7Ph6PB4IgQCz2nOv7/hNAROGqm80Gy+USmqYBAJRSYGZYlgVd1yOREtETsN1uUa/Xkc1moWkaCoUCbNuGZVnI5XLIZDIYj8cgIiQSCeTzeSilvgFKKei6jkqlAsMw4Louer0ems0mGo0GTNOEaZq4XC5Yr9fhBvf7/bNIj8dDTqeTdLtdYWbp9/sym81+jHm1Wj17wMzi+36Y82vTbNuWZDIpw+FQmFk8z4t8EwvNiMfDnEUEnueF0TIzbrcbiChM4KsnJPL3a7xer2EC7/oTICLhJu9NBIB/vbnJ58jfmD8AAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEeElEQVR4nMVXO0hcWxRd58ydG0eDiYK/QlEyhdoMCOIPRBTUJthoDMQiiIWxiBKstLCzsBDERtFCRButFEESPyMBC7E1WkSiVgqKToxJwHvPWa/Im5v5qPNB3lvVZc7se9ZZe6999xEkif8RRjJBJKG1BgAIISClTJqAeAwFSEIIkVRsQtRJgiR+/PiB/v5+vH79Gru7uxBCOIokDCYA27ZJkr29vQRAAMzLy+Pl5SW11tRaJ/I6kmRSydvf3wcAGIaB09NTXF1dQQiBpLKZjAIbGxvMysqilJI9PT3UWlMpldDJtda0bZsJEQglsbi4yNbWVpJMePNQxGVDRlS51hrp6el4/vy5U5gJKA4hBL5+/YqVlZX4XBBpMSklbNuGbdsJ2y9I9uLiAh8+fIiPwPn5eVhwrA2UUlBKPWhN0zSRmZl5PwGlFABgeXkZ2dnZ8Pv9EELAsixorWEYBlwuV1hXBP6o5XK54HK5HuyQP3/+RFNT0/0EgtJ6vV60t7djbm4OR0dHSElJgZQSgUAANzc3EELA7XY7Kbm+vsb79+/x6tUrHBwcAMCdSpBESkpK/Dbc399nd3c319bW2NfXx/T0dJqmyfr6eh4eHjr/GxoacppUVVUVSYY1qKBjtra2+Pbt29g21FrTsiyS5M3NDSsqKpwNhBAEwIqKCn769IljY2Osqalx1svLy2MSiFmEQggn92lpafj9+zeklE7+DcPAzs4OPn/+jNraWiwuLqKrqwsvX77E9PS0I/e9iDyxbdtUSjmdKhRHR0d8+vQppZSUUlIIQSklAfD4+DiuVEYqENWIXC5X1PPGxgbm5ubw7ds3lJeXw+/3hxVTcXExpqam4PV60dDQgPz8fGc92CtC3xuKKAJLS0soKipCTk4OZmdnsbq6CtM00dLSgtHRUWRkZODNmzdYXl6GUgr5+fnw+/148uQJ1tfXMTExAdM0UV1djZqaGqSmpj6YYiPI0jAMTE5Ooru7Gx6PBz6fD2VlZRgeHkZlZWVYkM/nw+DgINxuNzo7O+HxePDs2TO0tbWhra0NBwcH2NzcxNbWFpRS8Hq96OrqutOOBvDX82lpaQCAzMxMLCwsOFKShG3bcLvdODk5gWVZKC0tBQAUFRVhfn4e7969w+3tLUzTRElJCUpKSmBZFsbHx3F8fHzn6YUQ0UW4vb3Nk5MTkqRlWVRKOUV5dnbGnJwcDgwMOJ/gtbU1NjY2hhXYXQUcWYSbm5vs6OiItmF1dTUKCgoci0kpHStKKVFQUIDCwkJHtbq6Onz//h1fvnxBMJ2hRRf8LkTC4/EgNzc3eihVSsU96QZrZ3h4GIFAACMjIzFjgtBa/yEWl3n/RXDuC3a20OHE4/GwubmZe3t7YVLHQsITUSSZX79+8cWLF077ra2tjZuA1jq5oTQIIQSUUri6unJ+CwQCzlo88UkrEHrKmZkZ5ubmsrCwkB8/fiTJe10QiUe5GQHA9fU1DMOI2fmiVHgMAlprxzWhz/8ZAeDvJzfRITWp2/FdSPZy+g/mK9ExQ3mQGQAAAABJRU5ErkJggg==">
 </head>
 <body>
 
@@ -1783,12 +1786,13 @@ function todayStr() { return new Date().toISOString().split('T')[0]; }
 function addDays(ds,n) { const d=new Date(ds); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function dedupe(a) { return [...new Set(a)]; }
 function getProtoQs(protocols) {
-  let auto=[],hetero=[],weekly=[],monthly=[];
+  let auto=[],hetero=[],weekly=[],monthly=[],endCure=[];
   protocols.forEach(p=>{ const pr=PROTOCOLS[p]; if(!pr) return;
-    auto=dedupe([...auto,...pr.auto]); hetero=dedupe([...hetero,...pr.hetero]);
-    weekly=dedupe([...weekly,...pr.weekly]); monthly=dedupe([...monthly,...pr.monthly]);
+    auto=dedupe([...auto,...(pr.auto||[])]); hetero=dedupe([...hetero,...(pr.hetero||[])]);
+    weekly=dedupe([...weekly,...(pr.weekly||[])]); monthly=dedupe([...monthly,...(pr.monthly||[])]);
+    endCure=dedupe([...endCure,...(pr.endCure||pr.monthly||[])]);
   });
-  return {auto,hetero,weekly,monthly};
+  return {auto,hetero,weekly,monthly,endCure};
 }
 function getFridays(start,end) {
   const f=[]; let d=new Date(start);
@@ -1801,7 +1805,7 @@ function genSchedule(p) {
   sched.push({date:p.j1Date,questionnaires:[...qs.auto],hetero:[...qs.hetero],done:[],type:'j1',label:'J1 — Bilan initial'});
   getFridays(addDays(p.j1Date,1),p.endDate).forEach(f=>
     sched.push({date:f,questionnaires:[...qs.weekly],hetero:[],done:[],type:'weekly',label:'Suivi hebdomadaire'}));
-  sched.push({date:p.endDate,questionnaires:[...qs.monthly],hetero:[...qs.hetero],done:[],type:'end',label:'Bilan fin de cure'});
+  sched.push({date:p.endDate,questionnaires:[...qs.endCure],hetero:[...qs.hetero],done:[],type:'end',label:'Bilan fin de cure'});
   for(let m=1;m<=6;m++) {
     const d=new Date(p.endDate); d.setMonth(d.getMonth()+m);
     sched.push({date:d.toISOString().split('T')[0],questionnaires:[...qs.monthly],hetero:[...qs.hetero],done:[],type:'monthly',label:'Post-cure M+'+m});
@@ -2107,8 +2111,8 @@ function renderTimeline() {
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
           +(!isDone&&(isToday||isPast)&&NS.userProfile&&NS.userProfile.role!=='lecture'?'<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
-              +'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>'
-              +(isPast?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Ignorer">✕ Ignorer</button>':'')
+              +'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>'+((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Avancer à aujourd\'hui">📅 Répondre maintenant</button>':'')
+              +'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Ignorer">✕ Ignorer</button>'
               +'</div>':'')
           +'</div>';
       }).join('')
@@ -4693,6 +4697,36 @@ function safeCloseQuestionnaire() {
   }
   currentQ = {patientId:null, qName:null, date:null, answers:[], currentIdx:0};
   closeModal('m-questionnaire');
+}
+
+async function moveQToToday(patientId, qName, fromDate) {
+  if(NS.userProfile?.role === 'lecture') { showError('Accès refusé — compte lecture seule.', 3000); return; }
+  const today = todayStr();
+  if(fromDate === today) return;
+  if(!confirm('Déplacer "' + qName + '" à aujourd\'hui (' + fmtDate(today) + ') ?')) return;
+  const p = NS.currentPatient; if(!p) return;
+  const patRef = db.doc('patients/'+patientId);
+  const snap = await patRef.get();
+  const patData = snap.data();
+  let schedule = patData.schedule || [];
+  // Remove from original date
+  schedule = schedule.map(s => {
+    if(s.date !== fromDate) return s;
+    return {...s, questionnaires: (s.questionnaires||[]).filter(q => q !== qName)};
+  });
+  // Add to today slot (find or create)
+  const todaySlot = schedule.find(s => s.date === today);
+  if(todaySlot) {
+    if(!todaySlot.questionnaires.includes(qName)) todaySlot.questionnaires.push(qName);
+  } else {
+    schedule.push({date:today, questionnaires:[qName], hetero:[], done:[], type:'moved', label:'Questionnaire avancé'});
+  }
+  // Sort schedule by date
+  schedule.sort((a,b) => a.date.localeCompare(b.date));
+  await patRef.update({schedule});
+  NS.currentPatient.schedule = schedule;
+  renderTimeline();
+  showError('Questionnaire déplacé à aujourd\'hui.', 2000);
 }
 
 async function ignoreQuestionnaire(patientId, qName, date) {
