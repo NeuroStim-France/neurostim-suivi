@@ -3565,18 +3565,6 @@ function downloadExcelTemplate() {
   alert('Le modèle Excel sera disponible dans une prochaine version. En attendant, vous pouvez utiliser votre fichier Excel existant EXT-CFG-Questionnaire-NeuroStim.');
 }
 
-async function loadExcelConfig() {
-  try {
-    const snap = await db.doc('config/excel').get();
-    if(snap.exists) {
-      const d = snap.data();
-      const statusEl = document.getElementById('excel-config-status');
-      if(statusEl) statusEl.textContent = 'Fichier configuré : '+d.filename+' (importé par '+d.uploadedBy+')';
-    }
-  } catch(e) {}
-}
-
-
 // ── CABINETS MANAGEMENT ──
 async function loadCabinetsList() {
   const el = document.getElementById('cabinets-list'); if(!el) return;
