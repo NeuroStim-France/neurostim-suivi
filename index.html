@@ -3345,11 +3345,12 @@ async function uploadExcelConfig(input) {
 
           // Determine phase
           let phase = null;
+          const dcl = dateCol.toLowerCase();
           if(dateCol.includes('J1') || dateCol.includes('première séance')) phase = 'j1';
           else if(dateCol.includes('vendredi') || dateCol.includes('Vendredi')) phase = 'weekly';
-          else if(dateCol.includes('Derniere') || dateCol.includes('dernière') || dateCol.includes('derniere')) phase = 'end';
-          else if(dateCol.includes('mois')) phase = 'monthly';
           else if(dateCol.includes('veille') || dateCol.includes('ciblage')) phase = 'consent';
+          else if(dcl.includes('mois')) phase = 'monthly';
+          else if(dcl.startsWith('derniere') || dcl.startsWith('dernière')) phase = 'end';
           if(!phase) return;
 
           // Parse questionnaires (comma-separated)
