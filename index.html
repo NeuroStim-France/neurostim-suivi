@@ -3352,6 +3352,7 @@ async function uploadExcelConfig(input) {
           else if(dcl.includes('mois')) phase = 'monthly';
           else if(dcl.startsWith('derniere') || dcl.startsWith('dernière')) phase = 'end';
           if(!phase) return;
+          if(phase==='end'||phase==='weekly') console.log('ROW phase='+phase+' date='+dateCol+' q='+qCol+' prot='+protCol);
 
           // Parse questionnaires (comma-separated)
           // Normalize questionnaire names from xlsx to internal names
