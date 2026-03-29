@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a4d8f'/><text y='.9em' font-size='80' font-family='Arial,sans-serif' font-weight='bold' fill='white' x='50%' text-anchor='middle' dominant-baseline='hanging' dy='5'>N</text></svg>">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMWE0ZDhmIi8+PHRleHQgeD0iNTAiIHk9IjcyIiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3MiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5OPC90ZXh0Pjwvc3ZnPg==">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NeuroStim — Suivi rTMS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -2078,9 +2079,16 @@ function renderPatientDetail() {
 function renderTimeline() {
   const p=NS.currentPatient, el=document.getElementById('timeline'); if(!el) return;
   const tod=todayStr();
+  // Merge current PROTOCOLS into schedule slots so xlsx updates reflect immediately
+  const liveProtoQs = getProtoQs(p.protocols||[]);
   let html='';
   (p.schedule||[]).forEach(s=>{
-    const done=s.done||[], qs=s.questionnaires||[], het=s.hetero||[], ign=s.ignored||[];
+    // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
+    let slotQs = s.questionnaires||[];
+    if(s.type==='end') slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]);
+    if(s.type==='j1') slotQs = dedupe([...slotQs, ...liveProtoQs.auto]);
+    if(s.type==='weekly') slotQs = dedupe([...slotQs, ...liveProtoQs.weekly]);
+    const done=s.done||[], qs=slotQs, het=s.hetero||[], ign=s.ignored||[];
     const isToday=s.date===tod, isPast=s.date<tod;
     const rem=qs.filter(q=>!done.includes(q));
     const allDone=rem.length===0&&qs.length>0;
