@@ -3502,13 +3502,14 @@ function applyExcelConfig(config) {
   // Update PROTOCOLS object with Excel data
   Object.entries(config.protocols).forEach(([key, prot]) => {
     if(PROTOCOLS[key]) {
-      PROTOCOLS[key].auto = prot.j1 || PROTOCOLS[key].auto;
+      PROTOCOLS[key].auto = prot.auto || prot.j1 || PROTOCOLS[key].auto;
       PROTOCOLS[key].hetero = prot.hetero || PROTOCOLS[key].hetero;
       PROTOCOLS[key].weekly = prot.weekly || PROTOCOLS[key].weekly;
       PROTOCOLS[key].endCure = prot.endCure || PROTOCOLS[key].endCure;
       PROTOCOLS[key].monthly = prot.monthly || PROTOCOLS[key].monthly;
     }
   });
+  console.log('Excel config applied endCure depression:', PROTOCOLS['depression']?.endCure);
   console.log('Excel config applied:', Object.keys(config.protocols).length, 'protocols');
 }
 
