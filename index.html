@@ -3507,6 +3507,7 @@ function applyExcelConfig(config) {
       PROTOCOLS[key].hetero = prot.hetero || PROTOCOLS[key].hetero;
       PROTOCOLS[key].weekly = prot.weekly || PROTOCOLS[key].weekly;
       PROTOCOLS[key].endCure = prot.endCure || PROTOCOLS[key].endCure;
+      if(key==='depression') console.log('applyExcelConfig depression endCure:', prot.endCure, '→', PROTOCOLS[key].endCure);
       PROTOCOLS[key].monthly = prot.monthly || PROTOCOLS[key].monthly;
     }
   });
