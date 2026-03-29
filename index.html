@@ -3445,6 +3445,8 @@ async function uploadExcelConfig(input) {
         });
 
         applyExcelConfig(config);
+        // Refresh timeline if a patient is currently open
+        if(NS.currentPatient) { renderTimeline(); renderScores(); }
         // Also parse questionnaire sheets
         const parsedQs = parseExcelQuestionnaires(workbook);
         const qUpdated = applyExcelQuestionnaires(parsedQs);
