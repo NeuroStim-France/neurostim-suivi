@@ -1310,6 +1310,7 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
     </div>
     <div class="mf">
+      <button class="btn btn-secondary" onclick="closeModal('m-add-patient')">Annuler</button>
       <button class="btn btn-secondary" id="btn-prev-pat" style="display:none" onclick="prevStepPat()">← Précédent</button>
       <button class="btn btn-primary" id="btn-next-pat" onclick="nextStepPat()">Suivant →</button>
     </div>
@@ -1786,13 +1787,15 @@ function todayStr() { return new Date().toISOString().split('T')[0]; }
 function addDays(ds,n) { const d=new Date(ds); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function dedupe(a) { return [...new Set(a)]; }
 function getProtoQs(protocols) {
-  let auto=[],hetero=[],weekly=[],monthly=[],endCure=[];
+  let auto=[],hetero=[],weekly=[],monthly=[],endCure=[],heteroEnd=[],heteroMonthly=[];
   protocols.forEach(p=>{ const pr=PROTOCOLS[p]; if(!pr) return;
     auto=dedupe([...auto,...(pr.auto||[])]); hetero=dedupe([...hetero,...(pr.hetero||[])]);
     weekly=dedupe([...weekly,...(pr.weekly||[])]); monthly=dedupe([...monthly,...(pr.monthly||[])]);
     endCure=dedupe([...endCure,...(pr.endCure||pr.monthly||[])]);
+    heteroEnd=dedupe([...heteroEnd,...(pr.heteroEnd||pr.hetero_end||[])]);
+    heteroMonthly=dedupe([...heteroMonthly,...(pr.heteroMonthly||pr.hetero_monthly||[])]);
   });
-  return {auto,hetero,weekly,monthly,endCure};
+  return {auto,hetero,weekly,monthly,endCure,heteroEnd,heteroMonthly};
 }
 function getFridays(start,end) {
   const f=[]; let d=new Date(start);
@@ -1805,10 +1808,10 @@ function genSchedule(p) {
   sched.push({date:p.j1Date,questionnaires:[...qs.auto],hetero:[...qs.hetero],done:[],type:'j1',label:'J1 — Bilan initial'});
   getFridays(addDays(p.j1Date,1),p.endDate).forEach(f=>
     sched.push({date:f,questionnaires:[...qs.weekly],hetero:[],done:[],type:'weekly',label:'Suivi hebdomadaire'}));
-  sched.push({date:p.endDate,questionnaires:[...qs.endCure],hetero:[...qs.hetero],done:[],type:'end',label:'Bilan fin de cure'});
+  sched.push({date:p.endDate,questionnaires:[...qs.endCure],hetero:[...qs.heteroEnd],done:[],type:'end',label:'Bilan fin de cure'});
   for(let m=1;m<=6;m++) {
     const d=new Date(p.endDate); d.setMonth(d.getMonth()+m);
-    sched.push({date:d.toISOString().split('T')[0],questionnaires:[...qs.monthly],hetero:[...qs.hetero],done:[],type:'monthly',label:'Post-cure M+'+m});
+    sched.push({date:d.toISOString().split('T')[0],questionnaires:[...qs.monthly],hetero:[...qs.heteroMonthly],done:[],type:'monthly',label:'Post-cure M+'+m});
   }
   return sched;
 }
@@ -2087,7 +2090,8 @@ function renderTimeline() {
   (p.schedule||[]).forEach(s=>{
     // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
     let slotQs = s.questionnaires||[];
-    if(s.type==='end') slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]);
+    if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
+    if(s.type==='monthly') { s = {...s, hetero: liveProtoQs.heteroMonthly}; }
     if(s.type==='j1') slotQs = dedupe([...slotQs, ...liveProtoQs.auto]);
     if(s.type==='weekly') slotQs = dedupe([...slotQs, ...liveProtoQs.weekly]);
     const done=s.done||[], qs=slotQs, het=s.hetero||[], ign=s.ignored||[];
@@ -3512,6 +3516,8 @@ function applyExcelConfig(config) {
       PROTOCOLS[key].weekly = prot.weekly || PROTOCOLS[key].weekly;
       PROTOCOLS[key].endCure = prot.endCure || PROTOCOLS[key].endCure;
       PROTOCOLS[key].monthly = prot.monthly || PROTOCOLS[key].monthly;
+      PROTOCOLS[key].hetero_end = prot.hetero_end || [];
+      PROTOCOLS[key].hetero_monthly = prot.hetero_monthly || [];
     }
   });
   console.log('Excel config applied:', Object.keys(config.protocols).length, 'protocols');
