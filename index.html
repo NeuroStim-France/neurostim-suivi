@@ -2617,8 +2617,14 @@ async function createUser() {
   const cabinets=[];
   document.querySelectorAll('.cabinet-check:checked').forEach(el=>cabinets.push(el.value));
   try {
-    const cred=await auth.createUserWithEmailAndPassword(email,pwd);
-    await db.doc('users/'+cred.user.uid).set({email,role,displayName:name,cabinets,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:NS.userProfile.email});
+    // Use secondary app to avoid signing out current admin
+    const secondaryApp = firebase.initializeApp(firebase.app().options, 'secondary_' + Date.now());
+    const secondaryAuth = secondaryApp.auth();
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pwd);
+    const uid = cred.user.uid;
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+    await db.doc('users/'+uid).set({email,role,displayName:name,cabinets,mustChangePassword:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:NS.userProfile.email});
     closeModal('m-add-user');
     loadUsersList();
     logAccess('create_user',email);
