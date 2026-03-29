@@ -3392,6 +3392,7 @@ async function uploadExcelConfig(input) {
           }
 
           // Add to phaseMap
+          if(phase==='end') console.log('end row: autoQs='+JSON.stringify(autoQs)+' affectedProts='+JSON.stringify(affectedProts));
           affectedProts.forEach(protKey => {
             if(!phaseMap[protKey]) phaseMap[protKey] = {j1:[],weekly:[],end:[],monthly:[],hetero_j1:[],hetero_end:[],hetero_monthly:[]};
             if(phase === 'j1') {
