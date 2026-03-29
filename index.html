@@ -3384,7 +3384,7 @@ async function uploadExcelConfig(input) {
           // Determine which protocols are affected
           let affectedProts = [];
           if(protCol.toLowerCase().includes('tous les protocoles') || protCol.toLowerCase().includes('en cours de cure')) {
-            affectedProts = Object.keys(protocolMap);
+            affectedProts = Object.values(protocolMap);
           } else {
             Object.entries(protocolMap).forEach(([name, key]) => {
               if(protCol.includes(name)) affectedProts.push(key);
