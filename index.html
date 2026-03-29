@@ -3352,7 +3352,6 @@ async function uploadExcelConfig(input) {
           else if(dcl.includes('mois')) phase = 'monthly';
           else if(dcl.startsWith('derniere') || dcl.startsWith('dernière')) phase = 'end';
           if(!phase) return;
-          if(phase==='end'||phase==='weekly') console.log('ROW phase='+phase+' date='+dateCol+' q='+qCol+' prot='+protCol);
 
           // Parse questionnaires (comma-separated)
           // Normalize questionnaire names from xlsx to internal names
@@ -3392,7 +3391,6 @@ async function uploadExcelConfig(input) {
           }
 
           // Add to phaseMap
-          if(phase==='end') console.log('end row: autoQs='+JSON.stringify(autoQs)+' affectedProts='+JSON.stringify(affectedProts));
           affectedProts.forEach(protKey => {
             if(!phaseMap[protKey]) phaseMap[protKey] = {j1:[],weekly:[],end:[],monthly:[],hetero_j1:[],hetero_end:[],hetero_monthly:[]};
             if(phase === 'j1') {
@@ -3410,8 +3408,6 @@ async function uploadExcelConfig(input) {
           });
         });
 
-        console.log('phaseMap depression end:', JSON.stringify(phaseMap['depression'] && phaseMap['depression'].end));
-        console.log('phaseMap depression weekly:', JSON.stringify(phaseMap['depression'] && phaseMap['depression'].weekly));
         // Build final config
         const protocols = {};
         Object.entries(protocolMap).forEach(([name, key]) => {
@@ -3503,7 +3499,6 @@ function parseExcelConfig(bytes) {
 }
 
 function applyExcelConfig(config) {
-  console.log('applyExcelConfig called, has protocols:', !!(config && config.protocols), 'depression endCure:', config && config.protocols && config.protocols.depression && config.protocols.depression.endCure);
   if(!config || !config.protocols) return;
   // Update PROTOCOLS object with Excel data
   Object.entries(config.protocols).forEach(([key, prot]) => {
@@ -3512,11 +3507,9 @@ function applyExcelConfig(config) {
       PROTOCOLS[key].hetero = prot.hetero || PROTOCOLS[key].hetero;
       PROTOCOLS[key].weekly = prot.weekly || PROTOCOLS[key].weekly;
       PROTOCOLS[key].endCure = prot.endCure || PROTOCOLS[key].endCure;
-      if(key==='depression') console.log('applyExcelConfig depression endCure:', prot.endCure, '→', PROTOCOLS[key].endCure);
       PROTOCOLS[key].monthly = prot.monthly || PROTOCOLS[key].monthly;
     }
   });
-  console.log('Excel config applied endCure depression:', PROTOCOLS['depression']?.endCure);
   console.log('Excel config applied:', Object.keys(config.protocols).length, 'protocols');
 }
 
