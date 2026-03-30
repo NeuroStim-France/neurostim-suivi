@@ -2294,14 +2294,24 @@ function openScoreDetail(qName, date) {
   const questions = qi.questions||[];
   let detailHTML = '';
   questions.forEach((q,i)=>{
-    const ansIdx = answers[i];
-    const opts = qi.optionsPerQuestion?qi.optionsPerQuestion[i]:(qi.options||[]);
-    const ansText = opts[ansIdx]||'—';
-    const pts = typeof ansIdx==='number'?ansIdx:'?';
+    const ans = answers[i];
+    const qType = (qi.questionTypes && qi.questionTypes[i]) || 'radio';
+    let ansText, pts;
+    if(qType === 'slider') {
+      ansText = ans !== undefined && ans !== null ? String(ans) : '—';
+      pts = ans !== undefined ? ans : '—';
+    } else if(qType === 'multi') {
+      ansText = typeof ans === 'string' ? ans : (Array.isArray(ans) ? ans.join(', ') : '—');
+      pts = '—';
+    } else {
+      const opts = qi.optionsPerQuestion?qi.optionsPerQuestion[i]:(qi.options||[]);
+      ansText = opts[ans]||'—';
+      pts = typeof ans==='number'?ans:'?';
+    }
     detailHTML += '<div class="score-row">'
       +'<div class="score-q">'+(i+1)+'. '+q+'</div>'
       +'<div class="score-a">'+ansText+'</div>'
-      +'<div class="score-pt" style="font-family:monospace;min-width:28px;text-align:right;color:var(--text3)">'+pts+'</div>'
+      +(qType!=='multi'?'<div class="score-pt" style="font-family:monospace;min-width:28px;text-align:right;color:var(--text3)">'+pts+'</div>':'')
       +'</div>';
   });
   document.getElementById('sd-detail').innerHTML = detailHTML||'<div class="empty"><p>Détail non disponible</p></div>';
@@ -2473,11 +2483,49 @@ function renderQuestion() {
   document.getElementById('q-progress-bar').style.width=((idx/total)*100)+'%';
   document.getElementById('q-progress-text').textContent=(idx+1)+' / '+total;
   document.getElementById('q-question').textContent=qi.questions[idx];
-  const opts=qi.optionsPerQuestion?qi.optionsPerQuestion[idx]:(qi.options||[]);
-  document.getElementById('q-options').innerHTML=opts.map((opt,i)=>
-    '<label class="q-opt'+(currentQ.answers[idx]===i?' selected':'')+'">'
-    +'<input type="radio" name="qopt" value="'+i+'"'+(currentQ.answers[idx]===i?' checked':'')+' onchange="selectOpt('+i+')">'
-    +'<span>'+opt+'</span></label>').join('');
+
+  const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
+  const optEl = document.getElementById('q-options');
+
+  if(qType === 'slider') {
+    const cfg = qi.sliderConfigs && qi.sliderConfigs[idx];
+    const min = cfg ? cfg.min : 0;
+    const max = cfg ? cfg.max : 10;
+    const steps = cfg ? cfg.steps - 1 : 10;
+    const labelMin = cfg ? cfg.labelMin : String(min);
+    const labelMax = cfg ? cfg.labelMax : String(max);
+    const curVal = currentQ.answers[idx] !== undefined ? currentQ.answers[idx] : Math.round((min+max)/2);
+    optEl.innerHTML =
+      '<div style="padding:20px 0">' +
+      '<div style="font-size:28px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:16px" id="slider-val-display">' + curVal + '</div>' +
+      '<input type="range" id="q-slider" min="' + min + '" max="' + max + '" step="' + ((max-min)/steps) + '" value="' + curVal + '" style="width:100%;accent-color:var(--accent);height:8px;cursor:pointer" oninput="sliderInput(this.value)">' +
+      '<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text2);gap:8px">' +
+      '<span style="max-width:45%;line-height:1.3">' + labelMin + '</span>' +
+      '<span style="max-width:45%;text-align:right;line-height:1.3">' + labelMax + '</span>' +
+      '</div></div>';
+    if(currentQ.answers[idx] === undefined) currentQ.answers[idx] = curVal;
+
+  } else if(qType === 'multi') {
+    const opts = (qi.multiOptions && qi.multiOptions[idx]) || [];
+    const selected = currentQ.answers[idx] ? (Array.isArray(currentQ.answers[idx]) ? currentQ.answers[idx] : []) : [];
+    optEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0">' +
+      opts.map(function(opt) {
+        const isSel = selected.includes(opt);
+        return '<label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid '+(isSel?'var(--accent)':'var(--border2)')+';border-radius:var(--r-sm);cursor:pointer;background:'+(isSel?'var(--accent-bg)':'var(--surface)')+'">' +
+        '<input type="checkbox" value="' + opt + '"' + (isSel?' checked':'') + ' onchange="multiToggle(this)" style="accent-color:var(--accent)">' +
+        '<span style="font-size:13px">' + opt + '</span></label>';
+      }).join('') +
+      '</div>';
+    if(!Array.isArray(currentQ.answers[idx])) currentQ.answers[idx] = [];
+
+  } else {
+    const opts=qi.optionsPerQuestion?qi.optionsPerQuestion[idx]:(qi.options||[]);
+    optEl.innerHTML=opts.map((opt,i)=>
+      '<label class="q-opt'+(currentQ.answers[idx]===i?' selected':'')+'">'
+      +'<input type="radio" name="qopt" value="'+i+'"'+(currentQ.answers[idx]===i?' checked':'')+' onchange="selectOpt('+i+')">'
+      +'<span>'+opt+'</span></label>').join('');
+  }
+
   document.getElementById('q-prev').style.display=idx>0?'inline-flex':'none';
   const nb=document.getElementById('q-next');
   nb.textContent=idx<total-1?'Suivant →':'✓ Terminer';
@@ -2491,17 +2539,56 @@ function selectOpt(i) {
     el.querySelector('input').checked=j===i;
   });
 }
+function sliderInput(val) {
+  const v = parseFloat(val);
+  currentQ.answers[currentQ.currentIdx] = v;
+  const disp = document.getElementById('slider-val-display');
+  if(disp) disp.textContent = Number.isInteger(v) ? v : v.toFixed(1);
+}
+function multiToggle(checkbox) {
+  const idx = currentQ.currentIdx;
+  if(!Array.isArray(currentQ.answers[idx])) currentQ.answers[idx] = [];
+  const val = checkbox.value;
+  if(checkbox.checked) {
+    if(!currentQ.answers[idx].includes(val)) currentQ.answers[idx].push(val);
+  } else {
+    currentQ.answers[idx] = currentQ.answers[idx].filter(v=>v!==val);
+  }
+  // Update visual state
+  checkbox.closest('label').style.background = checkbox.checked ? 'var(--accent-bg)' : 'var(--surface)';
+  checkbox.closest('label').style.borderColor = checkbox.checked ? 'var(--accent)' : 'var(--border2)';
+}
 function qNext() {
-  if(currentQ.answers[currentQ.currentIdx]===undefined){alert('Veuillez sélectionner une réponse.');return;}
+  const qi = QUESTIONNAIRES[currentQ.qName];
+  const idx = currentQ.currentIdx;
+  const qType = (qi && qi.questionTypes && qi.questionTypes[idx]) || 'radio';
+  // Multi: always allow next (zero selections = no zones)
+  // Slider: always has a value (initialized at mid)
+  if(qType === 'radio' && currentQ.answers[idx] === undefined) {
+    alert('Veuillez sélectionner une réponse.'); return;
+  }
   currentQ.currentIdx++; renderQuestion();
 }
 function qPrev() { if(currentQ.currentIdx>0){currentQ.currentIdx--;renderQuestion();} }
 
 async function qFinish() {
-  if(currentQ.answers[currentQ.currentIdx]===undefined){alert('Veuillez sélectionner une réponse.');return;}
   const qi=QUESTIONNAIRES[currentQ.qName];
-  const score=currentQ.answers.reduce((a,b)=>a+b,0);
-  const resp={questionnaire:currentQ.qName,date:currentQ.date,score,answers:currentQ.answers,completedAt:todayStr()};
+  const idx=currentQ.currentIdx;
+  const qType=(qi&&qi.questionTypes&&qi.questionTypes[idx])||'radio';
+  if(qType==='radio' && currentQ.answers[idx]===undefined){alert('Veuillez sélectionner une réponse.');return;}
+  // Calculate score: sum numeric answers, skip multi (string arrays)
+  const score = currentQ.answers.reduce((a,b)=>{
+    if(Array.isArray(b)) return a; // multi = no score contribution
+    if(typeof b === 'number') return a+b;
+    return a;
+  }, 0);
+  // Store multi answers as joined string in answers array for display
+  const answersToStore = currentQ.answers.map((a,i)=>{
+    const t = (qi&&qi.questionTypes&&qi.questionTypes[i])||'radio';
+    if(t==='multi') return Array.isArray(a) ? a.join('; ') : (a||'');
+    return a;
+  });
+  const resp={questionnaire:currentQ.qName,date:currentQ.date,score,answers:answersToStore,completedAt:todayStr()};
   const key=currentQ.date+'_'+currentQ.qName;
   const patRef=db.doc('patients/'+currentQ.patientId);
   const patSnap=await patRef.get();
@@ -4111,11 +4198,15 @@ function parseExcelQuestionnaires(workbook) {
         if(type==="MQ" && row[1]) { instructions = (row[1]+"").trim(); }
         else if(type==='SQ' && row[1]) {
           if(currentQ) questions.push(currentQ);
-          currentQ = {text:String(row[1]).trim(), options:[]};
+          const isMulti = (row[11] && String(row[11]).trim().toUpperCase() === 'MULTI');
+          const multiOpts = isMulti && row[2] ? String(row[2]).split(';').map(s=>s.trim()).filter(Boolean) : [];
+          currentQ = {text:String(row[1]).trim(), options:[], isSlider:false, isMulti, multiOpts};
         } else if(type==='Ans' && currentQ && row[2]) {
           const scoreVal = row[scoreCol];
           const score = scoreVal!==null&&scoreVal!==undefined ? (scoreVal===parseInt(scoreVal)?parseInt(scoreVal):parseFloat(scoreVal)) : currentQ.options.length;
-          currentQ.options.push({text:String(row[2]).trim(), score});
+          const isSliderAns = row[7] && String(row[7]).trim().toUpperCase() === 'SLIDER';
+          if(isSliderAns) currentQ.isSlider = true;
+          currentQ.options.push({text:String(row[2]).trim(), score, isSlider:isSliderAns});
         }
       });
       if(currentQ) questions.push(currentQ);
@@ -4132,6 +4223,22 @@ function applyExcelQuestionnaires(parsedQs) {
     if(data.instructions) QUESTIONNAIRES[qKey].instructions = data.instructions;
     if(data.questions && data.questions.length) {
       QUESTIONNAIRES[qKey].questions = data.questions.map(q=>q.text);
+      // Store per-question types (slider/multi/radio)
+      QUESTIONNAIRES[qKey].questionTypes = data.questions.map(q=>
+        q.isMulti ? 'multi' : q.isSlider ? 'slider' : 'radio'
+      );
+      // Store slider configs: {min, max, labelMin, labelMax}
+      QUESTIONNAIRES[qKey].sliderConfigs = data.questions.map(q=>{
+        if(!q.isSlider) return null;
+        const opts = q.options;
+        const first = opts[0] ? String(opts[0].text) : '0';
+        const last = opts[opts.length-1] ? String(opts[opts.length-1].text) : String(opts.length-1);
+        const minScore = opts[0] ? opts[0].score : 0;
+        const maxScore = opts[opts.length-1] ? opts[opts.length-1].score : opts.length-1;
+        return {min:minScore, max:maxScore, labelMin:first, labelMax:last, steps:opts.length};
+      });
+      // Store multi options
+      QUESTIONNAIRES[qKey].multiOptions = data.questions.map(q=>q.isMulti ? q.multiOpts : null);
       // Check if all have same options
       const allSame = new Set(data.questions.map(q=>JSON.stringify(q.options.map(o=>o.text)))).size === 1;
       if(allSame && data.questions[0].options.length) {
@@ -5952,6 +6059,14 @@ async function generatePDF() {
       if(!scoresByQ[qn]) scoresByQ[qn] = [];
       scoresByQ[qn].push({date:s.date, score:r.score});
     });
+  });
+  // Add PEM scores (stored outside schedule)
+  Object.keys(responses).forEach(function(key) {
+    if(!key.endsWith('_PEM')) return;
+    const r = responses[key];
+    if(!r||r.score===undefined||r.score===null) return;
+    if(!scoresByQ['PEM']) scoresByQ['PEM'] = [];
+    scoresByQ['PEM'].push({date:r.date, score:r.score});
   });
 
   // Filter: >=2 scores with >=7 days gap
