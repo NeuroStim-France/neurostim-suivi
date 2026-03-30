@@ -3126,10 +3126,47 @@ function renderPQQuestion() {
   document.getElementById('pq-bar').style.width = ((idx/total)*100)+'%';
   document.getElementById('pq-progress').textContent = (idx+1)+' / '+total;
   document.getElementById('pq-question').textContent = qi.questions[idx];
-  const opts = qi.optionsPerQuestion ? qi.optionsPerQuestion[idx] : (qi.options||[]);
-  document.getElementById('pq-options').innerHTML = opts.map((opt,i)=>
-    '<button class="pq-opt'+(pqState.answers[idx]===i?' selected':'')+'" onclick="pqSelect('+i+')">'+opt+'</button>'
-  ).join('');
+
+  const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
+  const optEl = document.getElementById('pq-options');
+
+  if(qType === 'slider') {
+    const cfg = qi.sliderConfigs && qi.sliderConfigs[idx];
+    const min = cfg ? cfg.min : 0;
+    const max = cfg ? cfg.max : 10;
+    const steps = cfg ? cfg.steps - 1 : 10;
+    const labelMin = cfg ? cfg.labelMin : String(min);
+    const labelMax = cfg ? cfg.labelMax : String(max);
+    const curVal = pqState.answers[idx] !== undefined ? pqState.answers[idx] : Math.round((min+max)/2);
+    optEl.innerHTML =
+      '<div style="padding:24px 0">' +
+      '<div style="font-size:48px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:20px" id="pq-slider-val">' + curVal + '</div>' +
+      '<input type="range" id="pq-slider" min="' + min + '" max="' + max + '" step="' + ((max-min)/steps) + '" value="' + curVal + '" style="width:100%;height:12px;accent-color:var(--accent);cursor:pointer" oninput="pqSliderInput(this.value)">' +
+      '<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--text2);gap:8px">' +
+      '<span style="max-width:45%;line-height:1.4">' + labelMin + '</span>' +
+      '<span style="max-width:45%;text-align:right;line-height:1.4">' + labelMax + '</span>' +
+      '</div></div>';
+    if(pqState.answers[idx] === undefined) pqState.answers[idx] = curVal;
+
+  } else if(qType === 'multi') {
+    const opts = (qi.multiOptions && qi.multiOptions[idx]) || [];
+    const selected = Array.isArray(pqState.answers[idx]) ? pqState.answers[idx] : [];
+    optEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;padding:16px 0">' +
+      opts.map(function(opt) {
+        const isSel = selected.includes(opt);
+        return '<label style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:2px solid '+(isSel?'var(--accent)':'var(--border2)')+';border-radius:12px;cursor:pointer;background:'+(isSel?'var(--accent-bg)':'var(--surface)')+';font-size:15px">' +
+          '<input type="checkbox" value="' + opt + '"' + (isSel?' checked':'') + ' onchange="pqMultiToggle(this)" style="width:18px;height:18px;accent-color:var(--accent)">' +
+          opt + '</label>';
+      }).join('') + '</div>';
+    if(!Array.isArray(pqState.answers[idx])) pqState.answers[idx] = [];
+
+  } else {
+    const opts = qi.optionsPerQuestion ? qi.optionsPerQuestion[idx] : (qi.options||[]);
+    optEl.innerHTML = opts.map(function(opt,i) {
+      return '<button class="pq-opt'+(pqState.answers[idx]===i?' selected':'')+'" onclick="pqSelect('+i+')">'+opt+'</button>';
+    }).join('');
+  }
+
   document.getElementById('pq-prev').style.display = idx>0?'inline-flex':'none';
   const nb = document.getElementById('pq-next');
   nb.textContent = idx<total-1 ? 'Suivant →' : '✓ Terminer';
@@ -3140,9 +3177,31 @@ function pqSelect(i) {
   pqState.answers[pqState.idx] = i;
   document.querySelectorAll('.pq-opt').forEach((el,j)=>el.classList.toggle('selected',j===i));
 }
-
+function pqSliderInput(val) {
+  const v = parseFloat(val);
+  pqState.answers[pqState.idx] = v;
+  const disp = document.getElementById('pq-slider-val');
+  if(disp) disp.textContent = Number.isInteger(v) ? v : v.toFixed(1);
+}
+function pqMultiToggle(checkbox) {
+  const idx = pqState.idx;
+  if(!Array.isArray(pqState.answers[idx])) pqState.answers[idx] = [];
+  const val = checkbox.value;
+  if(checkbox.checked) {
+    if(!pqState.answers[idx].includes(val)) pqState.answers[idx].push(val);
+  } else {
+    pqState.answers[idx] = pqState.answers[idx].filter(v=>v!==val);
+  }
+  checkbox.closest('label').style.background = checkbox.checked ? 'var(--accent-bg)' : 'var(--surface)';
+  checkbox.closest('label').style.borderColor = checkbox.checked ? 'var(--accent)' : 'var(--border2)';
+}
 function pqNext() {
-  if(pqState.answers[pqState.idx]===undefined){alert('Veuillez faire un choix.');return;}
+  const qi = QUESTIONNAIRES[pqState.qName];
+  const idx = pqState.idx;
+  const qType = (qi && qi.questionTypes && qi.questionTypes[idx]) || 'radio';
+  if(qType === 'radio' && pqState.answers[idx] === undefined) {
+    alert('Veuillez faire un choix.'); return;
+  }
   pqState.idx++; renderPQQuestion();
 }
 
@@ -3153,8 +3212,19 @@ function pqPrev() {
 async function pqFinish() {
   if(pqState.answers[pqState.idx]===undefined){alert('Veuillez faire un choix.');return;}
   const qi = QUESTIONNAIRES[pqState.qName];
-  const score = pqState.answers.reduce((a,b)=>a+b,0);
-  const resp = {questionnaire:pqState.qName, date:pqState.date, score, answers:pqState.answers, completedAt:new Date().toISOString().split('T')[0]};
+  const qi2 = QUESTIONNAIRES[pqState.qName];
+  const score = pqState.answers.reduce((a,b,i)=>{
+    const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
+    if(t==='multi') return a;
+    if(typeof b === 'number') return a+b;
+    return a;
+  }, 0);
+  const answersToStore = pqState.answers.map((a,i)=>{
+    const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
+    if(t==='multi') return Array.isArray(a) ? a.join('; ') : (a||'');
+    return a;
+  });
+  const resp = {questionnaire:pqState.qName, date:pqState.date, score, answers:answersToStore, completedAt:new Date().toISOString().split('T')[0]};
   const key = pqState.date+'_'+pqState.qName;
   try {
     const patRef = db.doc('patients/'+pqState.patientId);
