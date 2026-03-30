@@ -3767,7 +3767,41 @@ async function loadExcelConfig() {
       }
       if(d.config) applyExcelConfig(d.config);
     }
+    // Also load questionnaire definitions (slider/multi metadata)
+    const snapQ = await db.doc('config/questionnaires').get();
+    if(snapQ.exists && snapQ.data().data) {
+      try {
+        const parsedQs = JSON.parse(snapQ.data().data);
+        applyExcelQuestionnairesFromFirestore(parsedQs);
+      } catch(e) { console.warn('Could not apply questionnaires from Firestore:', e); }
+    }
   } catch(e) {}
+}
+
+function applyExcelQuestionnairesFromFirestore(parsedQs) {
+  for(const [qKey, data] of Object.entries(parsedQs)) {
+    if(!QUESTIONNAIRES[qKey] || !data.questions || !data.questions.length) continue;
+    // Rebuild questionTypes, sliderConfigs, multiOptions from stored questions
+    const questionTypes = data.questions.map(q =>
+      q.isMulti ? 'multi' : q.isSlider ? 'slider' : 'radio'
+    );
+    const sliderConfigs = data.questions.map(q => {
+      if(!q.isSlider) return null;
+      const opts = q.options || [];
+      const first = opts[0] ? String(opts[0].text) : '0';
+      const last = opts[opts.length-1] ? String(opts[opts.length-1].text) : String(opts.length-1);
+      const minScore = opts[0] ? opts[0].score : 0;
+      const maxScore = opts[opts.length-1] ? opts[opts.length-1].score : opts.length-1;
+      return {min:minScore, max:maxScore, labelMin:first, labelMax:last, steps:opts.length};
+    });
+    const multiOptions = data.questions.map(q =>
+      q.isMulti ? (q.multiOpts || []) : null
+    );
+    QUESTIONNAIRES[qKey].questionTypes = questionTypes;
+    QUESTIONNAIRES[qKey].sliderConfigs = sliderConfigs;
+    QUESTIONNAIRES[qKey].multiOptions = multiOptions;
+    if(data.instructions) QUESTIONNAIRES[qKey].instructions = data.instructions;
+  }
 }
 
 function downloadExcelTemplate() {
