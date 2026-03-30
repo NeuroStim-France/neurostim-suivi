@@ -714,6 +714,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
             <button class="btn btn-secondary btn-sm no-print" id="fav-toggle-btn" onclick="toggleFavorite()">☆ Favori</button>
             <button class="btn btn-secondary btn-sm no-print" onclick="generatePDF()">📄 Compte-rendu</button>
+            <button class="btn btn-sm write-only" onclick="openAddPEM()" style="color:#2d6a4f;background:#d8f3dc;border:1px solid #95d5b2;font-weight:600">+ PEM</button>
             <button class="btn btn-primary btn-sm write-only" onclick="openAddSingleQ()" style="color:#fff;background:var(--accent)"><span style="color:#fff;font-weight:700;margin-right:4px">+</span> Ajouter un questionnaire</button>
           </div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end" class="write-only">
@@ -1476,6 +1477,31 @@ body.role-saisie .analyse-only { display:none !important; }
   </div>
 </div>
 
+<!-- MODAL: PEM -->
+<div id="m-add-pem" class="overlay">
+  <div class="modal sm fade">
+    <div class="mh"><div class="mh-title">⚡ Saisir le PEM</div><button class="close-btn" onclick="closeModal('m-add-pem')">✕</button></div>
+    <div class="mb">
+      <p class="text-muted" style="margin-bottom:16px">Potentiel Évoqué Moteur — valeur en % de la puissance maximale de la machine.</p>
+      <div class="fg">
+        <label>Date de la mesure</label>
+        <input type="date" id="pem-date" class="fg input" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
+      </div>
+      <div class="fg">
+        <label>Valeur PEM (%)</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" id="pem-value" min="1" max="100" placeholder="Ex: 65" class="fg input" style="width:120px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:18px;font-weight:700;text-align:center">
+          <span style="font-size:20px;font-weight:700;color:var(--text2)">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeModal('m-add-pem')">Annuler</button>
+      <button class="btn btn-primary" onclick="savePEM()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: QUESTIONNAIRE UNIQUE -->
 <div id="m-add-single-q" class="overlay">
   <div class="modal sm fade">
@@ -1726,6 +1752,19 @@ const QUESTIONNAIRES = {
     finalOptions: ["Oui je confirme (0)", "Non je ne suis pas d'accord (1)"],
     maxScore: 0,
     interpret: (s) => s === 0 ? {label: 'Consentement donné', color: 'green'} : {label: 'Consentement refusé ou incomplet', color: 'red'}
+  },
+  'PEM': {
+    name: 'PEM', fullName: 'Potentiel Évoqué Moteur',
+    type: 'auto', domain: 'Neurophysiologie',
+    instructions: '',
+    maxScore: 100,
+    unit: '%',
+    interpret: function(s) {
+      if(s === null || s === undefined) return {label:'', color:'gray'};
+      if(s >= 70) return {label: s + '% — Élevé', color: 'green'};
+      if(s >= 40) return {label: s + '% — Modéré', color: 'amber'};
+      return {label: s + '% — Faible', color: 'red'};
+    }
   }
 };
 
@@ -2118,7 +2157,7 @@ function renderTimeline() {
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+resp.score+'/'+(qi&&qi.maxScore||'?')+' — '+lbl+'</div>'
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):(resp.score+'/'+(qi&&qi.maxScore||'?')+' — '+lbl))+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
@@ -2220,8 +2259,8 @@ function renderScores() {
         const safeD=s.date.replace(/'/g,'');
         return '<div class="score-point" style="cursor:pointer;border:1px solid var(--border);border-radius:6px;padding:8px 10px" onclick="openScoreDetail(' + "'"+safeQ+"','"+safeD+"'" + ')" title="Voir le détail">'
           +'<div class="sp-date">'+fmtDate(s.date)+'</div>'
-          +'<div class="sp-val" style="color:var(--'+sc.color+')">'+s.score+'</div>'
-          +'<div style="font-size:9px;color:var(--text3);margin-top:1px">détail →</div>'
+          +'<div class="sp-val" style="color:var(--'+sc.color+')">'+s.score+(q==='PEM'?'%':'')+'</div>'
+          +(q!=='PEM'?'<div style="font-size:9px;color:var(--text3);margin-top:1px">détail →</div>':'')
           +'</div>';
       }).join('')
       +(delta!==null?'<div class="score-delta '+(delta<0?'good':delta>0?'bad':'')+'">'+((delta>0?'+':'')+delta)+'</div>':'')
@@ -5288,6 +5327,36 @@ function toggleProt(prot, btn) {
 // ════════════════════════════════════════════
 let pinBuffer = '';
 
+// ══════════════════════════════════════════
+// PEM — Potentiel Évoqué Moteur
+// ══════════════════════════════════════════
+function openAddPEM() {
+  const p = NS.currentPatient; if(!p) return;
+  document.getElementById('pem-date').value = todayStr();
+  document.getElementById('pem-value').value = '';
+  openModal('m-add-pem');
+}
+
+async function savePEM() {
+  const p = NS.currentPatient; if(!p) return;
+  const date = document.getElementById('pem-date').value;
+  const val = parseInt(document.getElementById('pem-value').value);
+  if(!date) { showError('Veuillez saisir une date.', 3000); return; }
+  if(isNaN(val) || val < 1 || val > 100) { showError('La valeur PEM doit être entre 1 et 100.', 3000); return; }
+
+  const key = date + '_PEM';
+  const responses = { ...(p.responses || {}) };
+  responses[key] = { questionnaire: 'PEM', date, score: val, completedAt: new Date().toISOString() };
+
+  await db.doc('patients/' + p.id).update({ responses });
+  NS.currentPatient.responses = responses;
+  closeModal('m-add-pem');
+  renderScores();
+  showError('PEM enregistré : ' + val + '%', 2000);
+  logAccess('add_pem', p.code + ' ' + date + ' ' + val + '%');
+}
+
+
 async function getStoredPin() {
   try {
     const snap = await db.doc('users/'+NS.user.uid+'/prefs/pin').get();
@@ -6265,7 +6334,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       // Block close if questionnaire is active
       if(o.id==='m-questionnaire' && (document.body.classList.contains('in-questionnaire')||document.body.classList.contains('patient-lock'))) return;
       // Block outside click for modals with data entry
-      const noClickClose = ['m-add-patient','m-edit-patient','m-adjust-dates','m-add-single-q','m-consolidation'];
+      const noClickClose = ['m-add-patient','m-edit-patient','m-adjust-dates','m-add-single-q','m-consolidation','m-add-pem'];
       if(noClickClose.includes(o.id)) return;
       o.classList.remove('open');
     });
