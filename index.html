@@ -1414,6 +1414,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <div class="mh-title" style="color:#fff">Consentement éclairé — rTMS</div>
         <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px" id="consent-progress">Étape 1 / 3</div>
       </div>
+      <button class="btn btn-sm" onclick="showQRFromQ()" title="QR Code patient" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)">📷 QR Code</button>
     </div>
     <div class="mb">
       <!-- Video step -->
@@ -2814,9 +2815,14 @@ function showQR(patientId,qName,date) {
 }
 
 function showQRFromQ() {
-  // Generate QR for the currently open questionnaire
+  // Generate QR for the currently open questionnaire (works from both normal and consent modals)
   if(!currentQ.patientId || !currentQ.qName) return;
-  closeModal('m-questionnaire');
+  const consentOpen = document.getElementById('m-consent') && document.getElementById('m-consent').style.display === 'flex';
+  if(consentOpen) {
+    document.getElementById('m-consent').style.display = 'none';
+  } else {
+    closeModal('m-questionnaire');
+  }
   showQR(currentQ.patientId, currentQ.qName, currentQ.date);
 }
 
