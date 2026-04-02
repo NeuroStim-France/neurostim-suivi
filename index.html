@@ -3119,11 +3119,150 @@ function showPatientQScreen() {
   const qi = QUESTIONNAIRES[pqState.qName];
   if(!qi) { document.getElementById('pq-body').innerHTML='<div class="empty"><p>Questionnaire introuvable.</p></div>'; return; }
   document.getElementById('pq-title').textContent = qi.fullName||pqState.qName;
+
+  // Consent type: show dedicated video + questions flow in patient screen
+  if(qi.type === 'consent') {
+    renderPQConsentScreen(qi);
+    return;
+  }
+
   if(qi.instructions) {
     document.getElementById('pq-instructions').textContent = qi.instructions;
     document.getElementById('pq-instructions').style.display='block';
   }
   renderPQQuestion();
+}
+
+function renderPQConsentScreen(qi) {
+  pqState.consentAnswers = new Array(qi.questions.length).fill(undefined);
+  pqState.consentFinalAnswer = undefined;
+  pqState.consentVideoWatched = false;
+  const body = document.getElementById('pq-body');
+  body.style.display = 'block';
+  document.getElementById('pq-done-screen').style.display = 'none';
+  // Hide progress bar (not relevant for consent)
+  const bar = body.querySelector('.pq-progress');
+  if(bar) bar.style.display = 'none';
+  const barText = body.querySelector('.pq-progress-text');
+  if(barText) barText.style.display = 'none';
+  document.getElementById('pq-instructions').style.display = 'none';
+  document.getElementById('pq-question').style.display = 'none';
+  document.getElementById('pq-options').innerHTML = '';
+  const nav = body.querySelector('.pq-nav');
+  if(nav) nav.style.display = 'none';
+
+  body.innerHTML =
+    '<div style="margin-bottom:14px">' +
+      '<p style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">' + (qi.instructions||'') + '</p>' +
+      '<video id="pq-consent-video" controls style="width:100%;border-radius:8px;background:#000;max-height:340px">' +
+        '<source src="' + (qi.videoUrl||'') + '" type="video/mp4">' +
+      '</video>' +
+    '</div>' +
+    '<button class="btn btn-primary" style="width:100%;margin-bottom:14px" id="pq-consent-video-btn" onclick="pqConsentVideoWatched()">' +
+      '✓ J'ai visionné la vidéo — Continuer vers les questions' +
+    '</button>' +
+    '<div id="pq-consent-questions" style="display:none"></div>' +
+    '<button class="btn btn-primary" style="width:100%;margin-top:20px;display:none" id="pq-consent-submit-btn" onclick="pqConsentSubmit()">✓ Valider le consentement</button>';
+}
+
+function pqConsentVideoWatched() {
+  document.getElementById('pq-consent-video-btn').style.display = 'none';
+  pqState.consentVideoWatched = true;
+  const qi = QUESTIONNAIRES[pqState.qName];
+  const qArea = document.getElementById('pq-consent-questions');
+  qArea.style.display = 'block';
+  let html = '<div style="font-size:13px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px">Veuillez répondre à toutes les questions suivantes pour confirmer votre compréhension.</div>';
+  qi.questions.forEach((q, i) => {
+    html += '<div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">' +
+      '<div style="font-size:14px;font-weight:500;margin-bottom:10px;line-height:1.5">' + (i+1) + '. ' + q + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">' +
+        '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border:1px solid var(--border2);border-radius:6px;font-size:14px">' +
+          '<input type="radio" name="pcq' + i + '" value="0" onchange="pqConsentAnswer(' + i + ',0)" style="accent-color:var(--accent)"> Oui' +
+        '</label>' +
+        '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border:1px solid var(--border2);border-radius:6px;font-size:14px">' +
+          '<input type="radio" name="pcq' + i + '" value="1" onchange="pqConsentAnswer(' + i + ',1)" style="accent-color:var(--accent)"> Non' +
+        '</label>' +
+      '</div></div>';
+  });
+  // Final consent question
+  html += '<div style="margin-bottom:18px;padding:16px;background:var(--accent-bg);border:2px solid var(--accent-light);border-radius:8px">' +
+    '<div style="font-size:15px;font-weight:600;margin-bottom:12px;line-height:1.5">' + (qi.finalQuestion||'Je donne mon consentement éclairé') + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px">' +
+      '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border:1px solid var(--accent-light);border-radius:6px;font-size:14px;background:#fff">' +
+        '<input type="radio" name="pcq_final" value="0" onchange="pqConsentFinal(0)" style="accent-color:var(--accent)"> ✓ Oui, je confirme' +
+      '</label>' +
+      '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 14px;border:1px solid var(--border2);border-radius:6px;font-size:14px">' +
+        '<input type="radio" name="pcq_final" value="1" onchange="pqConsentFinal(1)" style="accent-color:var(--accent)"> Non, je refuse' +
+      '</label>' +
+    '</div></div>';
+  qArea.innerHTML = html;
+  document.getElementById('pq-consent-submit-btn').style.display = 'block';
+}
+
+function pqConsentAnswer(idx, val) {
+  pqState.consentAnswers[idx] = val;
+}
+
+function pqConsentFinal(val) {
+  pqState.consentFinalAnswer = val;
+}
+
+async function pqConsentSubmit() {
+  const qi = QUESTIONNAIRES[pqState.qName];
+  // Validate all questions answered
+  for(let i = 0; i < qi.questions.length; i++) {
+    if(pqState.consentAnswers[i] === undefined) {
+      alert('Veuillez répondre à toutes les questions (question ' + (i+1) + ' sans réponse).'); return;
+    }
+  }
+  if(pqState.consentFinalAnswer === undefined) {
+    alert('Veuillez confirmer ou refuser le consentement final.'); return;
+  }
+  const accepted = pqState.consentFinalAnswer === 0;
+  const allAnswered = pqState.consentAnswers.every(a => a === 0);
+  const allOk = accepted && allAnswered;
+  const score = accepted ? 0 : 99;
+  const allAnswers = [...pqState.consentAnswers, pqState.consentFinalAnswer];
+  const key = pqState.date + '_' + pqState.qName;
+  const resp = {
+    questionnaire: pqState.qName, date: pqState.date, score,
+    answers: allAnswers, accepted: allOk, refused: !allOk,
+    completedAt: new Date().toISOString().split('T')[0]
+  };
+  try {
+    const patRef = db.doc('patients/' + pqState.patientId);
+    const patSnap = await patRef.get();
+    const patData = patSnap.data();
+    const responses = {...(patData.responses||{})};
+    responses[key] = resp;
+    let remainingQs = [];
+    const schedule = (patData.schedule||[]).map(s => {
+      if(s.date === pqState.date) {
+        const done = [...(s.done||[])];
+        if(!done.includes(pqState.qName)) done.push(pqState.qName);
+        remainingQs = (s.questionnaires||[]).filter(q => !done.includes(q) && !(s.ignored||[]).includes(q));
+        return {...s, done};
+      }
+      return s;
+    });
+    await patRef.update({responses, schedule, consentSigned: allOk, consentDate: new Date().toISOString().split('T')[0]});
+    pqState.remainingQs = remainingQs;
+  } catch(e) { console.error('Consent save error:', e); pqState.remainingQs = []; }
+  // Show done screen
+  document.getElementById('pq-body').style.display = 'none';
+  const doneScreen = document.getElementById('pq-done-screen');
+  doneScreen.style.display = 'block';
+  const closeBtn = document.getElementById('pq-close-btn');
+  if(closeBtn) closeBtn.style.display = 'block';
+  const nextBtn = document.getElementById('pq-next-q-btn');
+  if(nextBtn) {
+    if(pqState.remainingQs && pqState.remainingQs.length > 0) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Questionnaire suivant : ' + pqState.remainingQs[0] + ' →';
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  }
 }
 
 function renderPQQuestion() {
@@ -3284,6 +3423,11 @@ function pqStartNext() {
   document.getElementById('pq-done-screen').style.display='none';
   const qi = QUESTIONNAIRES[nextQ];
   document.getElementById('pq-title').textContent = qi ? (qi.fullName||nextQ) : nextQ;
+  // Consent type: use dedicated patient consent flow
+  if(qi && qi.type === 'consent') {
+    renderPQConsentScreen(qi);
+    return;
+  }
   document.getElementById('pq-instructions').textContent = qi ? (qi.instructions||'') : '';
   document.getElementById('pq-instructions').style.display = qi&&qi.instructions ? 'block' : 'none';
   renderPQQuestion();
