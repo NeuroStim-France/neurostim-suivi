@@ -5898,7 +5898,15 @@ async function confirmInterruptCure() {
     ]);
 
     const schedule = (p.schedule||[]).map(s => {
-      if(s.type === 'monthly') return s; // post-cure always preserved
+      // Monthly (post-cure) slots: preserve only if doPostcure is true
+      if(s.type === 'monthly') {
+        if(doPostcure) return s;
+        // No post-cure: remove unanswered monthly slots, keep already done
+        const done = s.done||[], ign = s.ignored||[];
+        const keepQs = (s.questionnaires||[]).filter(q => done.includes(q)||ign.includes(q));
+        const keepHet = (s.hetero||[]).filter(q => done.includes(q)||ign.includes(q));
+        return {...s, questionnaires: keepQs, hetero: keepHet};
+      }
       if(s.date > interruptDate) {
         if(remainingProtos.length > 0) {
           // Keep questionnaires that belong to remaining active protocols
@@ -5925,7 +5933,8 @@ async function confirmInterruptCure() {
     });
 
     const allInterrupted = updatedProtos.every(pr => pr.interrupted);
-    const newStatus = allInterrupted ? 'postcure' : 'cure';
+    // Status: postcure only if doPostcure AND all protocols interrupted; else termine
+    const newStatus = allInterrupted ? (doPostcure ? 'postcure' : 'termine') : 'cure';
     const newEndDate = allInterrupted ? interruptDate : p.endDate;
 
     updateData = {
