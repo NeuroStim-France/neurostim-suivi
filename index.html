@@ -191,7 +191,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 
 /* NOTES */
 .note-item{padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
+.note-item.note-lecture{background:var(--purple-bg);border-color:var(--purple-border)}
 .note-meta{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
+.note-meta.note-lecture-meta{color:var(--purple)}
 .note-body{font-size:13px;line-height:1.5}
 
 /* SCORES */
@@ -535,7 +537,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="sb-search" style="margin-top:8px">
         <div class="search-bar" style="padding:6px 10px">
           <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><path d="M15 15l-3-3"/></svg>
-          <input type="text" id="global-search" placeholder="Rechercher un patient…" oninput="globalSearch(this.value)" style="font-size:12px">
+          <input type="text" id="global-search" placeholder="Rechercher un patient…" oninput="globalSearch(this.value)" style="font-size:12px" autocomplete="off">
         </div>
         <div id="global-search-results" style="display:none;position:absolute;left:8px;right:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:200;max-height:280px;overflow-y:auto;margin-top:2px"></div>
       </div>
@@ -796,8 +798,8 @@ body.role-saisie .analyse-only { display:none !important; }
         <div id="scores-table"><div class="empty"><p>Aucune donnée</p></div></div>
       </div>
       <div id="tc-notes" class="tab-content">
-        <div class="card write-only" style="margin-bottom:12px">
-          <div class="fg" style="margin-bottom:8px"><label>Nouvelle note</label><textarea id="note-input" rows="3" placeholder="Observation clinique, événement notable…"></textarea></div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="fg" style="margin-bottom:8px"><label>Nouvelle note</label><textarea id="note-input" rows="3" placeholder="Observation clinique, événement notable…" autocomplete="off"></textarea></div>
           <button class="btn btn-primary btn-sm" onclick="saveNote()">Enregistrer la note</button>
         </div>
         <div id="notes-list"></div>
@@ -1063,9 +1065,9 @@ body.role-saisie .analyse-only { display:none !important; }
           <div id="cabinets-list"></div>
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-top:12px">
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Ajouter un cabinet</div>
-            <div class="fg" style="margin-bottom:8px"><label>Nom</label><input type="text" id="new-cabinet-name" placeholder="ex: NeuroStim Lyon"></div>
-            <div class="fg" style="margin-bottom:8px"><label>Adresse</label><input type="text" id="new-cabinet-address" placeholder="ex: 12 rue de la Paix, 75001 Paris"></div>
-            <div class="fg" style="margin-bottom:10px"><label>Téléphone</label><input type="text" id="new-cabinet-phone" placeholder="ex: 01 23 45 67 89"></div>
+            <div class="fg" style="margin-bottom:8px"><label>Nom</label><input type="text" id="new-cabinet-name" placeholder="ex: NeuroStim Lyon" autocomplete="off"></div>
+            <div class="fg" style="margin-bottom:8px"><label>Adresse</label><input type="text" id="new-cabinet-address" placeholder="ex: 12 rue de la Paix, 75001 Paris" autocomplete="off"></div>
+            <div class="fg" style="margin-bottom:10px"><label>Téléphone</label><input type="text" id="new-cabinet-phone" placeholder="ex: 01 23 45 67 89" autocomplete="off"></div>
             <button class="btn btn-primary btn-sm" onclick="addCabinet()">+ Ajouter ce cabinet</button>
           </div>
         </div>
@@ -1255,8 +1257,8 @@ body.role-saisie .analyse-only { display:none !important; }
       <div id="ps1">
         <div class="step-label">Étape 1 — Identité</div>
         <div class="g2">
-          <div class="fg"><label>Prénom *</label><input type="text" id="p-prenom" placeholder="Marie" oninput="genCodePreview()"></div>
-          <div class="fg"><label>Nom *</label><input type="text" id="p-nom" placeholder="Dupont" oninput="genCodePreview()"></div>
+          <div class="fg"><label>Prénom *</label><input type="text" id="p-prenom" placeholder="Marie" oninput="genCodePreview()" autocomplete="off"></div>
+          <div class="fg"><label>Nom *</label><input type="text" id="p-nom" placeholder="Dupont" oninput="genCodePreview()" autocomplete="off"></div>
         </div>
         <div class="fg"><label>Date de naissance *</label><input type="date" id="p-dob" oninput="genCodePreview()"></div>
         <div style="padding:10px 14px;background:var(--accent-bg);border:1px solid var(--accent-light);border-radius:var(--r-sm);margin-bottom:14px">
@@ -1386,9 +1388,9 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">Ajouter un utilisateur</div><button class="close-btn" onclick="closeModal('m-add-user')">✕</button></div>
     <div class="mb">
-      <div class="fg"><label>Nom complet</label><input type="text" id="new-user-name" placeholder="Dr. Martin"></div>
-      <div class="fg"><label>Email</label><input type="email" id="new-user-email" placeholder="dr.martin@neurostim.fr"></div>
-      <div class="fg"><label>Mot de passe provisoire</label><input type="password" id="new-user-pwd" placeholder="••••••••"></div>
+      <div class="fg"><label>Nom complet</label><input type="text" id="new-user-name" placeholder="Dr. Martin" autocomplete="off"></div>
+      <div class="fg"><label>Email</label><input type="email" id="new-user-email" placeholder="dr.martin@neurostim.fr" autocomplete="off"></div>
+      <div class="fg"><label>Mot de passe provisoire</label><input type="password" id="new-user-pwd" placeholder="••••••••" autocomplete="new-password"></div>
       <div class="fg"><label>Rôle</label>
         <select id="new-user-role">
           <option value="saisie">Saisie (lecture + modification)</option>
@@ -1576,7 +1578,7 @@ body.role-saisie .analyse-only { display:none !important; }
         </select>
       </div>
       <div class="fg"><label>Date souhaitée</label><input type="date" id="single-q-date"></div>
-      <div class="fg"><label>Label (optionnel)</label><input type="text" id="single-q-label" placeholder="ex: Bilan intermédiaire, Suivi spécial..."></div>
+      <div class="fg"><label>Label (optionnel)</label><input type="text" id="single-q-label" placeholder="ex: Bilan intermédiaire, Suivi spécial..." autocomplete="off"></div>
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-add-single-q')">Annuler</button>
@@ -2316,15 +2318,26 @@ function renderNotes() {
   const p=NS.currentPatient, el=document.getElementById('notes-list'); if(!el) return;
   const notes=p.notes||[];
   if(notes.length===0){el.innerHTML='<div class="empty"><p>Aucune note</p></div>';return;}
+  const myEmail = NS.userProfile?.email;
+  const myRole = NS.userProfile?.role || 'saisie';
   el.innerHTML=[...notes].map((n,i)=>{
     const realIdx=notes.length-1-i;
-    const modifiedStr=n.modifiedDate?'<span style="color:var(--text3);font-size:10px"> · modifiée le '+fmtDate(n.modifiedDate)+'</span>':'';
-    const editBtn=NS.userProfile&&NS.userProfile.role!=='lecture'
-      ?'<button class="btn btn-xs btn-ghost write-only" style="margin-left:auto" onclick="openEditNote('+realIdx+')">✏️</button>':'' ;
-    return '<div class="note-item">'
-      +'<div class="note-meta" style="display:flex;align-items:center;gap:6px">'
-      +'<span>'+n.author+' · '+fmtDate(n.date)+modifiedStr+'</span>'
-      +editBtn
+    const isLecture = n.role === 'lecture';
+    const isOwn = n.authorEmail === myEmail;
+    // Admin/saisie can edit all; lecteurs can only edit their own
+    const canEdit = myRole !== 'lecture' || isOwn;
+    const itemCls = isLecture ? 'note-item note-lecture' : 'note-item';
+    const metaCls = isLecture ? 'note-meta note-lecture-meta' : 'note-meta';
+    const roleTag = isLecture ? ' <span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);border-radius:3px;padding:1px 5px">Lecture</span>' : '';
+    const modifiedStr = n.modifiedDate ? '<span style="font-size:10px;opacity:.7"> · modifiée le '+fmtDate(n.modifiedDate)+'</span>' : '';
+    const editBtn = canEdit
+      ? '<button class="btn btn-xs btn-ghost" style="color:var(--text3)" onclick="openEditNote('+realIdx+')">✏️</button>'
+      + '<button class="btn btn-xs btn-ghost" style="color:var(--red)" onclick="deleteNote('+realIdx+')">🗑</button>'
+      : '';
+    return '<div class="'+itemCls+'">'
+      +'<div class="'+metaCls+'" style="display:flex;align-items:center;gap:6px">'
+      +'<span>'+n.author+roleTag+' · '+fmtDate(n.date)+modifiedStr+'</span>'
+      +'<div style="margin-left:auto;display:flex;gap:4px">'+editBtn+'</div>'
       +'</div>'
       +'<div class="note-body">'+n.text+'</div>'
       +'</div>';
@@ -2343,17 +2356,39 @@ async function saveEditNote() {
   if(!text) return;
   const p = NS.currentPatient;
   const notes = [...(p.notes||[])];
-  notes[idx] = {...notes[idx], text, modifiedDate: todayStr(), modifiedBy: NS.userProfile.displayName||NS.userProfile.email};
+  const note = notes[idx];
+  // Permission check: lecteurs can only edit their own notes
+  if(NS.userProfile.role === 'lecture' && note.authorEmail !== NS.userProfile.email) {
+    alert('Vous ne pouvez modifier que vos propres notes.'); return;
+  }
+  notes[idx] = {...note, text, modifiedDate: todayStr(), modifiedBy: NS.userProfile.displayName||NS.userProfile.email};
   await db.doc('patients/'+p.id).update({notes});
   NS.currentPatient.notes = notes;
   closeModal('m-edit-note');
   renderNotes();
 }
 
+async function deleteNote(idx) {
+  if(!confirm('Supprimer cette note ?')) return;
+  const p = NS.currentPatient;
+  const notes = [...(p.notes||[])];
+  const note = notes[idx];
+  // Permission check
+  if(NS.userProfile.role === 'lecture' && note.authorEmail !== NS.userProfile.email) {
+    alert('Vous ne pouvez supprimer que vos propres notes.'); return;
+  }
+  notes.splice(idx, 1);
+  await db.doc('patients/'+p.id).update({notes});
+  NS.currentPatient.notes = notes;
+  renderNotes();
+  renderLastNote();
+}
+
 async function saveNote() {
   const p=NS.currentPatient, text=document.getElementById('note-input').value.trim();
   if(!text) return;
-  const note={text,date:todayStr(),author:NS.userProfile.displayName||NS.userProfile.email};
+  const role = NS.userProfile.role || 'saisie';
+  const note={text, date:todayStr(), author:NS.userProfile.displayName||NS.userProfile.email, authorEmail:NS.userProfile.email, role};
   const notes=[...(p.notes||[]),note];
   await db.doc('patients/'+p.id).update({notes});
   NS.currentPatient.notes=notes;
@@ -2948,6 +2983,8 @@ async function createPatient() {
 
     await db.collection('patients').add({
       code, patientId, dob, j1Date, endDate, cabinet,
+      prenom: prenom,
+      nom: nom,
       protocols: validProtos,
       status,
       notes:[], responses:{},
@@ -3125,29 +3162,38 @@ async function openEditPatient(id) {
   document.getElementById('edit-end').value = p.endDate || '';
   document.getElementById('edit-status').value = p.status || 'cure';
   document.getElementById('edit-dob').value = p.dob || '';
+  // Prénom / Nom (extract from code if not stored separately)
+  const prenomEl = document.getElementById('edit-prenom');
+  const nomEl = document.getElementById('edit-nom');
+  if(prenomEl) prenomEl.value = p.prenom || '';
+  if(nomEl) nomEl.value = p.nom || '';
   // Protocols
+  const _np = normalizeProtocols(p);
   document.querySelectorAll('.edit-prot-btn').forEach(b => {
-    const _np = normalizeProtocols(p);
     b.classList.toggle('active', _np.some(pr=>pr.name===b.dataset.prot));
   });
-  document.getElementById('edit-protocols-hidden').value = JSON.stringify(normalizeProtocols(p).map(pr=>pr.name));
-  // Cabinet
+  document.getElementById('edit-protocols-hidden').value = JSON.stringify(_np.map(pr=>pr.name));
+  // Cabinet principal
   const cabSel = document.getElementById('edit-cabinet');
   if(cabSel) {
-    // Populate with current cabinets list
     const cabs = NS.cabinets || ['NeuroStim Bastille','NeuroStim Étoile','NeuroStim Luxembourg'];
-    cabSel.innerHTML = cabs.map(function(c){ const name=typeof c==='string'?c:c.name; return '<option value="'+name+'"'+(name===p.cabinet?' selected':'')+'>'+name+'</option>'; }).join('');
+    cabSel.innerHTML = cabs.map(function(c){
+      const name = typeof c==='string' ? c : c.name;
+      return '<option value="'+name+'"'+(name===p.cabinet?' selected':'')+'>'+name+'</option>';
+    }).join('');
   }
-  // Extra cabinets (multi-cabinet)
+  // Cabinets supplémentaires
   const extraEl = document.getElementById('edit-extra-cabinets');
   if(extraEl) {
     const cabs = NS.cabinets || ['NeuroStim Bastille','NeuroStim Étoile','NeuroStim Luxembourg'];
     const extraCabs = p.extraCabinets || [];
-    extraEl.innerHTML = cabs.map(c =>
-      '<label style="display:flex;gap:8px;align-items:center;font-size:13px">'
-      +'<input type="checkbox" class="extra-cabinet-check" value="'+c+'"'+(extraCabs.includes(c)?' checked':'')+'> '+c
-      +'</label>'
-    ).join('');
+    extraEl.innerHTML = cabs.map(function(c) {
+      const name = typeof c==='string' ? c : c.name;
+      const checked = extraCabs.includes(name) ? ' checked' : '';
+      return '<label style="display:flex;gap:8px;align-items:center;font-size:13px">'
+        +'<input type="checkbox" class="extra-cabinet-check" value="'+name+'"'+checked+'> '+name
+        +'</label>';
+    }).join('');
   }
   openModal('m-edit-patient');
 }
@@ -3193,9 +3239,13 @@ async function saveEditPatient() {
   const newCabinet = document.getElementById('edit-cabinet') ? document.getElementById('edit-cabinet').value : null;
   const extraCabinets = [];
   document.querySelectorAll('.extra-cabinet-check:checked').forEach(cb => extraCabinets.push(cb.value));
+  const newPrenom = document.getElementById('edit-prenom')?.value.trim() || '';
+  const newNom = document.getElementById('edit-nom')?.value.trim() || '';
   const updateData = {j1Date, endDate, status, dob, protocols, schedule: newSchedule};
   if(newCabinet) updateData.cabinet = newCabinet;
-  if(extraCabinets.length >= 0) updateData.extraCabinets = extraCabinets;
+  updateData.extraCabinets = extraCabinets;
+  if(newPrenom) updateData.prenom = newPrenom;
+  if(newNom) updateData.nom = newNom;
   await db.doc('patients/'+id).update(updateData);
   // Log detailed history entry on the patient document
   const histEntry = {
@@ -6579,7 +6629,7 @@ async function buildHistory() {
 
   // Build day map
   var dayMap = {};
-  function getDay(d) { if(!dayMap[d]) dayMap[d]={ms:[],qs:[],notes:[]}; return dayMap[d]; }
+  function getDay(d) { if(!dayMap[d]) dayMap[d]={ms:[],qs:[]}; return dayMap[d]; }
 
   // Milestones
   if(p.consentDate) getDay(p.consentDate).ms.push({icon:'✓', label:'Consentement signé', cls:'green'});
@@ -6609,12 +6659,6 @@ async function buildHistory() {
     });
   });
 
-  // Notes
-  notes.forEach(function(n) {
-    if(!n||!n.date) return;
-    getDay(n.date).notes.push(n);
-  });
-
   var dates = Object.keys(dayMap).sort();
   if(!dates.length) {
     el.innerHTML='<div class="empty"><p>Aucun événement. Complétez des questionnaires pour voir la timeline.</p></div>';
@@ -6626,7 +6670,7 @@ async function buildHistory() {
 
   dates.forEach(function(date, di) {
     var day = dayMap[date];
-    var hasContent = day.ms.length || day.qs.length || day.notes.length;
+    var hasContent = day.ms.length || day.qs.length;
     if(!hasContent) return;
 
     // Connector between days
@@ -6664,11 +6708,6 @@ async function buildHistory() {
       out += '</div>';
     }
 
-    // Notes
-    day.notes.forEach(function(n) {
-      out += '<div class="hist-connector" style="height:8px"></div>';
-      out += '<div class="hist-note-pill">📝 '+(n.text||'').substring(0,120)+(n.text&&n.text.length>120?'…':'')+' <span style="opacity:.7">— '+(n.author||'')+'</span></div>';
-    });
   });
 
   out += '</div>';
@@ -7112,12 +7151,25 @@ document.addEventListener('DOMContentLoaded',()=>{
 <!-- MODAL: EDIT PATIENT -->
 <div id="m-edit-patient" class="overlay">
   <div class="modal fade">
-    <div class="mh"><div class="mh-title">Modifier le patient</div><button class="close-btn" onclick="closeModal('m-edit-patient')">✕</button></div>
+    <div class="mh"><div class="mh-title">✏️ Modifier le patient</div><button class="close-btn" onclick="closeModal('m-edit-patient')">✕</button></div>
     <div class="mb">
       <input type="hidden" id="edit-pat-id">
       <input type="hidden" id="edit-protocols-hidden" value="[]">
+      <!-- Identité -->
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Identité</div>
       <div class="g2">
-        <div class="fg"><label>Date de naissance</label><input type="date" id="edit-dob"></div>
+        <div class="fg"><label>Prénom</label><input type="text" id="edit-prenom" autocomplete="off"></div>
+        <div class="fg"><label>Nom</label><input type="text" id="edit-nom" autocomplete="off"></div>
+      </div>
+      <div class="fg"><label>Date de naissance</label><input type="date" id="edit-dob"></div>
+      <!-- Cabinet -->
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;margin-top:4px">Cabinet principal</div>
+      <div class="fg"><select id="edit-cabinet" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px"></select></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cabinets supplémentaires</div>
+      <div id="edit-extra-cabinets" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"></div>
+      <!-- Statut & dates -->
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cure</div>
+      <div class="g2">
         <div class="fg"><label>Statut</label>
           <select id="edit-status">
             <option value="cure">En cure</option>
@@ -7125,6 +7177,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             <option value="termine">Terminé</option>
           </select>
         </div>
+        <div class="fg"><label>Date de naissance</label><input type="date" id="edit-dob2" style="display:none"></div>
       </div>
       <div class="g2">
         <div class="fg"><label>Date J1</label><input type="date" id="edit-j1"></div>
@@ -7175,7 +7228,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Modifier la note</div><button class="close-btn" onclick="closeModal('m-edit-note')">✕</button></div>
     <div class="mb">
       <input type="hidden" id="edit-note-idx">
-      <div class="fg"><label>Note</label><textarea id="edit-note-text" rows="5"></textarea></div>
+      <div class="fg"><label>Note</label><textarea id="edit-note-text" rows="5" autocomplete="off"></textarea></div>
       <div class="info-box" style="font-size:11px">L'horodatage original est conservé. La date de modification sera ajoutée.</div>
     </div>
     <div class="mf">
@@ -7316,7 +7369,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Modifier l'utilisateur</div><button class="close-btn" onclick="closeModal('m-edit-user')">✕</button></div>
     <div class="mb">
       <input type="hidden" id="edit-user-uid">
-      <div class="fg"><label>Nom complet</label><input type="text" id="edit-user-name"></div>
+      <div class="fg"><label>Nom complet</label><input type="text" id="edit-user-name" autocomplete="off"></div>
       <div class="fg"><label>Rôle</label>
         <select id="edit-user-role">
           <option value="saisie">Saisie</option>
@@ -7351,8 +7404,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div style="padding:12px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r-sm);margin-bottom:14px;font-size:12px;color:var(--red)">
         ⚠ Cette action est irréversible. Toutes les données du patient seront définitivement supprimées.
       </div>
-      <div class="fg"><label>Code du patient à effacer</label><input type="text" id="rgpd-erase-code" placeholder="ex: MAR-DUP-15031978"></div>
-      <div class="fg"><label>Confirmer en tapant "EFFACER"</label><input type="text" id="rgpd-erase-confirm" placeholder="EFFACER"></div>
+      <div class="fg"><label>Code du patient à effacer</label><input type="text" id="rgpd-erase-code" placeholder="ex: MAR-DUP-15031978" autocomplete="off"></div>
+      <div class="fg"><label>Confirmer en tapant "EFFACER"</label><input type="text" id="rgpd-erase-confirm" placeholder="EFFACER" autocomplete="off"></div>
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-rgpd-erase')">Annuler</button>
@@ -7367,7 +7420,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Export données patient — RGPD Art. 20</div><button class="close-btn" onclick="closeModal('m-rgpd-export')">✕</button></div>
     <div class="mb">
       <p class="text-muted" style="margin-bottom:14px">Télécharger toutes les données d'un patient au format JSON (portabilité des données).</p>
-      <div class="fg"><label>Code du patient</label><input type="text" id="rgpd-export-code" placeholder="ex: MAR-DUP-15031978"></div>
+      <div class="fg"><label>Code du patient</label><input type="text" id="rgpd-export-code" placeholder="ex: MAR-DUP-15031978" autocomplete="off"></div>
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-rgpd-export')">Annuler</button>
@@ -7390,7 +7443,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div id="pwd-first-login-warning" style="display:none" class="warn-box" style="margin-bottom:14px">
         Première connexion — veuillez changer le mot de passe provisoire qui vous a été attribué.
       </div>
-      <div class="fg"><label>Mot de passe actuel</label><input type="password" id="pwd-current" placeholder="••••••••"></div>
+      <div class="fg"><label>Mot de passe actuel</label><input type="password" id="pwd-current" placeholder="••••••••" autocomplete="current-password"></div>
       <div class="fg"><label>Nouveau mot de passe</label><input type="password" id="pwd-new" placeholder="••••••••" oninput="checkPwdStrength(this.value)"></div>
       <div id="pwd-strength" style="height:4px;border-radius:2px;background:var(--border);margin-top:-8px;margin-bottom:10px;overflow:hidden">
         <div id="pwd-strength-bar" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
