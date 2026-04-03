@@ -2882,11 +2882,11 @@ function renderProtocolList() {
     const opts = PROTO_OPTIONS.map(o => '<option value="'+o.value+'"'+(pr.name===o.value?' selected':'')+'>'+o.label+'</option>').join('');
     html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px">';
     if(newPat.protocols.length > 1) html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:600;color:var(--text2)">Protocole '+(i+1)+'</span><button class="btn btn-ghost btn-sm" style="color:var(--red);font-size:11px" onclick="removeProtocolEntry('+i+')">✕ Retirer</button></div>';
-    html += '<div class="fg" style="margin-bottom:8px"><label style="font-size:11px">Protocole *</label><select onchange="updateProtocolField('+i+','name',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px;background:var(--surface)">'+opts+'</select></div>';
+    html += '<div class="fg" style="margin-bottom:8px"><label style="font-size:11px">Protocole *</label><select onchange="updateProtocolField('+i+',\'name\',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px;background:var(--surface)">'+opts+'</select></div>';
     if(isCure) {
       html += '<div class="g2">';
-      html += '<div class="fg"><label style="font-size:11px">Date J1 *</label><input type="date" value="'+(pr.startDate||'')+'" onchange="updateProtocolField('+i+','startDate',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
-      html += '<div class="fg"><label style="font-size:11px">Date fin de cure *</label><input type="date" value="'+(pr.endDate||'')+'" onchange="updateProtocolField('+i+','endDate',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
+      html += '<div class="fg"><label style="font-size:11px">Date J1 *</label><input type="date" value="'+(pr.startDate||'')+'" onchange="updateProtocolField('+i+',\'startDate\',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
+      html += '<div class="fg"><label style="font-size:11px">Date fin de cure *</label><input type="date" value="'+(pr.endDate||'')+'" onchange="updateProtocolField('+i+',\'endDate\',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
       html += '</div>';
     }
     html += '</div>';
@@ -5817,7 +5817,7 @@ async function confirmInterruptCure() {
   const doPostcure = document.getElementById('interrupt-postcure')?.value === 'yes';
   const whichProto = document.getElementById('interrupt-protocol-sel')?.value || 'all';
 
-  if(!interruptDate) { alert('Veuillez indiquer la date d'interruption.'); return; }
+  if(!interruptDate) { alert('Veuillez indiquer la date d\'interruption.'); return; }
 
   const isPostcureInterrupt = whichProto === 'postcure';
   let updateData = {};
