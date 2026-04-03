@@ -1972,9 +1972,13 @@ function loadDashboard() {
   const pts=NS.patients, tod=todayStr();
   let todayItems=[],overdueItems=[],upcomingItems=[];
   pts.forEach(p=>{
+    // Only show active cure patients in today/overdue/upcoming — not interrupted/terminated/postcure
+    const activeCure = p.status === 'cure' || !p.status;
     (p.schedule||[]).forEach(s=>{
       const done=s.done||[], ignored=s.ignored||[], rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
       if(rem.length===0) return;
+      // For non-active-cure patients, still show monthly post-cure questionnaires
+      if(!activeCure && s.type !== 'monthly') return;
       const item={...s,patient:p,remaining:rem};
       if(s.date===tod) todayItems.push(item);
       else if(s.date<tod) overdueItems.push(item);
@@ -2127,13 +2131,17 @@ function renderTimeline() {
   // Merge current PROTOCOLS into schedule slots so xlsx updates reflect immediately
   const liveProtoQs = getProtoQs(p.protocols||[]);
   let html='';
+  const isInterrupted = !!p.interruptDate;
   (p.schedule||[]).forEach(s=>{
     // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
+    // But do NOT re-merge for interrupted patients — their schedule was already purged
     let slotQs = s.questionnaires||[];
-    if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
-    if(s.type==='monthly') { s = {...s, hetero: liveProtoQs.heteroMonthly}; }
-    if(s.type==='j1') slotQs = dedupe([...slotQs, ...liveProtoQs.auto]);
-    if(s.type==='weekly') slotQs = dedupe([...slotQs, ...liveProtoQs.weekly]);
+    if(!isInterrupted) {
+      if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
+      if(s.type==='monthly') { s = {...s, hetero: liveProtoQs.heteroMonthly}; }
+      if(s.type==='j1') slotQs = dedupe([...slotQs, ...liveProtoQs.auto]);
+      if(s.type==='weekly') slotQs = dedupe([...slotQs, ...liveProtoQs.weekly]);
+    }
     const done=s.done||[], qs=slotQs, het=s.hetero||[], ign=s.ignored||[];
     const isToday=s.date===tod, isPast=s.date<tod;
     const rem=qs.filter(q=>!done.includes(q));
@@ -5482,11 +5490,19 @@ async function confirmInterruptCure() {
   if(!interruptDate) { alert('Veuillez indiquer la date d interruption.'); return; }
 
   // Remove all future questionnaires after interrupt date
+  // Also clear unanswered questionnaires on past/present slots (they must not show as overdue)
   const schedule = (p.schedule||[]).map(s => {
-    if(s.date > interruptDate && s.type !== 'monthly') {
+    if(s.type === 'monthly') return s; // keep post-cure monthly slots untouched
+    if(s.date > interruptDate) {
+      // Future slots: cancel entirely
       return {...s, cancelled: true, questionnaires: [], hetero: []};
     }
-    return s;
+    // Past and present slots (<= interruptDate): remove only unanswered questionnaires
+    const done = s.done || [];
+    const ignored = s.ignored || [];
+    const keepQs = (s.questionnaires||[]).filter(q => done.includes(q) || ignored.includes(q));
+    const keepHet = (s.hetero||[]).filter(q => done.includes(q) || ignored.includes(q));
+    return {...s, questionnaires: keepQs, hetero: keepHet};
   }).filter(s => s.questionnaires?.length > 0 || s.hetero?.length > 0 || s.done?.length > 0);
 
   await db.doc('patients/'+p.id).update({
