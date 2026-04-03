@@ -719,6 +719,7 @@ body.role-saisie .analyse-only { display:none !important; }
           </div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end" class="write-only">
             <button class="btn btn-ghost btn-sm" onclick="openAdjustDates()">📅 Dates</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAddProtocolToPatient()">➕ Protocole</button>
             <button class="btn btn-ghost btn-sm" onclick="openConsolidation()">📆 Post-cure</button>
             <button class="btn btn-ghost btn-sm" onclick="openInterruptCure()">⛔ Interrompre</button>
             <button class="btn btn-ghost btn-sm" onclick="NS.currentPatient&&openEditPatient(NS.currentPatient.id)">✏️ Modifier</button>
@@ -1270,30 +1271,25 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <!-- Step 2 -->
       <div id="ps2" style="display:none">
-        <div class="step-label">Étape 2 — Protocole &amp; dates</div>
-        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Protocole(s) — sélection multiple possible</div>
-        <div class="prot-grid">
-          <button class="prot-btn" onclick="toggleProtocol('depression',this)">Dépression</button>
-          <button class="prot-btn" onclick="toggleProtocol('anxiete',this)">Trouble anxieux</button>
-          <button class="prot-btn" onclick="toggleProtocol('toc',this)">TOC</button>
-          <button class="prot-btn" onclick="toggleProtocol('ptsd',this)">PTSD</button>
-          <button class="prot-btn" onclick="toggleProtocol('douleur',this)">Douleur</button>
-          <button class="prot-btn" onclick="toggleProtocol('schiz_h',this)">Schizo. halluc.</button>
-          <button class="prot-btn" onclick="toggleProtocol('schiz_n',this)">Schizo. nég.</button>
-          <button class="prot-btn" onclick="toggleProtocol('cognitif',this)">Trouble cognitif</button>
-          <button class="prot-btn" onclick="toggleProtocol('add_alc',this)">Addiction alcool</button>
-          <button class="prot-btn" onclick="toggleProtocol('add_coc',this)">Addiction cocaïne</button>
-          <button class="prot-btn" onclick="toggleProtocol('add_aut',this)">Addiction autre</button>
+        <div class="step-label">Étape 2 — Protocole(s) &amp; dates</div>
+        <!-- Mode selector -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button id="mode-cure-btn" class="btn btn-primary btn-sm" onclick="setPatientMode('cure')" style="flex:1">🩺 Cure rTMS</button>
+          <button id="mode-postcure-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('postcure')" style="flex:1">📆 Post-cure directe</button>
         </div>
-        <div class="g2">
-          <div class="fg"><label>Date J1 (1ère séance) *</label><input type="date" id="p-j1" onchange="autoCalcEndDate()"></div>
-          <div class="fg"><label>Date fin de cure estimée *</label><input type="date" id="p-end"></div>
+        <!-- Protocol list (dynamic) -->
+        <div id="proto-list-area"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
+        <!-- Post-cure direct start date -->
+        <div id="postcure-startdate-area" style="display:none">
+          <div class="fg"><label>Date de début du suivi post-cure *</label><input type="date" id="p-postcure-start"></div>
         </div>
+        <!-- Schedule preview -->
         <div id="sched-area" style="display:none">
           <div class="divider"></div>
           <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Questionnaires générés automatiquement</div>
           <div class="sched-phase"><div class="sched-phase-title">J1</div><div class="sched-tags" id="sched-auto"></div></div>
-          <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires (J1 + fin de cure)</div><div class="sched-tags" id="sched-hetero"></div></div>
+          <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires</div><div class="sched-tags" id="sched-hetero"></div></div>
           <div class="sched-phase"><div class="sched-phase-title">Chaque vendredi en cure</div><div class="sched-tags" id="sched-weekly"></div></div>
           <div class="sched-phase"><div class="sched-phase-title">Mensuel × 6 mois post-cure</div><div class="sched-tags" id="sched-monthly"></div></div>
         </div>
@@ -1302,11 +1298,18 @@ body.role-saisie .analyse-only { display:none !important; }
       <div id="ps3" style="display:none">
         <div class="step-label">Étape 3 — Confirmation</div>
         <div class="success-box" style="margin-bottom:14px"><div style="font-weight:600;margin-bottom:3px">✓ Prêt à créer le patient</div>Le calendrier de questionnaires sera généré automatiquement.</div>
-        <div style="font-size:13px;line-height:2">
+        <div style="font-size:13px;line-height:2" id="c-summary">
           Code : <strong class="mono" id="c-code">—</strong><br>
-          Protocole(s) : <strong id="c-prots">—</strong><br>
-          J1 : <strong id="c-j1">—</strong><br>
-          Fin de cure : <strong id="c-end">—</strong>
+          <span id="c-details">
+            Protocole(s) : <strong id="c-prots">—</strong><br>
+            J1 : <strong id="c-j1">—</strong><br>
+            Fin de cure : <strong id="c-end">—</strong>
+          </span>
+          <span id="c-postcure-details" style="display:none">
+            Mode : <strong>Post-cure directe</strong><br>
+            Début post-cure : <strong id="c-postcure-start">—</strong><br>
+            Protocole(s) : <strong id="c-prots2">—</strong>
+          </span>
         </div>
       </div>
     </div>
@@ -1448,10 +1451,15 @@ body.role-saisie .analyse-only { display:none !important; }
 <!-- MODAL: INTERROMPRE LA CURE -->
 <div id="m-interrupt-cure" class="overlay">
   <div class="modal sm fade">
-    <div class="mh"><div class="mh-title">⛔ Interrompre la cure</div><button class="close-btn" onclick="closeModal('m-interrupt-cure')">✕</button></div>
+    <div class="mh"><div class="mh-title">⛔ Interrompre</div><button class="close-btn" onclick="closeModal('m-interrupt-cure')">✕</button></div>
     <div class="mb">
       <div class="warn-box" style="margin-bottom:14px">
-        La cure sera marquée comme interrompue. Les questionnaires non complétés après cette date seront supprimés du calendrier.
+        Les questionnaires non complétés après la date d'interruption seront supprimés du calendrier.
+      </div>
+      <div class="fg" id="interrupt-protocol-area" style="display:none"><label>Interrompre</label>
+        <select id="interrupt-protocol-sel">
+          <option value="all">Tous les protocoles</option>
+        </select>
       </div>
       <div class="fg"><label>Date d'interruption</label><input type="date" id="interrupt-date"></div>
       <div class="fg"><label>Raison (optionnel)</label>
@@ -1464,7 +1472,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="Autre">Autre</option>
         </select>
       </div>
-      <div class="fg"><label>Démarrer le suivi post-cure immédiatement ?</label>
+      <div class="fg" id="interrupt-postcure-area"><label>Démarrer le suivi post-cure immédiatement ?</label>
         <select id="interrupt-postcure">
           <option value="yes">Oui — configurer le suivi post-cure</option>
           <option value="no">Non — interrompre sans suivi post-cure</option>
@@ -1473,7 +1481,39 @@ body.role-saisie .analyse-only { display:none !important; }
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-interrupt-cure')">Annuler</button>
-      <button class="btn btn-danger" onclick="confirmInterruptCure()">⛔ Confirmer l'interruption</button>
+      <button class="btn btn-danger" onclick="confirmInterruptCure()">⛔ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD PROTOCOL TO PATIENT -->
+<div id="m-add-protocol" class="overlay">
+  <div class="modal sm fade">
+    <div class="mh"><div class="mh-title">➕ Ajouter un protocole</div><button class="close-btn" onclick="closeModal('m-add-protocol')">✕</button></div>
+    <div class="mb">
+      <div class="info-box" style="margin-bottom:14px;font-size:12px">Les questionnaires déjà présents dans le calendrier ne seront pas dupliqués.</div>
+      <div class="fg"><label>Protocole *</label>
+        <select id="add-proto-name" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
+          <option value="">-- Choisir --</option>
+          <option value="depression">Dépression</option>
+          <option value="anxiete">Trouble anxieux</option>
+          <option value="toc">TOC</option>
+          <option value="ptsd">PTSD</option>
+          <option value="douleur">Douleur</option>
+          <option value="schiz_h">Schizo. hallucinatoire</option>
+          <option value="schiz_n">Schizo. négative</option>
+          <option value="cognitif">Trouble cognitif</option>
+          <option value="add_alc">Addiction — Alcool</option>
+          <option value="add_coc">Addiction — Cocaïne</option>
+          <option value="add_aut">Addiction — Autre</option>
+        </select>
+      </div>
+      <div class="fg"><label>Date J1 de ce protocole *</label><input type="date" id="add-proto-j1"></div>
+      <div class="fg"><label>Date fin de cure de ce protocole *</label><input type="date" id="add-proto-end"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeModal('m-add-protocol')">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmAddProtocol()">➕ Ajouter</button>
     </div>
   </div>
 </div>
@@ -1804,7 +1844,7 @@ const PROTOCOLS = {
 
 const NS = {user:null,userProfile:null,patients:[],currentPatient:null,unsub:null};
 let currentQ = {patientId:null,qName:null,date:null,answers:[],currentIdx:0};
-let newPat = {step:1,protocols:[]};
+let newPat = {step:1, protocols:[], mode:'cure'}; // protocols = [{name,startDate,endDate}]
 
 function genCode(p,n,d) {
   const pp=p.trim().toUpperCase().replace(/[^A-Z]/g,'').substring(0,3).padEnd(3,'X');
@@ -1826,9 +1866,21 @@ function fmtDob(d) {
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function addDays(ds,n) { const d=new Date(ds); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function dedupe(a) { return [...new Set(a)]; }
+// ── Protocol normalization: migrate old string[] to {name,startDate,endDate}[] ──
+function normalizeProtocols(p) {
+  const raw = p.protocols || [];
+  if(!raw.length) return [];
+  // Already new format?
+  if(typeof raw[0] === 'object') return raw;
+  // Old format: array of strings — use j1Date as startDate, endDate as endDate
+  return raw.map(name => ({name, startDate: p.j1Date || todayStr(), endDate: p.endDate || ''}));
+}
+
+// getProtoQs accepts both string[] (legacy) and object[] (new)
 function getProtoQs(protocols) {
+  const names = protocols.map(p => typeof p === 'object' ? p.name : p);
   let auto=[],hetero=[],weekly=[],monthly=[],endCure=[],heteroEnd=[],heteroMonthly=[];
-  protocols.forEach(p=>{ const pr=PROTOCOLS[p]; if(!pr) return;
+  names.forEach(n=>{ const pr=PROTOCOLS[n]; if(!pr) return;
     auto=dedupe([...auto,...(pr.auto||[])]); hetero=dedupe([...hetero,...(pr.hetero||[])]);
     weekly=dedupe([...weekly,...(pr.weekly||[])]); monthly=dedupe([...monthly,...(pr.monthly||[])]);
     endCure=dedupe([...endCure,...(pr.endCure||pr.monthly||[])]);
@@ -1842,16 +1894,89 @@ function getFridays(start,end) {
   while(d<=new Date(end)) { if(d.getDay()===5) f.push(d.toISOString().split('T')[0]); d.setDate(d.getDate()+1); }
   return f;
 }
+
+// genSchedule — supports multi-protocol new format
+// p.protocols = [{name, startDate, endDate}]  OR  legacy string[]
+// p.j1Date / p.endDate used as fallback for legacy
 function genSchedule(p) {
-  const qs=getProtoQs(p.protocols), sched=[];
-  sched.push({date:p.j1Date,questionnaires:['Consentement rTMS'],hetero:[],done:[],type:'consent',label:'Consentement'});
-  sched.push({date:p.j1Date,questionnaires:[...qs.auto],hetero:[...qs.hetero],done:[],type:'j1',label:'J1 — Bilan initial'});
-  getFridays(addDays(p.j1Date,1),p.endDate).forEach(f=>
-    sched.push({date:f,questionnaires:[...qs.weekly],hetero:[],done:[],type:'weekly',label:'Suivi hebdomadaire'}));
-  sched.push({date:p.endDate,questionnaires:[...qs.endCure],hetero:[...qs.heteroEnd],done:[],type:'end',label:'Bilan fin de cure'});
+  const protos = normalizeProtocols(p);
+  const sched = [];
+  if(!protos.length) return sched;
+
+  // Global earliest startDate = J1 for consent
+  const globalJ1 = protos.reduce((min,pr) => pr.startDate < min ? pr.startDate : min, protos[0].startDate);
+
+  // Consent slot at global J1
+  sched.push({date:globalJ1, questionnaires:['Consentement rTMS'], hetero:[], done:[], type:'consent', label:'Consentement'});
+
+  // Merge all J1 questionnaires per unique startDate
+  const byStart = {};
+  protos.forEach(pr => {
+    if(!byStart[pr.startDate]) byStart[pr.startDate] = [];
+    byStart[pr.startDate].push(pr.name);
+  });
+  Object.entries(byStart).forEach(([startDate, names]) => {
+    const qs = getProtoQs(names);
+    const label = startDate === globalJ1 ? 'J1 — Bilan initial' : 'J1 — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ');
+    sched.push({date:startDate, questionnaires:[...qs.auto], hetero:[...qs.hetero], done:[], type:'j1', label});
+  });
+
+  // Weekly questionnaires: union of all protocols, from each startDate to its endDate
+  // Collect all (date → set of weekly qs) to avoid duplicate slots
+  const weeklyByDate = {};
+  protos.forEach(pr => {
+    if(!pr.endDate) return;
+    const qs = getProtoQs([pr.name]);
+    getFridays(addDays(pr.startDate,1), pr.endDate).forEach(f => {
+      if(!weeklyByDate[f]) weeklyByDate[f] = new Set();
+      qs.weekly.forEach(q => weeklyByDate[f].add(q));
+    });
+  });
+  Object.entries(weeklyByDate).sort(([a],[b])=>a<b?-1:1).forEach(([date, qSet]) => {
+    sched.push({date, questionnaires:[...qSet], hetero:[], done:[], type:'weekly', label:'Suivi hebdomadaire'});
+  });
+
+  // End-of-cure per protocol (each has its own endDate)
+  const byEnd = {};
+  protos.forEach(pr => {
+    if(!pr.endDate) return;
+    if(!byEnd[pr.endDate]) byEnd[pr.endDate] = [];
+    byEnd[pr.endDate].push(pr.name);
+  });
+  Object.entries(byEnd).forEach(([endDate, names]) => {
+    const qs = getProtoQs(names);
+    const label = Object.keys(byEnd).length > 1
+      ? 'Fin de cure — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
+      : 'Bilan fin de cure';
+    sched.push({date:endDate, questionnaires:[...qs.endCure], hetero:[...qs.heteroEnd], done:[], type:'end', label});
+  });
+
+  // Post-cure monthly: union of all protocols, from latest endDate
+  const allNames = protos.map(pr=>pr.name);
+  const qs = getProtoQs(allNames);
+  const latestEnd = protos.filter(pr=>pr.endDate).reduce((max,pr) => pr.endDate > max ? pr.endDate : max, '');
+  if(latestEnd && qs.monthly.length) {
+    for(let m=1;m<=6;m++) {
+      const d=new Date(latestEnd); d.setMonth(d.getMonth()+m);
+      sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Post-cure M+'+m});
+    }
+  }
+
+  // Sort chronologically, dedupe same-date same-type
+  sched.sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  return sched;
+}
+
+// genSchedulePostcureOnly — for patients starting directly in post-cure
+function genSchedulePostcureOnly(p) {
+  const protos = normalizeProtocols(p);
+  const allNames = protos.map(pr=>pr.name);
+  const qs = getProtoQs(allNames);
+  const startDate = protos[0]?.startDate || todayStr();
+  const sched = [];
   for(let m=1;m<=6;m++) {
-    const d=new Date(p.endDate); d.setMonth(d.getMonth()+m);
-    sched.push({date:d.toISOString().split('T')[0],questionnaires:[...qs.monthly],hetero:[...qs.heteroMonthly],done:[],type:'monthly',label:'Post-cure M+'+m});
+    const d=new Date(startDate); d.setMonth(d.getMonth()+m);
+    sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Post-cure M+'+m});
   }
   return sched;
 }
@@ -1949,7 +2074,7 @@ function renderPatientList(filter={}) {
   const list=document.getElementById('patient-list'); if(!list) return;
   let pts=[...NS.patients].filter(p=>!p.archived); // exclude archived by default
   if(filter.status&&filter.status!=='all') pts=pts.filter(p=>p.status===filter.status);
-  if(filter.protocol&&filter.protocol!=='all') pts=pts.filter(p=>p.protocols&&p.protocols.includes(filter.protocol));
+  if(filter.protocol&&filter.protocol!=='all') pts=pts.filter(p=>normalizeProtocols(p).some(pr=>pr.name===filter.protocol));
   if(filter.search) { const s=filter.search.toLowerCase(); pts=pts.filter(p=>p.code?.toLowerCase().includes(s)||p.patientId?.toLowerCase().includes(s)); }
   list.innerHTML=pts.length===0?'<div class="empty"><p>Aucun patient trouvé</p></div>':pts.map(patRowHTML).join('');
 }
@@ -1957,7 +2082,7 @@ function renderPatientList(filter={}) {
 function patRowHTML(p) {
   const ini=codeInitials(p.code);
   const sb=p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Post-cure</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
-  const prots=(p.protocols||[]).map(pr=>PROTOCOLS[pr]?.name||pr).join(', ');
+  const prots=normalizeProtocols(p).map(pr=>(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'⛔':'')).join(', ');
   return '<div class="patient-row" onclick="openPatient(\''+p.id+'\')">'
     +'<div class="pat-av">'+ini+'</div>'
     +'<div class="pat-left"><div class="pat-code">'+(p.code||'—')+'</div>'
@@ -2118,7 +2243,8 @@ function renderPatientDetail() {
   if(endEl) endEl.textContent=fmtDate(p.endDate);
   // Protocols
   const protsEl=document.getElementById('pd-prots');
-  if(protsEl) protsEl.innerHTML=(p.protocols||[]).map(pr=>'<span class="badge b-blue">'+(PROTOCOLS[pr]&&PROTOCOLS[pr].name||pr)+'</span>').join('');
+  const _protos = normalizeProtocols(p);
+  if(protsEl) protsEl.innerHTML=_protos.map(pr=>'<span class="badge b-blue">'+(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'<span style="color:var(--red);font-size:10px"> ⛔</span>':'')+'</span>').join('');
   const firstTab=document.querySelector('#page-patient-detail .tab');
   switchTab('suivi',firstTab);
   renderTimeline(); renderNotes(); renderScores();
@@ -2129,7 +2255,7 @@ function renderTimeline() {
   const p=NS.currentPatient, el=document.getElementById('timeline'); if(!el) return;
   const tod=todayStr();
   // Merge current PROTOCOLS into schedule slots so xlsx updates reflect immediately
-  const liveProtoQs = getProtoQs(p.protocols||[]);
+  const liveProtoQs = getProtoQs(normalizeProtocols(p));
   let html='';
   const isInterrupted = !!p.interruptDate;
   (p.schedule||[]).forEach(s=>{
@@ -2637,10 +2763,8 @@ async function qFinish() {
 }
 
 function openAddPatient() {
-  newPat={step:1,protocols:[]};
-  document.querySelectorAll('.prot-btn').forEach(b=>b.classList.remove('active'));
-  ['p-prenom','p-nom','p-j1','p-end'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  const dob=document.getElementById('p-dob'); if(dob) dob.value='';
+  newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure'};
+  ['p-prenom','p-nom','p-dob'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const cp=document.getElementById('code-prev'); if(cp){cp.textContent='XXX-XXX-AAAAMMJJ';cp.style.opacity='.4';}
   const sa=document.getElementById('sched-area'); if(sa) sa.style.display='none';
   renderPatStep();
@@ -2654,14 +2778,15 @@ function renderPatStep() {
   });
   document.getElementById('btn-prev-pat').style.display=newPat.step>1?'inline-flex':'none';
   document.getElementById('btn-next-pat').textContent=newPat.step<3?'Suivant →':'✓ Créer le patient';
-  if(newPat.step===2) updateSchedPreview();
+  if(newPat.step===2) { renderProtocolList(); setPatientMode(newPat.mode||'cure'); updateSchedPreview(); }
   if(newPat.step===3) renderPatSummary();
 }
 
 function updateSchedPreview() {
-  if(!newPat.protocols.length){document.getElementById('sched-area').style.display='none';return;}
+  const validProtos = newPat.protocols.filter(p=>p.name);
+  if(!validProtos.length){document.getElementById('sched-area').style.display='none';return;}
   document.getElementById('sched-area').style.display='block';
-  const qs=getProtoQs(newPat.protocols);
+  const qs=getProtoQs(validProtos);
   document.getElementById('sched-auto').innerHTML=qs.auto.map(q=>'<span class="stag stag-common">'+q+'</span>').join('');
   document.getElementById('sched-hetero').innerHTML=qs.hetero.map(q=>'<span class="stag stag-hetero">'+q+'</span>').join('');
   document.getElementById('sched-weekly').innerHTML=qs.weekly.map(q=>'<span class="stag stag-common">'+q+'</span>').join('');
@@ -2671,15 +2796,102 @@ function updateSchedPreview() {
 function renderPatSummary() {
   const code=genCode(document.getElementById('p-prenom').value,document.getElementById('p-nom').value,document.getElementById('p-dob').value);
   document.getElementById('c-code').textContent=code;
-  document.getElementById('c-prots').textContent=newPat.protocols.map(p=>PROTOCOLS[p]&&PROTOCOLS[p].name||p).join(', ')||'—';
-  document.getElementById('c-j1').textContent=fmtDate(document.getElementById('p-j1').value);
-  document.getElementById('c-end').textContent=fmtDate(document.getElementById('p-end').value);
+  const valid = newPat.protocols.filter(p=>p.name);
+  if(newPat.mode === 'postcure') {
+    document.getElementById('c-details').style.display='none';
+    document.getElementById('c-postcure-details').style.display='';
+    document.getElementById('c-prots2').textContent = valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ')||'—';
+    document.getElementById('c-postcure-start').textContent = fmtDate(document.getElementById('p-postcure-start')?.value);
+  } else {
+    document.getElementById('c-details').style.display='';
+    document.getElementById('c-postcure-details').style.display='none';
+    document.getElementById('c-prots').textContent = valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ')||'—';
+    const firstStart = valid.reduce((m,p)=>(!m||p.startDate<m)?p.startDate:m,'');
+    const lastEnd = valid.reduce((m,p)=>p.endDate>m?p.endDate:m,'');
+    document.getElementById('c-j1').textContent = fmtDate(firstStart);
+    document.getElementById('c-end').textContent = valid.length>1 ? valid.map(p=>(PROTOCOLS[p.name]?.name||p.name)+': '+fmtDate(p.endDate)).join(' · ') : fmtDate(lastEnd);
+  }
 }
 
 function toggleProtocol(val,el) {
-  if(newPat.protocols.includes(val)){newPat.protocols=newPat.protocols.filter(p=>p!==val);el.classList.remove('active');}
-  else{newPat.protocols.push(val);el.classList.add('active');}
+  // Legacy function kept for compatibility — new UI uses protocol entries
   updateSchedPreview();
+}
+
+// ── Protocol entry UI ──────────────────────────────────────────
+const PROTO_OPTIONS = [
+  {value:'', label:'-- Choisir un protocole --'},
+  {value:'depression', label:'Dépression'},
+  {value:'anxiete', label:'Trouble anxieux'},
+  {value:'toc', label:'TOC'},
+  {value:'ptsd', label:'PTSD'},
+  {value:'douleur', label:'Douleur'},
+  {value:'schiz_h', label:'Schizo. hallucinatoire'},
+  {value:'schiz_n', label:'Schizo. négative'},
+  {value:'cognitif', label:'Trouble cognitif'},
+  {value:'add_alc', label:'Addiction — Alcool'},
+  {value:'add_coc', label:'Addiction — Cocaïne'},
+  {value:'add_aut', label:'Addiction — Autre'},
+];
+
+function setPatientMode(mode) {
+  newPat.mode = mode;
+  document.getElementById('mode-cure-btn').className = 'btn btn-sm ' + (mode==='cure' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('mode-postcure-btn').className = 'btn btn-sm ' + (mode==='postcure' ? 'btn-primary' : 'btn-secondary');
+  document.getElementById('postcure-startdate-area').style.display = mode==='postcure' ? 'block' : 'none';
+  renderProtocolList();
+  updateSchedPreview();
+}
+
+function addProtocolEntry() {
+  newPat.protocols.push({name:'', startDate:'', endDate:''});
+  renderProtocolList();
+}
+
+function removeProtocolEntry(idx) {
+  if(newPat.protocols.length <= 1) { newPat.protocols[0] = {name:'',startDate:'',endDate:''}; }
+  else { newPat.protocols.splice(idx, 1); }
+  renderProtocolList();
+  updateSchedPreview();
+}
+
+function updateProtocolField(idx, field, value) {
+  newPat.protocols[idx][field] = value;
+  if(field === 'startDate' && !newPat.protocols[idx].endDate) {
+    // Auto-calc end date for this protocol
+    const name = newPat.protocols[idx].name;
+    if(name && value) {
+      const maxSess = PROTOCOL_SESSIONS[name] || 30;
+      const d = new Date(value);
+      let sessions = 0;
+      while(sessions < maxSess) { d.setDate(d.getDate()+1); if(d.getDay()!==0&&d.getDay()!==6) sessions++; }
+      newPat.protocols[idx].endDate = d.toISOString().split('T')[0];
+      renderProtocolList();
+    }
+  }
+  if(field === 'name' && newPat.protocols[idx].startDate) updateProtocolField(idx,'startDate',newPat.protocols[idx].startDate);
+  updateSchedPreview();
+}
+
+function renderProtocolList() {
+  const area = document.getElementById('proto-list-area');
+  if(!area) return;
+  const isCure = newPat.mode !== 'postcure';
+  let html = '';
+  newPat.protocols.forEach((pr, i) => {
+    const opts = PROTO_OPTIONS.map(o => '<option value="'+o.value+'"'+(pr.name===o.value?' selected':'')+'>'+o.label+'</option>').join('');
+    html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px">';
+    if(newPat.protocols.length > 1) html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:600;color:var(--text2)">Protocole '+(i+1)+'</span><button class="btn btn-ghost btn-sm" style="color:var(--red);font-size:11px" onclick="removeProtocolEntry('+i+')">✕ Retirer</button></div>';
+    html += '<div class="fg" style="margin-bottom:8px"><label style="font-size:11px">Protocole *</label><select onchange="updateProtocolField('+i+','name',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px;background:var(--surface)">'+opts+'</select></div>';
+    if(isCure) {
+      html += '<div class="g2">';
+      html += '<div class="fg"><label style="font-size:11px">Date J1 *</label><input type="date" value="'+(pr.startDate||'')+'" onchange="updateProtocolField('+i+','startDate',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
+      html += '<div class="fg"><label style="font-size:11px">Date fin de cure *</label><input type="date" value="'+(pr.endDate||'')+'" onchange="updateProtocolField('+i+','endDate',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px"></div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  area.innerHTML = html;
 }
 
 async function nextStepPat() {
@@ -2712,23 +2924,46 @@ async function createPatient() {
     const prenom=document.getElementById('p-prenom').value.trim();
     const nom=document.getElementById('p-nom').value.trim();
     const dob=document.getElementById('p-dob').value;
-    const j1Date=document.getElementById('p-j1').value;
-    const endDate=document.getElementById('p-end').value;
     const cabinet=document.getElementById('cabinet-sel').value;
     const code=genCode(prenom,nom,dob);
+    const validProtos = newPat.protocols.filter(p=>p.name);
     const snap=await db.collection('patients').get();
     const patientId='NS-'+new Date().getFullYear()+'-'+String(snap.size+1).padStart(5,'0');
+
+    // Build schedule
+    let schedule, status, j1Date, endDate;
+    if(newPat.mode === 'postcure') {
+      const startDate = document.getElementById('p-postcure-start')?.value || todayStr();
+      validProtos.forEach(p => p.startDate = startDate);
+      schedule = genSchedulePostcureOnly({protocols: validProtos});
+      status = 'postcure';
+      j1Date = startDate;
+      endDate = startDate;
+    } else {
+      schedule = genSchedule({protocols: validProtos});
+      status = 'cure';
+      j1Date = validProtos.reduce((m,p)=>(!m||p.startDate<m)?p.startDate:m,'');
+      endDate = validProtos.reduce((m,p)=>p.endDate>m?p.endDate:m,'');
+    }
+
     await db.collection('patients').add({
-      code,patientId,dob,j1Date,endDate,cabinet,
-      protocols:newPat.protocols,status:'cure',
-      notes:[],responses:{},
-      schedule:genSchedule({protocols:newPat.protocols,j1Date,endDate}),
+      code, patientId, dob, j1Date, endDate, cabinet,
+      protocols: validProtos,
+      status,
+      notes:[], responses:{},
+      schedule,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       createdBy:NS.userProfile.email
     });
     hideLoading();
     closeModal('m-add-patient');
-    logAccess('create_patient',code);
+    logAccess('create_patient', code);
+    if(newPat.mode === 'postcure') {
+      // Open post-cure config immediately after creation
+      await new Promise(r => setTimeout(r, 800));
+      const fresh = NS.patients.find(p=>p.code===code);
+      if(fresh) { NS.currentPatient = fresh; setTimeout(()=>openConsolidation(), 400); }
+    }
   } catch(err) {
     hideLoading();
     showError('Erreur lors de la création : '+err.message, 5000);
@@ -2803,7 +3038,7 @@ function exportCSV() {
   pts.forEach(p=>{
     Object.values(p.responses||{}).forEach(resp=>{
       const qi=QUESTIONNAIRES[resp.questionnaire];
-      rows.push([p.code,p.patientId,p.cabinet,(p.protocols||[]).join(';'),p.j1Date,p.endDate,resp.questionnaire,resp.date,resp.score,qi&&qi.interpret&&qi.interpret(resp.score)&&qi.interpret(resp.score).label||'']);
+      rows.push([p.code,p.patientId,p.cabinet,normalizeProtocols(p).map(pr=>pr.name).join(';'),p.j1Date,p.endDate,resp.questionnaire,resp.date,resp.score,qi&&qi.interpret&&qi.interpret(resp.score)&&qi.interpret(resp.score).label||'']);
     });
   });
   const bom='\uFEFF'; const csv=bom+rows.map(r=>r.map(c=>'"'+c+'"').join(';')).join('\n');
@@ -2892,9 +3127,10 @@ async function openEditPatient(id) {
   document.getElementById('edit-dob').value = p.dob || '';
   // Protocols
   document.querySelectorAll('.edit-prot-btn').forEach(b => {
-    b.classList.toggle('active', p.protocols && p.protocols.includes(b.dataset.prot));
+    const _np = normalizeProtocols(p);
+    b.classList.toggle('active', _np.some(pr=>pr.name===b.dataset.prot));
   });
-  document.getElementById('edit-protocols-hidden').value = JSON.stringify(p.protocols || []);
+  document.getElementById('edit-protocols-hidden').value = JSON.stringify(normalizeProtocols(p).map(pr=>pr.name));
   // Cabinet
   const cabSel = document.getElementById('edit-cabinet');
   if(cabSel) {
@@ -2930,11 +3166,17 @@ async function saveEditPatient() {
   const endDate = document.getElementById('edit-end').value;
   const status = document.getElementById('edit-status').value;
   const dob = document.getElementById('edit-dob').value;
-  const protocols = JSON.parse(document.getElementById('edit-protocols-hidden').value || '[]');
+  const rawProts = JSON.parse(document.getElementById('edit-protocols-hidden').value || '[]');
+  // Convert to new format, preserving existing dates if already new format
+  const existingProtos = normalizeProtocols(NS.currentPatient||{});
+  const protocols = rawProts.map(name => {
+    const ex = existingProtos.find(pr=>pr.name===name);
+    return ex || {name, startDate: j1Date, endDate};
+  });
   if(!j1Date || !endDate) { alert('Veuillez remplir les dates.'); return; }
   if(!protocols.length) { alert('Veuillez sélectionner au moins un protocole.'); return; }
   // Regenerate schedule based on new dates/protocols
-  const newSchedule = genSchedule({protocols, j1Date, endDate});
+  const newSchedule = genSchedule({protocols});
   // Preserve done status by type+index
   const patSnap2 = await db.doc('patients/'+id).get();
   const oldSched = patSnap2.data().schedule || [];
@@ -3028,7 +3270,8 @@ async function saveAdjustDates() {
   const endDate = document.getElementById('adj-end').value;
   if(!j1Date || !endDate) { alert('Veuillez remplir les deux dates.'); return; }
   // Generate new schedule
-  const newSchedule = genSchedule({protocols: p.protocols, j1Date, endDate});
+  const adjProtos = normalizeProtocols(p).map(pr => ({...pr, startDate:j1Date, endDate}));
+  const newSchedule = genSchedule({protocols: adjProtos});
   // Preserve done status by TYPE (not date) — so completed items stay completed
   // regardless of date shifts
   const oldSchedule = p.schedule || [];
@@ -4208,7 +4451,7 @@ async function renderFavorisList() {
   return c.substring(0,2);
 })(p.code) : '??';
     const sb = p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Post-cure</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
-    const prots = (p.protocols||[]).map(pr=>PROTOCOLS[pr]&&PROTOCOLS[pr].name||pr).join(', ');
+    const prots = normalizeProtocols(p).map(pr=>PROTOCOLS[pr.name]?.name||pr.name).join(', ');
     return '<div class="patient-row" data-id="'+p.id+'" onclick="openPatient(this.dataset.id)">'
       +'<div class="pat-av" style="background:var(--amber-bg);color:var(--amber)">'+ini+'</div>'
       +'<div class="pat-left">'
@@ -4771,7 +5014,7 @@ async function exportResearch(format) {
           patient_code: p.code,
           patient_id: p.patientId,
           cabinet: p.cabinet,
-          protocoles: (p.protocols||[]).map(pr=>PROTOCOLS[pr]?.name||pr).join(';'),
+          protocoles: normalizeProtocols(p).map(pr=>PROTOCOLS[pr.name]?.name||pr.name).join(';'),
           j1_date: p.j1Date || '',
           end_date: p.endDate || '',
           questionnaire: resp.questionnaire,
@@ -4916,7 +5159,7 @@ async function globalSearch(query) {
         .filter(p =>
           p.code?.toLowerCase().includes(q) ||
           p.patientId?.toLowerCase().includes(q) ||
-          (p.protocols||[]).some(pr => PROTOCOLS[pr]?.name?.toLowerCase().includes(q))
+          normalizeProtocols(p).some(pr => PROTOCOLS[pr.name]?.name?.toLowerCase().includes(q))
         )
         .slice(0, 8);
 
@@ -4926,7 +5169,7 @@ async function globalSearch(query) {
       }
 
       resultsEl.innerHTML = results.map(p => {
-        const prots = (p.protocols||[]).map(pr=>PROTOCOLS[pr]?.name||pr).join(', ');
+        const prots = normalizeProtocols(p).map(pr=>PROTOCOLS[pr.name]?.name||pr.name).join(', ');
         const statusColor = p.status==='cure'?'var(--accent)':p.status==='postcure'?'var(--green)':'var(--text3)';
         return '<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center" '
           + 'onmouseenter="this.style.background=\'var(--surface2)\'" '
@@ -5087,25 +5330,28 @@ function validatePatientStep1() {
 }
 
 function validatePatientStep2() {
-  const j1 = document.getElementById('p-j1')?.value;
-  const end = document.getElementById('p-end')?.value;
-
-  if(!j1) { showFieldError('p-j1', 'Date J1 requise'); return false; }
-  if(!end) { showFieldError('p-end', 'Date de fin requise'); return false; }
-  if(new Date(end) <= new Date(j1)) { showFieldError('p-end', 'La fin de cure doit être après J1'); return false; }
-
-  const durationDays = (new Date(end) - new Date(j1)) / (24*3600*1000);
-  if(durationDays < 7) { showFieldError('p-end', 'Durée de cure trop courte (min. 7 jours)'); return false; }
-  if(durationDays > 365) {
-    if(!confirm('La durée de cure est de '+Math.round(durationDays)+' jours. Confirmer ?')) return false;
-  }
-
-  if(!newPat.protocols.length) {
-    showError('Veuillez sélectionner au moins un protocole.', 3000);
-    return false;
-  }
-
   clearFieldErrors();
+  const valid = newPat.protocols.filter(p=>p.name);
+  if(!valid.length) { showError('Veuillez sélectionner au moins un protocole.', 3000); return false; }
+
+  if(newPat.mode === 'postcure') {
+    const start = document.getElementById('p-postcure-start')?.value;
+    if(!start) { showError('Veuillez indiquer la date de début du suivi post-cure.', 3000); return false; }
+    // Store start date into protocols
+    newPat.protocols.forEach(p => { if(p.name) p.startDate = start; });
+    return true;
+  }
+
+  // Cure mode: validate each protocol entry
+  for(let i=0; i<valid.length; i++) {
+    const pr = valid[i];
+    if(!pr.startDate) { showError('Protocole '+(i+1)+' : date J1 requise.', 3000); return false; }
+    if(!pr.endDate) { showError('Protocole '+(i+1)+' : date de fin requise.', 3000); return false; }
+    if(new Date(pr.endDate) <= new Date(pr.startDate)) { showError('Protocole '+(i+1)+' : la fin doit être après le J1.', 3000); return false; }
+    const days = (new Date(pr.endDate)-new Date(pr.startDate))/(24*3600*1000);
+    if(days < 7) { showError('Protocole '+(i+1)+' : durée trop courte (min. 7 jours).', 3000); return false; }
+    if(days > 365) { if(!confirm('Protocole '+(i+1)+' : durée de '+Math.round(days)+' jours. Confirmer ?')) return false; }
+  }
   return true;
 }
 
@@ -5444,7 +5690,7 @@ async function loadArchives() {
   if(parts.length >= 2) return (parts[0][0]||'') + (parts[1][0]||'');
   return c.substring(0,2);
 })(p.code) : '??';
-      const prots = (p.protocols||[]).map(function(pr) { return PROTOCOLS[pr] ? PROTOCOLS[pr].name : pr; }).join(', ');
+      const prots = normalizeProtocols(p).map(function(pr) { return PROTOCOLS[pr.name] ? PROTOCOLS[pr.name].name : pr.name; }).join(', ');
       return '<div class="patient-row">'
         +'<div class="pat-av" style="background:var(--surface2);color:var(--text3)">'+ini+'</div>'
         +'<div class="pat-left">'
@@ -5474,10 +5720,93 @@ async function unarchivePatient(id) {
 // ════════════════════════════════════════════════
 // INTERRUPTION DE CURE
 // ════════════════════════════════════════════════
+function openAddProtocolToPatient() {
+  const p = NS.currentPatient; if(!p) return;
+  document.getElementById('add-proto-name').value = '';
+  document.getElementById('add-proto-j1').value = todayStr();
+  document.getElementById('add-proto-end').value = '';
+  openModal('m-add-protocol');
+}
+
+async function confirmAddProtocol() {
+  const p = NS.currentPatient; if(!p) return;
+  const name = document.getElementById('add-proto-name').value;
+  const j1 = document.getElementById('add-proto-j1').value;
+  const end = document.getElementById('add-proto-end').value;
+  if(!name) { alert('Veuillez choisir un protocole.'); return; }
+  if(!j1 || !end) { alert('Veuillez remplir les deux dates.'); return; }
+  if(new Date(end) <= new Date(j1)) { alert('La fin de cure doit être après le J1.'); return; }
+
+  // Normalize existing protocols
+  const existingProtos = normalizeProtocols(p);
+  // Check not already present
+  if(existingProtos.find(pr => pr.name === name)) {
+    if(!confirm('Ce protocole est déjà actif. Ajouter quand même (nouvelle cure) ?')) return;
+  }
+  const newProtos = [...existingProtos, {name, startDate: j1, endDate: end}];
+
+  // Get existing schedule — preserve done responses, add only new slots
+  const existingSchedule = p.schedule || [];
+  const newSchedule = genSchedule({protocols: newProtos});
+
+  // Merge: keep existing slots (with done), add new slots not already present
+  // Key for dedup: date + type + (for weekly: date is enough)
+  const existingKeys = new Set(existingSchedule.map(s => s.date+'|'+s.type));
+
+  // For j1/end/consent: may have different labels — merge questionnaires
+  const mergedSchedule = [...existingSchedule];
+
+  newSchedule.forEach(ns => {
+    const key = ns.date+'|'+ns.type;
+    const existing = mergedSchedule.find(s => s.date===ns.date && s.type===ns.type);
+    if(existing) {
+      // Merge questionnaires without duplicating already-done ones
+      const newQs = (ns.questionnaires||[]).filter(q => !existing.questionnaires.includes(q));
+      const newHet = (ns.hetero||[]).filter(q => !(existing.hetero||[]).includes(q));
+      existing.questionnaires = [...existing.questionnaires, ...newQs];
+      existing.hetero = [...(existing.hetero||[]), ...newHet];
+    } else {
+      mergedSchedule.push({...ns});
+    }
+  });
+  mergedSchedule.sort((a,b) => a.date<b.date?-1:a.date>b.date?1:0);
+
+  // Update endDate to latest
+  const newEndDate = newProtos.reduce((m,pr)=>pr.endDate>m?pr.endDate:m,'');
+
+  showLoading('Mise à jour du calendrier…');
+  try {
+    await db.doc('patients/'+p.id).update({
+      protocols: newProtos,
+      endDate: newEndDate,
+      schedule: mergedSchedule
+    });
+    logAccess('add_protocol', p.code + ' · ' + name + ' · J1:' + j1);
+    closeModal('m-add-protocol');
+    const fresh = await db.doc('patients/'+p.id).get();
+    NS.currentPatient = {id: p.id, ...fresh.data()};
+    renderPatientDetail();
+  } catch(e) {
+    showError('Erreur : ' + e.message, 5000);
+  }
+  hideLoading();
+}
+
 function openInterruptCure() {
   const p = NS.currentPatient; if(!p) return;
+  const protos = normalizeProtocols(p);
   const dateEl = document.getElementById('interrupt-date');
   if(dateEl) dateEl.value = todayStr();
+
+  // Build protocol selector
+  const sel = document.getElementById('interrupt-protocol-sel');
+  if(sel) {
+    sel.innerHTML = '<option value="all">Tous les protocoles</option>'
+      + protos.map(pr => '<option value="'+pr.name+'">'+(PROTOCOLS[pr.name]?.name||pr.name)+'</option>').join('')
+      + (p.status==='postcure'||p.consolidation ? '<option value="postcure">Suivi post-cure</option>' : '');
+    const selArea = document.getElementById('interrupt-protocol-area');
+    if(selArea) selArea.style.display = protos.length > 1 || p.status==='postcure' ? 'block' : 'none';
+  }
   openModal('m-interrupt-cure');
 }
 
@@ -5486,43 +5815,87 @@ async function confirmInterruptCure() {
   const interruptDate = document.getElementById('interrupt-date')?.value;
   const reason = document.getElementById('interrupt-reason')?.value || '';
   const doPostcure = document.getElementById('interrupt-postcure')?.value === 'yes';
+  const whichProto = document.getElementById('interrupt-protocol-sel')?.value || 'all';
 
-  if(!interruptDate) { alert('Veuillez indiquer la date d interruption.'); return; }
+  if(!interruptDate) { alert('Veuillez indiquer la date d'interruption.'); return; }
 
-  // Remove all future questionnaires after interrupt date
-  // Also clear unanswered questionnaires on past/present slots (they must not show as overdue)
-  const schedule = (p.schedule||[]).map(s => {
-    if(s.type === 'monthly') return s; // keep post-cure monthly slots untouched
-    if(s.date > interruptDate) {
-      // Future slots: cancel entirely
-      return {...s, cancelled: true, questionnaires: [], hetero: []};
-    }
-    // Past and present slots (<= interruptDate): remove only unanswered questionnaires
-    const done = s.done || [];
-    const ignored = s.ignored || [];
-    const keepQs = (s.questionnaires||[]).filter(q => done.includes(q) || ignored.includes(q));
-    const keepHet = (s.hetero||[]).filter(q => done.includes(q) || ignored.includes(q));
-    return {...s, questionnaires: keepQs, hetero: keepHet};
-  }).filter(s => s.questionnaires?.length > 0 || s.hetero?.length > 0 || s.done?.length > 0);
+  const isPostcureInterrupt = whichProto === 'postcure';
+  let updateData = {};
 
-  await db.doc('patients/'+p.id).update({
-    status: 'postcure',
-    endDate: interruptDate,
-    interruptDate,
-    interruptReason: reason,
-    schedule
-  });
+  if(isPostcureInterrupt) {
+    // Interrupt only post-cure: remove all monthly slots after interruptDate
+    const schedule = (p.schedule||[]).map(s => {
+      if(s.type !== 'monthly') return s;
+      if(s.date > interruptDate) return {...s, questionnaires: [], hetero: []};
+      const done = s.done||[], ign = s.ignored||[];
+      return {...s,
+        questionnaires: (s.questionnaires||[]).filter(q=>done.includes(q)||ign.includes(q)),
+        hetero: (s.hetero||[]).filter(q=>done.includes(q)||ign.includes(q))
+      };
+    }).filter(s => s.questionnaires?.length>0||s.hetero?.length>0||s.done?.length>0);
+    updateData = {status:'termine', schedule, postcureInterruptDate: interruptDate};
+  } else {
+    // Interrupt one or all cure protocols
+    const protos = normalizeProtocols(p);
+    const protosToInterrupt = whichProto === 'all' ? protos.map(pr=>pr.name) : [whichProto];
 
-  logAccess('interrupt_cure', p.code + ' · ' + interruptDate + (reason?' · '+reason:''));
+    // Determine which questionnaires belong exclusively to interrupted protocols
+    // (not shared with remaining active protocols)
+    const remainingProtos = protos.filter(pr => !protosToInterrupt.includes(pr.name));
+    const remainingQs = remainingProtos.length ? getProtoQs(remainingProtos) : {weekly:[], auto:[], endCure:[], monthly:[]};
+    const allRemainingQNames = new Set([
+      ...remainingQs.weekly, ...remainingQs.auto, ...remainingQs.endCure, ...remainingQs.monthly
+    ]);
+
+    const schedule = (p.schedule||[]).map(s => {
+      if(s.type === 'monthly') return s; // post-cure always preserved
+      if(s.date > interruptDate) {
+        if(remainingProtos.length > 0) {
+          // Keep questionnaires that belong to remaining active protocols
+          const keepQs = (s.questionnaires||[]).filter(q => allRemainingQNames.has(q));
+          const keepHet = (s.hetero||[]).filter(q => allRemainingQNames.has(q));
+          if(keepQs.length || keepHet.length) return {...s, questionnaires:keepQs, hetero:keepHet};
+          return {...s, questionnaires:[], hetero:[]}; // cancel slot
+        }
+        return {...s, cancelled:true, questionnaires:[], hetero:[]};
+      }
+      // Past/present: remove only unanswered qs of interrupted protocols
+      const done = s.done||[], ign = s.ignored||[];
+      const interruptedQs = getProtoQs(protosToInterrupt);
+      const interruptedNames = new Set([...interruptedQs.weekly,...interruptedQs.auto,...interruptedQs.endCure]);
+      const keepQs = (s.questionnaires||[]).filter(q => done.includes(q)||ign.includes(q)||!interruptedNames.has(q));
+      const keepHet = (s.hetero||[]).filter(q => done.includes(q)||ign.includes(q)||!interruptedNames.has(q));
+      return {...s, questionnaires:keepQs, hetero:keepHet};
+    }).filter(s => s.questionnaires?.length>0||s.hetero?.length>0||s.done?.length>0);
+
+    // Update protocols: mark interrupted ones
+    const updatedProtos = protos.map(pr => {
+      if(protosToInterrupt.includes(pr.name)) return {...pr, endDate:interruptDate, interrupted:true, interruptReason:reason};
+      return pr;
+    });
+
+    const allInterrupted = updatedProtos.every(pr => pr.interrupted);
+    const newStatus = allInterrupted ? 'postcure' : 'cure';
+    const newEndDate = allInterrupted ? interruptDate : p.endDate;
+
+    updateData = {
+      status: newStatus,
+      protocols: updatedProtos,
+      schedule,
+      ...(allInterrupted ? {endDate: newEndDate, interruptDate, interruptReason: reason} : {})
+    };
+  }
+
+  showLoading('Mise à jour…');
+  await db.doc('patients/'+p.id).update(updateData);
+  logAccess('interrupt_cure', p.code + ' · ' + whichProto + ' · ' + interruptDate + (reason?' · '+reason:''));
   closeModal('m-interrupt-cure');
-
-  // Refresh patient
   const fresh = await db.doc('patients/'+p.id).get();
   NS.currentPatient = {id: p.id, ...fresh.data()};
+  hideLoading();
   renderPatientDetail();
 
-  if(doPostcure) {
-    // Pre-fill start date for post-cure config
+  if(doPostcure && !isPostcureInterrupt) {
     const startEl = document.getElementById('cons-start-date');
     if(startEl) startEl.value = interruptDate;
     setTimeout(() => openConsolidation(), 300);
@@ -5534,7 +5907,7 @@ async function confirmInterruptCure() {
 // ════════════════════════════════════════════════
 function openConsolidation() {
   const p = NS.currentPatient; if(!p) return;
-  const qs = getProtoQs(p.protocols||[]);
+  const qs = getProtoQs(normalizeProtocols(p));
   consQuestionnaires = [...new Set([...qs.monthly])];
   if(!consQuestionnaires.length) consQuestionnaires = ['PHQ-9','GAD-7'];
   renderConsQs();
@@ -6440,7 +6813,7 @@ async function generatePDF() {
     const rows = [
       ['Code patient', p.code||'---'],
       ['Date de naissance', fmtDob(p.dob)],
-      ['Protocole(s)', (p.protocols||[]).map(function(pr){return PROTOCOLS[pr]?PROTOCOLS[pr].name:pr;}).join(', ')||'---'],
+      ['Protocole(s)', normalizeProtocols(p).map(function(pr){return PROTOCOLS[pr.name]?PROTOCOLS[pr.name].name:pr.name;}).join(', ')||'---'],
       ['J1 - Debut de cure', fmtDate(p.j1Date)],
       ['Fin de cure', fmtDate(p.endDate)],
       ['Statut', p.status==='cure'?'En cure':p.status==='postcure'?'Post-cure':'Termine']
