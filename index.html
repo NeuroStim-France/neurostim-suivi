@@ -3260,27 +3260,54 @@ function onPs2ParcoursTypeChange() {
   subEl.innerHTML=''; subEl.style.display='none';
   if(!type) return;
   subEl.style.display='block';
-  // Reuse the same sub-option rendering logic as the modal
-  // Temporarily set parcoursState to newPat.parcoursState and use existing render
-  const saved = parcoursState;
-  parcoursState = newPat.parcoursState;
-  parcoursState.type = type;
-  const fakeEl = {innerHTML:''};
-  // Build html inline (simplified — same options as modal)
-  let html = '';
-  if(type==='cpap') {
-    html='<div class="fg"><label>Dispositif</label><div style="display:flex;gap:8px">'
-      +['CPAP','OAM'].map(v=>'<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px"><input type="radio" name="ps2-cpap" data-v="'+v+'" onchange="newPat.parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent)"> '+v+'</label>').join('')
-      +'</div></div>';
+
+  if(type==='medicament') {
+    subEl.innerHTML='<div class="fg"><label>Stratégie</label><div id="ps2-med-strat-list" style="display:flex;flex-direction:column;gap:6px"></div></div><div id="ps2-med-fields" style="display:none"></div>';
+    const list = document.getElementById('ps2-med-strat-list');
+    [{v:'nouveau', l:'Nouveau traitement',  tip:"Monothérapie — nouvelle molécule"},
+     {v:'addon',   l:"Stratégie d'Add-on", tip:"Adjonction à un traitement existant"},
+     {v:'switch',  l:'Switch',               tip:"Remplacement d'un traitement existant"}
+    ].forEach(function(s) {
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%';
+      const inp=document.createElement('input'); inp.type='radio'; inp.name='ps2-med-strat'; inp.value=s.v;
+      inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
+      inp.addEventListener('change',function(){
+        newPat.parcoursState.subtype.strategie=s.v;
+        // Show fields
+        const f=document.getElementById('ps2-med-fields'); if(!f) return; f.style.display='block';
+        let fhtml='';
+        if(s.v==='switch') fhtml='<div class="g2"><div class="fg"><label>Traitement initial</label><input type="text" autocomplete="off" placeholder="Médicament" onchange="newPat.parcoursState.subtype.traitementInitial=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div><div class="fg"><label>Nouveau traitement</label><input type="text" autocomplete="off" placeholder="Médicament" onchange="newPat.parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div></div>';
+        else fhtml='<div class="fg"><label>Nom du médicament</label><input type="text" autocomplete="off" placeholder="Ex: Sertraline" onchange="newPat.parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+        fhtml+='<div class="fg"><label>Dose initiale</label><input type="text" autocomplete="off" placeholder="Ex: 50 mg/j" onchange="newPat.parcoursState.subtype.dose=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+        f.innerHTML=fhtml;
+      });
+      const span=document.createElement('span'); span.style.cssText='flex:1;min-width:0'; span.textContent=s.l;
+      const tipEl=document.createElement('span'); tipEl.title=s.tip; tipEl.textContent='ⓘ'; tipEl.style.cssText='cursor:help;color:var(--text3);font-size:12px;flex-shrink:0';
+      lbl.appendChild(inp); lbl.appendChild(span); lbl.appendChild(tipEl);
+      list.appendChild(lbl);
+    });
+  } else if(type==='cpap') {
+    subEl.innerHTML='<div class="fg"><label>Dispositif</label><div id="ps2-cpap-list" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>';
+    const cpapList=document.getElementById('ps2-cpap-list');
+    ['CPAP','OAM'].forEach(function(v) {
+      const lbl=document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 20px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-weight:500';
+      const inp=document.createElement('input'); inp.type='radio'; inp.name='ps2-cpap'; inp.value=v;
+      inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
+      inp.addEventListener('change',function(){newPat.parcoursState.subtype.dispositif=v;});
+      const span=document.createElement('span'); span.textContent=v;
+      lbl.appendChild(inp); lbl.appendChild(span);
+      cpapList.appendChild(lbl);
+    });
   } else if(type==='psychotherapie') {
-    html='<div class="fg"><label>Type</label><select id="ps2-psycho-type" onchange="newPat.parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">— Choisir —</option>'+['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Schémas','ICV','Autre'].map(v=>'<option>'+v+'</option>').join('')+'</select></div>'
+    subEl.innerHTML='<div class="fg"><label>Type</label><select id="ps2-psycho-type" onchange="newPat.parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">— Choisir —</option>'+['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Schémas','ICV','Autre'].map(function(v){return'<option>'+v+'</option>';}).join('')+'</select></div>'
       +'<div class="fg"><label>Rythme</label><select id="ps2-psycho-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
   } else if(type==='remediation'||type==='groupe') {
-    html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
+    let html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
     if(type==='groupe') html+='<div class="fg"><label>Description (optionnel)</label><input type="text" autocomplete="off" placeholder="Ex: Groupe TCC" onchange="newPat.parcoursState.subtype.desc=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+    subEl.innerHTML=html;
   }
-  subEl.innerHTML = html;
-  parcoursState = saved;
 }
 
 function setPatientMode(mode) {
@@ -6409,27 +6436,44 @@ function onParcoursTypeChange() {
   subEl.style.display = 'block';
   let html = '';
   if(type === 'medicament') {
-    html = '<div class="fg"><label>Stratégie</label>'
-      +'<div style="display:flex;flex-direction:column;gap:8px">'
-      +[['nouveau','Nouveau traitement','Introduction d\'une nouvelle molécule en monothérapie'],
-        ['addon','Stratégie d\'Add-on','Introduction d\'une nouvelle molécule en adjonction à un traitement existant'],
-        ['switch','Switch','Remplacement d\'un traitement existant']]
-      .map(([v,l,tip]) =>
-        '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%;overflow:hidden">'
-        +'<input type="radio" name="med-strat" value="'+v+'" data-v="'+v+'" onchange="onMedStrategieChange(this.dataset.v)" style="accent-color:var(--accent);flex-shrink:0">'
-        +'<span style="flex:1;min-width:0">'+l+'</span>'
-        +' <span title="'+tip+'" style="cursor:help;color:var(--text3);font-size:13px;flex-shrink:0">ⓘ</span></label>'
-      ).join('')
-      +'</div></div>'
-      +'<div id="med-fields" style="display:none"></div>';
+    subEl.innerHTML = '<div class="fg"><label>Stratégie</label><div id="med-strat-list" style="display:flex;flex-direction:column;gap:8px"></div></div><div id="med-fields" style="display:none"></div>';
+    const stratList = document.getElementById('med-strat-list');
+    const strats = [
+      {v:'nouveau', l:'Nouveau traitement',  tip:"Introduction d'une nouvelle molécule en monothérapie"},
+      {v:'addon',   l:"Stratégie d'Add-on", tip:"Adjonction à un traitement existant"},
+      {v:'switch',  l:'Switch',               tip:"Remplacement d'un traitement existant"},
+    ];
+    strats.forEach(function(s) {
+      const lbl = document.createElement('label');
+      lbl.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%';
+      const inp = document.createElement('input');
+      inp.type='radio'; inp.name='med-strat'; inp.value=s.v;
+      inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
+      inp.addEventListener('change', function(){onMedStrategieChange(s.v);});
+      const span = document.createElement('span');
+      span.style.cssText='flex:1;min-width:0';
+      span.textContent = s.l;
+      const tip = document.createElement('span');
+      tip.title=s.tip; tip.textContent='ⓘ';
+      tip.style.cssText='cursor:help;color:var(--text3);font-size:13px;flex-shrink:0';
+      lbl.appendChild(inp); lbl.appendChild(span); lbl.appendChild(tip);
+      stratList.appendChild(lbl);
+    });
   } else if(type === 'cpap') {
-    html = '<div class="fg"><label>Dispositif</label>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-      +['CPAP','OAM'].map(v =>
-        '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 16px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box">'
-        +'<input type="radio" name="cpap-type" value="'+v+'" data-v="'+v+'" onchange="parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent);flex-shrink:0"> '+v+'</label>'
-      ).join('')
-      +'</div></div>';
+    subEl.innerHTML = '<div class="fg"><label>Dispositif</label><div id="cpap-list" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>';
+    const cpapList = document.getElementById('cpap-list');
+    ['CPAP','OAM'].forEach(function(v) {
+      const lbl = document.createElement('label');
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 20px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-weight:500';
+      const inp = document.createElement('input');
+      inp.type='radio'; inp.name='cpap-type'; inp.value=v;
+      inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
+      inp.addEventListener('change', function(){parcoursState.subtype.dispositif=v;});
+      const span = document.createElement('span');
+      span.textContent=v;
+      lbl.appendChild(inp); lbl.appendChild(span);
+      cpapList.appendChild(lbl);
+    });
   } else if(type === 'psychotherapie') {
     html = '<div class="fg"><label>Type de psychothérapie</label>'
       +'<select id="psycho-type" onchange="parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
