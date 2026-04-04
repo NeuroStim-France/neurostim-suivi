@@ -6496,7 +6496,8 @@ function onParcoursTypeChange() {
   } else if(type === 'monitoring') {
     html = '<div class="info-box" style="font-size:12px">Monitoring libre : choisissez les questionnaires et leur fréquence dans la section ci-dessous.</div>';
   }
-  subEl.innerHTML = html;
+  // Only set innerHTML if html was built via string (not DOM direct)
+  if(html) subEl.innerHTML = html;
 }
 
 function renderRythmField(prefix) {
