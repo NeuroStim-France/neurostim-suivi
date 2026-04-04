@@ -3262,8 +3262,11 @@ function onPs2ParcoursTypeChange() {
   subEl.style.display='block';
 
   if(type==='medicament') {
-    subEl.innerHTML='<div class="fg"><label>Stratégie</label><div id="ps2-med-strat-list" style="display:flex;flex-direction:column;gap:6px"></div></div><div id="ps2-med-fields" style="display:none"></div>';
-    const list = document.getElementById('ps2-med-strat-list');
+    const fgDiv2=document.createElement('div'); fgDiv2.className='fg';
+    const lbl02=document.createElement('label'); lbl02.textContent='Stratégie'; fgDiv2.appendChild(lbl02);
+    const list=document.createElement('div'); list.style.cssText='display:flex;flex-direction:column;gap:6px'; fgDiv2.appendChild(list);
+    subEl.appendChild(fgDiv2);
+    const ps2MedFields=document.createElement('div'); ps2MedFields.id='ps2-med-fields'; ps2MedFields.style.display='none'; subEl.appendChild(ps2MedFields);
     [{v:'nouveau', l:'Nouveau traitement',  tip:"Monothérapie — nouvelle molécule"},
      {v:'addon',   l:"Stratégie d'Add-on", tip:"Adjonction à un traitement existant"},
      {v:'switch',  l:'Switch',               tip:"Remplacement d'un traitement existant"}
@@ -3275,7 +3278,7 @@ function onPs2ParcoursTypeChange() {
       inp.addEventListener('change',function(){
         newPat.parcoursState.subtype.strategie=s.v;
         // Show fields
-        const f=document.getElementById('ps2-med-fields'); if(!f) return; f.style.display='block';
+        const f=document.getElementById('ps2-med-fields')||ps2MedFields; if(!f) return; f.style.display='block';
         let fhtml='';
         if(s.v==='switch') fhtml='<div class="g2"><div class="fg"><label>Traitement initial</label><input type="text" autocomplete="off" placeholder="Médicament" onchange="newPat.parcoursState.subtype.traitementInitial=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div><div class="fg"><label>Nouveau traitement</label><input type="text" autocomplete="off" placeholder="Médicament" onchange="newPat.parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div></div>';
         else fhtml='<div class="fg"><label>Nom du médicament</label><input type="text" autocomplete="off" placeholder="Ex: Sertraline" onchange="newPat.parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
@@ -3288,8 +3291,10 @@ function onPs2ParcoursTypeChange() {
       list.appendChild(lbl);
     });
   } else if(type==='cpap') {
-    subEl.innerHTML='<div class="fg"><label>Dispositif</label><div id="ps2-cpap-list" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>';
-    const cpapList=document.getElementById('ps2-cpap-list');
+    const fgDiv3=document.createElement('div'); fgDiv3.className='fg';
+    const lbl03=document.createElement('label'); lbl03.textContent='Dispositif'; fgDiv3.appendChild(lbl03);
+    const cpapList=document.createElement('div'); cpapList.style.cssText='display:flex;gap:10px;flex-wrap:wrap'; fgDiv3.appendChild(cpapList);
+    subEl.appendChild(fgDiv3);
     ['CPAP','OAM'].forEach(function(v) {
       const lbl=document.createElement('label');
       lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 20px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-weight:500';
@@ -6437,7 +6442,7 @@ function onParcoursTypeChange() {
   let html = '';
   if(type === 'medicament') {
     subEl.innerHTML = '<div class="fg"><label>Stratégie</label><div id="med-strat-list" style="display:flex;flex-direction:column;gap:8px"></div></div><div id="med-fields" style="display:none"></div>';
-    const stratList = document.getElementById('med-strat-list');
+    const stratList = subEl.querySelector('#med-strat-list');
     const strats = [
       {v:'nouveau', l:'Nouveau traitement',  tip:"Introduction d'une nouvelle molécule en monothérapie"},
       {v:'addon',   l:"Stratégie d'Add-on", tip:"Adjonction à un traitement existant"},
@@ -6461,7 +6466,7 @@ function onParcoursTypeChange() {
     });
   } else if(type === 'cpap') {
     subEl.innerHTML = '<div class="fg"><label>Dispositif</label><div id="cpap-list" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>';
-    const cpapList = document.getElementById('cpap-list');
+    const cpapList = subEl.querySelector('#cpap-list');
     ['CPAP','OAM'].forEach(function(v) {
       const lbl = document.createElement('label');
       lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 20px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-weight:500';
@@ -6506,7 +6511,7 @@ function renderRythmField(prefix) {
 
 function onMedStrategieChange(v) {
   parcoursState.subtype.strategie = v;
-  const el = document.getElementById('med-fields');
+  const el = document.getElementById('med-fields') || document.querySelector('#parcours-suboptions #med-fields');
   if(!el) return;
   let html = '';
   if(v === 'switch') {
