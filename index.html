@@ -190,6 +190,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .tl-item-status.done{font-size:11px;color:var(--green)}
 
 /* NOTES */
+.dropdown-item{display:block;width:100%;text-align:left;padding:8px 14px;background:none;border:none;font-family:inherit;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap}
+.dropdown-item:hover{background:var(--surface2)}
 .note-item{padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
 .note-item.note-lecture{background:var(--purple-bg);border-color:var(--purple-border)}
 .note-meta{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
@@ -690,7 +692,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <input type="text" placeholder="Code patient, ID…" oninput="renderPatientList({search:this.value})">
         </div>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({status:this.value})">
-          <option value="all">Tous les statuts</option><option value="cure">En cure</option><option value="postcure">Post-cure</option><option value="termine">Terminé</option>
+          <option value="all">Tous les statuts</option><option value="cure">En cure</option><option value="postcure">Consolidation/maintien</option><option value="termine">Terminé</option>
         </select>
         <button class="btn btn-secondary btn-sm saisie-only" onclick="showPage('archives',document.querySelector('[onclick*=archives]'))" style="white-space:nowrap">📦 Archives</button>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({protocol:this.value})">
@@ -717,12 +719,22 @@ body.role-saisie .analyse-only { display:none !important; }
             <button class="btn btn-secondary btn-sm no-print" id="fav-toggle-btn" onclick="toggleFavorite()">☆ Favori</button>
             <button class="btn btn-secondary btn-sm no-print" onclick="generatePDF()">📄 Compte-rendu</button>
             <button class="btn btn-sm write-only" onclick="openAddPEM()" style="color:#2d6a4f;background:#d8f3dc;border:1px solid #95d5b2;font-weight:600">+ PEM</button>
-            <button class="btn btn-primary btn-sm write-only" onclick="openAddSingleQ()" style="color:#fff;background:var(--accent)"><span style="color:#fff;font-weight:700;margin-right:4px">+</span> Ajouter un questionnaire</button>
+            <!-- + Ajouter dropdown -->
+            <div style="position:relative;display:inline-block" class="write-only" id="add-dropdown-wrap">
+              <button class="btn btn-primary btn-sm" onclick="toggleAddDropdown()" style="color:#fff;background:var(--accent)">＋ Ajouter ▾</button>
+              <div id="add-dropdown-menu" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:220px;z-index:200;padding:6px 0">
+                <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 4px">Nouveau suivi</div>
+                <button class="dropdown-item" onclick="closeAddDropdown();openAddProtocolToPatient()">🧠 Cure rTMS</button>
+                <button class="dropdown-item" onclick="closeAddDropdown();openConsolidation()">📆 Consolidation / Maintien</button>
+                <button class="dropdown-item" onclick="closeAddDropdown();openAddParcours()">🗺️ Parcours</button>
+                <div style="height:1px;background:var(--border);margin:4px 0"></div>
+                <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 4px">Ponctuel</div>
+                <button class="dropdown-item" onclick="closeAddDropdown();openAddSingleQ()">📋 Questionnaire unique</button>
+              </div>
+            </div>
           </div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end" class="write-only">
             <button class="btn btn-ghost btn-sm" onclick="openAdjustDates()">📅 Dates</button>
-            <button class="btn btn-ghost btn-sm" onclick="openAddProtocolToPatient()">➕ Protocole</button>
-            <button class="btn btn-ghost btn-sm" onclick="openConsolidation()">📆 Post-cure</button>
             <button class="btn btn-ghost btn-sm" onclick="openInterruptCure()">⛔ Interrompre</button>
             <button class="btn btn-ghost btn-sm" onclick="NS.currentPatient&&openEditPatient(NS.currentPatient.id)">✏️ Modifier</button>
             <button class="btn btn-ghost btn-sm" id="archive-btn" onclick="NS.currentPatient&&archivePatient(NS.currentPatient.id)">🗄 Archiver</button>
@@ -1277,14 +1289,14 @@ body.role-saisie .analyse-only { display:none !important; }
         <!-- Mode selector -->
         <div style="display:flex;gap:8px;margin-bottom:14px">
           <button id="mode-cure-btn" class="btn btn-primary btn-sm" onclick="setPatientMode('cure')" style="flex:1">🩺 Cure rTMS</button>
-          <button id="mode-postcure-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('postcure')" style="flex:1">📆 Post-cure directe</button>
+          <button id="mode-postcure-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('postcure')" style="flex:1">📆 Consolidation directe</button>
         </div>
         <!-- Protocol list (dynamic) -->
         <div id="proto-list-area"></div>
         <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
         <!-- Post-cure direct start date -->
         <div id="postcure-startdate-area" style="display:none">
-          <div class="fg"><label>Date de début du suivi post-cure *</label><input type="date" id="p-postcure-start"></div>
+          <div class="fg"><label>Date de début *</label><input type="date" id="p-postcure-start"></div>
         </div>
         <!-- Schedule preview -->
         <div id="sched-area" style="display:none">
@@ -1308,7 +1320,7 @@ body.role-saisie .analyse-only { display:none !important; }
             Fin de cure : <strong id="c-end">—</strong>
           </span>
           <span id="c-postcure-details" style="display:none">
-            Mode : <strong>Post-cure directe</strong><br>
+            Mode : <strong>Consolidation directe</strong><br>
             Début post-cure : <strong id="c-postcure-start">—</strong><br>
             Protocole(s) : <strong id="c-prots2">—</strong>
           </span>
@@ -1476,14 +1488,89 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <div class="fg" id="interrupt-postcure-area"><label>Démarrer le suivi post-cure immédiatement ?</label>
         <select id="interrupt-postcure">
-          <option value="yes">Oui — configurer le suivi post-cure</option>
-          <option value="no">Non — interrompre sans suivi post-cure</option>
+          <option value="yes">Oui — configurer le suivi de consolidation/maintien</option>
+          <option value="no">Non — interrompre sans suivi de consolidation/maintien</option>
         </select>
       </div>
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-interrupt-cure')">Annuler</button>
       <button class="btn btn-danger" onclick="confirmInterruptCure()">⛔ Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PARCOURS -->
+<div id="m-add-parcours" class="overlay">
+  <div class="modal fade" style="max-width:640px">
+    <div class="mh"><div class="mh-title">🗺️ Nouveau parcours</div><button class="close-btn" onclick="closeModal('m-add-parcours')">✕</button></div>
+    <div class="mb" style="max-height:75vh;overflow-y:auto">
+
+      <!-- Contexte clinique -->
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif — multi-sélection possible)</span></div>
+      <div id="parcours-contexte-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+
+      <!-- Type de parcours -->
+      <div class="fg">
+        <label>Parcours <span style="color:var(--red)">*</span></label>
+        <select id="parcours-type" onchange="onParcoursTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
+          <option value="">— Choisir un parcours —</option>
+          <option value="medicament">💊 Intervention médicamenteuse</option>
+          <option value="cpap">🛏️ CPAP ou OAM</option>
+          <option value="psychotherapie">🗣️ Psychothérapie</option>
+          <option value="remediation">🧠 Remédiation cognitive</option>
+          <option value="groupe">👥 Thérapie de groupe</option>
+          <option value="monitoring">📈 Monitoring simple</option>
+        </select>
+      </div>
+
+      <!-- Sous-options dynamiques selon le type -->
+      <div id="parcours-suboptions" style="display:none"></div>
+
+      <!-- Dates & durée -->
+      <div class="g2" style="margin-top:8px">
+        <div class="fg"><label>Date de démarrage <span style="color:var(--red)">*</span></label><input type="date" id="parcours-start" autocomplete="off"></div>
+        <div class="fg">
+          <label>Durée du suivi</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="number" id="parcours-duration" min="1" max="120" value="6" style="width:80px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px;text-align:center">
+            <span style="font-size:13px;color:var(--text2)">mois <span style="color:var(--text3);font-size:11px">(0 = indéfini)</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questionnaires -->
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;margin-top:4px">Questionnaires de suivi</div>
+      <div class="info-box" style="margin-bottom:10px;font-size:12px">Base commune (démarrage + fin) + questionnaires spécifiques au contexte clinique. Fréquence par défaut : mensuel.</div>
+
+      <!-- Base commune -->
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Base commune <span style="font-weight:400;color:var(--text3)">(démarrage + fin)</span></div>
+      <div id="parcours-base-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+
+      <!-- Questionnaires spécifiques -->
+      <div id="parcours-specific-area" style="display:none">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Questionnaires spécifiques au contexte</div>
+        <div id="parcours-specific-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+      </div>
+
+      <!-- Questionnaires optionnels -->
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Ajouter des questionnaires</div>
+      <div id="parcours-added-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <select id="parcours-add-q-sel" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></select>
+        <button class="btn btn-secondary btn-sm" onclick="parcoursAddQ()">+ Ajouter</button>
+      </div>
+
+      <!-- Fréquence par questionnaire -->
+      <div id="parcours-freq-area" style="display:none">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Fréquence par questionnaire</div>
+        <div id="parcours-freq-list"></div>
+      </div>
+
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeModal('m-add-parcours')">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmAddParcours()">🗺️ Créer le parcours</button>
     </div>
   </div>
 </div>
@@ -1960,7 +2047,7 @@ function genSchedule(p) {
   if(latestEnd && qs.monthly.length) {
     for(let m=1;m<=6;m++) {
       const d=new Date(latestEnd); d.setMonth(d.getMonth()+m);
-      sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Post-cure M+'+m});
+      sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Consolidation M+'+m});
     }
   }
 
@@ -1978,7 +2065,7 @@ function genSchedulePostcureOnly(p) {
   const sched = [];
   for(let m=1;m<=6;m++) {
     const d=new Date(startDate); d.setMonth(d.getMonth()+m);
-    sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Post-cure M+'+m});
+    sched.push({date:d.toISOString().split('T')[0], questionnaires:[...qs.monthly], hetero:[...qs.heteroMonthly], done:[], type:'monthly', label:'Consolidation M+'+m});
   }
   return sched;
 }
@@ -2083,7 +2170,7 @@ function renderPatientList(filter={}) {
 
 function patRowHTML(p) {
   const ini=codeInitials(p.code);
-  const sb=p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Post-cure</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
+  const sb=p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Consolidation</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
   const prots=normalizeProtocols(p).map(pr=>(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'⛔':'')).join(', ');
   return '<div class="patient-row" onclick="openPatient(\''+p.id+'\')">'
     +'<div class="pat-av">'+ini+'</div>'
@@ -2228,7 +2315,7 @@ function renderPatientDetail() {
   // Status badge
   const sbEl=document.getElementById('pd-status-badge');
   if(sbEl) {
-    const sb=p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Post-cure</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
+    const sb=p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Consolidation</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
     sbEl.innerHTML=sb;
   }
   // Cabinet label (top right)
@@ -2246,7 +2333,19 @@ function renderPatientDetail() {
   // Protocols
   const protsEl=document.getElementById('pd-prots');
   const _protos = normalizeProtocols(p);
-  if(protsEl) protsEl.innerHTML=_protos.map(pr=>'<span class="badge b-blue">'+(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'<span style="color:var(--red);font-size:10px"> ⛔</span>':'')+'</span>').join('');
+  const _parcours = p.parcours || [];
+  if(protsEl) {
+    const rtmsBadges = _protos.map(pr =>
+      '<span class="badge b-blue">🧠 '+(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'<span style="color:var(--red);font-size:10px"> ⛔</span>':'')+'</span>'
+    );
+    const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈'};
+    const parcoursBadges = _parcours.filter(parc=>parc.status!=='interrompu').map(parc => {
+      const icon = PARCOURS_ICONS[parc.type] || '🗺️';
+      const label = {medicament:'Médicament',cpap:'CPAP/OAM',psychotherapie:'Psychothérapie',remediation:'Remédiation',groupe:'Thérapie groupe',monitoring:'Monitoring'}[parc.type] || parc.type;
+      return '<span class="badge" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)">'+icon+' '+label+'</span>';
+    });
+    protsEl.innerHTML = [...rtmsBadges, ...parcoursBadges].join('') || '<span style="font-size:12px;color:var(--text3)">Aucun suivi actif</span>';
+  }
   const firstTab=document.querySelector('#page-patient-detail .tab');
   switchTab('suivi',firstTab);
   renderTimeline(); renderNotes(); renderScores();
@@ -2276,8 +2375,12 @@ function renderTimeline() {
     const allDone=rem.length===0&&qs.length>0;
     const grpCls=allDone?'done':isPast?'overdue':isToday?'today-group':'upcoming';
     const icon=allDone?'✓':isPast?'⚠':isToday?'●':'○';
-    html+='<div class="tl-group '+grpCls+'">'
+    // Parcours slots get a purple accent
+    const isParcours = s.type==='parcours'||s.type==='parcours_suivi'||s.type==='parcours_end';
+    const grpStyle = isParcours ? ' style="border-left:3px solid var(--purple)"' : '';
+    html+='<div class="tl-group '+grpCls+'"'+grpStyle+'>'
       +'<div class="tl-group-header"><span class="tl-icon">'+icon+'</span>'
+      +(isParcours?'<span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border-radius:3px;padding:1px 5px;margin-right:4px">Parcours</span>':'')
       +'<span class="tl-label">'+s.label+'</span>'
       +'<span class="tl-date">'+fmtDate(s.date)+'</span></div>'
       +'<div class="tl-items">'
@@ -2383,6 +2486,21 @@ async function deleteNote(idx) {
   renderNotes();
   renderLastNote();
 }
+
+function toggleAddDropdown() {
+  const menu = document.getElementById('add-dropdown-menu');
+  if(!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+function closeAddDropdown() {
+  const menu = document.getElementById('add-dropdown-menu');
+  if(menu) menu.style.display = 'none';
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('add-dropdown-wrap');
+  if(wrap && !wrap.contains(e.target)) closeAddDropdown();
+});
 
 async function saveNote() {
   const p=NS.currentPatient, text=document.getElementById('note-input').value.trim();
@@ -3967,6 +4085,7 @@ async function uploadExcelConfig(input) {
         const bytes = new Uint8Array(e.target.result);
         // We only parse and extract config — raw file is NOT stored
         const workbook = XLSX.read(bytes, {type: 'array'});
+        applyParcoursConfig(workbook);
         const sheetName = 'Règles envoi des questionnaires';
 
         if(!workbook.SheetNames.includes(sheetName)) {
@@ -4227,6 +4346,47 @@ async function loadExcelConfig() {
       } catch(e) { console.warn('Could not apply questionnaires from Firestore:', e); }
     }
   } catch(e) {}
+}
+
+function applyParcoursConfig(wb) {
+  // Parse Parcours sheet if present
+  if(!wb.SheetNames.includes('Parcours')) return;
+  const ws = wb.Sheets['Parcours'];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null});
+
+  let section = null;
+  const newContextes = [];
+  const newByContexte = {};
+  const newBase = [];
+
+  rows.forEach(row => {
+    if(!row || !row[0]) return;
+    const a = row[0] ? String(row[0]).trim() : '';
+    if(a.includes('SECTION 1')) { section = 1; return; }
+    if(a.includes('SECTION 2')) { section = 2; return; }
+    if(a.includes('SECTION 3')) { section = 3; return; }
+    if(a.includes('SECTION 4')) { section = 4; return; }
+    if(a === 'CODE' || a === 'CODE CONTEXTE' || a === 'QUESTIONNAIRE' || a === 'SOUS-TYPE CODE') return;
+
+    if(section === 1 && row[1]) {
+      newContextes.push({code: a, label: String(row[1]).trim(), cat: row[2]?String(row[2]).trim():''});
+    } else if(section === 2 && row[1]) {
+      const optStr = row[5] ? String(row[5]).trim() : '';
+      newByContexte[a] = {
+        principal: row[1] ? String(row[1]).trim() : '',
+        freqP: row[2] ? String(row[2]).trim() : 'mensuel',
+        secondaire: row[3] ? String(row[3]).trim() : '',
+        freqS: row[4] ? String(row[4]).trim() : 'mensuel',
+        optionnels: optStr ? optStr.split(';').map(s=>s.trim()).filter(Boolean) : [],
+      };
+    } else if(section === 4 && row[0]) {
+      if(!['QUESTIONNAIRE','CODE'].includes(a)) newBase.push(a);
+    }
+  });
+
+  if(newContextes.length) PARCOURS_CONFIG.contextes = newContextes;
+  if(Object.keys(newByContexte).length) PARCOURS_CONFIG.byContexte = newByContexte;
+  if(newBase.length) PARCOURS_CONFIG.baseCommune = newBase;
 }
 
 function applyExcelQuestionnairesFromFirestore(parsedQs) {
@@ -4500,7 +4660,7 @@ async function renderFavorisList() {
   if(parts.length >= 2) return (parts[0][0]||'') + (parts[1][0]||'');
   return c.substring(0,2);
 })(p.code) : '??';
-    const sb = p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Post-cure</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
+    const sb = p.status==='cure'?'<span class="badge b-blue">En cure</span>':p.status==='postcure'?'<span class="badge b-green">Consolidation</span>':p.status==='termine'?'<span class="badge b-gray">Terminé</span>':'<span class="badge b-amber">Pré-cure</span>';
     const prots = normalizeProtocols(p).map(pr=>PROTOCOLS[pr.name]?.name||pr.name).join(', ');
     return '<div class="patient-row" data-id="'+p.id+'" onclick="openPatient(this.dataset.id)">'
       +'<div class="pat-av" style="background:var(--amber-bg);color:var(--amber)">'+ini+'</div>'
@@ -5324,7 +5484,7 @@ async function loadPatientHistory() {
       'edit_patient': 'Modification du dossier',
       'delete_patient': 'Suppression',
       'adjust_dates': 'Ajustement des dates de cure',
-      'set_consolidation': 'Configuration post-cure',
+      'set_consolidation': 'Configuration consolidation/maintien',
       'questionnaire_completed': 'Questionnaire complété',
       'note_ajoutee': 'Note clinique ajoutée',
       'note_modifiee': 'Note clinique modifiée',
@@ -5386,7 +5546,7 @@ function validatePatientStep2() {
 
   if(newPat.mode === 'postcure') {
     const start = document.getElementById('p-postcure-start')?.value;
-    if(!start) { showError('Veuillez indiquer la date de début du suivi post-cure.', 3000); return false; }
+    if(!start) { showError('Veuillez indiquer la date de début du suivi de consolidation.', 3000); return false; }
     // Store start date into protocols
     newPat.protocols.forEach(p => { if(p.name) p.startDate = start; });
     return true;
@@ -5770,6 +5930,423 @@ async function unarchivePatient(id) {
 // ════════════════════════════════════════════════
 // INTERRUPTION DE CURE
 // ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+// PARCOURS CONFIG (loaded from xlsx Parcours sheet)
+// ════════════════════════════════════════════════════
+let PARCOURS_CONFIG = {
+  contextes: [
+    {code:'DEP_CAR',  label:'Trouble dépressif caractérisé',              cat:'Humeur'},
+    {code:'BIP_DEP',  label:'Trouble bipolaire – phase dépressive',        cat:'Humeur'},
+    {code:'BIP_HYP',  label:'Trouble bipolaire – phase hypomane',          cat:'Humeur'},
+    {code:'BIP_MAN',  label:'Trouble bipolaire – phase maniaque',          cat:'Humeur'},
+    {code:'ANX_GEN',  label:'Trouble anxieux généralisé',                  cat:'Anxiété'},
+    {code:'SOM',      label:'Trouble du sommeil',                          cat:'Sommeil'},
+    {code:'PANIQUE',  label:'Trouble panique',                             cat:'Anxiété'},
+    {code:'TOC',      label:'TOC',                                         cat:'Anxiété'},
+    {code:'TSPT',     label:'TSPT',                                        cat:'Anxiété'},
+    {code:'SCHIZ',    label:'Schizophrénie',                               cat:'Psychose'},
+    {code:'SCHIZ_AFF',label:'Trouble schizo-affectif',                     cat:'Psychose'},
+    {code:'BORDER',   label:'Personnalité borderline',                     cat:'Personnalité'},
+    {code:'ANTISO',   label:'Personnalité antisociale',                    cat:'Personnalité'},
+    {code:'TSA',      label:'TSA',                                         cat:'Neurodév.'},
+    {code:'TDAH',     label:'TDAH',                                        cat:'Neurodév.'},
+    {code:'TCA',      label:'Conduites alimentaires',                      cat:'Comportement'},
+    {code:'SUBST',    label:'Usage de substances',                         cat:'Addiction'},
+    {code:'ADAPT',    label:'Trouble de l\'adaptation',                    cat:'Autre'},
+    {code:'AUTRE',    label:'Autre',                                       cat:'Autre'},
+  ],
+  // questionnaires by context code: {principal, freqPrincipal, secondaire, freqSecondaire, optionnels:[]}
+  byContexte: {
+    'DEP_CAR':   {principal:'QIDS-SR',   freqP:'mensuel', secondaire:'PHQ-9',     freqS:'mensuel', optionnels:['BDI-2','MADRS']},
+    'BIP_DEP':   {principal:'QIDS-SR',   freqP:'mensuel', secondaire:'PHQ-9',     freqS:'mensuel', optionnels:['ASRM','MDQ','HCL-32']},
+    'BIP_HYP':   {principal:'ASRM',      freqP:'mensuel', secondaire:'HCL-32',    freqS:'mensuel', optionnels:['MDQ']},
+    'BIP_MAN':   {principal:'ASRM',      freqP:'mensuel', secondaire:'MDQ',       freqS:'mensuel', optionnels:['HCL-32']},
+    'ANX_GEN':   {principal:'GAD-7',     freqP:'mensuel', secondaire:'PSWQ',      freqS:'mensuel', optionnels:['STAI','BAI','PHQ-9']},
+    'SOM':       {principal:'AIS',       freqP:'mensuel', secondaire:'Epworth',   freqS:'mensuel', optionnels:['ISI','Stop-Bang']},
+    'PANIQUE':   {principal:'PDSS-SR',   freqP:'mensuel', secondaire:'BAI',       freqS:'mensuel', optionnels:['GAD-7','PHQ-9']},
+    'TOC':       {principal:'Y-BOCS-SR', freqP:'mensuel', secondaire:'OCI',       freqS:'mensuel', optionnels:['GAD-7','PHQ-9']},
+    'TSPT':      {principal:'PCL-5',     freqP:'mensuel', secondaire:'IES-R',     freqS:'mensuel', optionnels:['PHQ-9','GAD-7']},
+    'SCHIZ':     {principal:'CAPE-71',   freqP:'mensuel', secondaire:'PDI-21',    freqS:'mensuel', optionnels:['AHRS','SANS']},
+    'SCHIZ_AFF': {principal:'CAPE-71',   freqP:'mensuel', secondaire:'QIDS-SR',   freqS:'mensuel', optionnels:['ASRM']},
+    'BORDER':    {principal:'MSI-BPD',   freqP:'mensuel', secondaire:'DERS-F',    freqS:'mensuel', optionnels:['PHQ-9','GAD-7']},
+    'ANTISO':    {principal:'LSRP',      freqP:'mensuel', secondaire:'SRP-4',     freqS:'mensuel', optionnels:['BIS-11']},
+    'TSA':       {principal:'RAADS-R',   freqP:'mensuel', secondaire:'AQ',        freqS:'mensuel', optionnels:['GAD-7']},
+    'TDAH':      {principal:'ASRS v1.1', freqP:'mensuel', secondaire:'DIVA5-SR',  freqS:'mensuel', optionnels:[]},
+    'TCA':       {principal:'EDE-Q',     freqP:'mensuel', secondaire:'SCOFF',     freqS:'mensuel', optionnels:['BITE']},
+    'SUBST':     {principal:'ASSIST',    freqP:'mensuel', secondaire:'AUDIT',     freqS:'mensuel', optionnels:['DUDIT','DSM5']},
+    'ADAPT':     {principal:'ADNM-20',   freqP:'mensuel', secondaire:'PSS',       freqS:'mensuel', optionnels:['PHQ-9','GAD-7']},
+    'AUTRE':     {principal:'',          freqP:'mensuel', secondaire:'',          freqS:'mensuel', optionnels:[]},
+  },
+  baseCommune: ['15D','SDS','AIS','EQ-5D-5L','Ricci-Gagnon'],
+};
+
+// parcours state for the modal
+let parcoursState = {
+  contextes: [],        // selected context codes
+  type: '',             // parcours type key
+  subtype: {},          // subtype-specific fields
+  startDate: '',
+  duration: 6,          // months, 0 = indefinite
+  // questionnaire sets
+  baseQs: [],           // base commune {name, freq}
+  specificQs: [],       // from context {name, freq, role:'principal'|'secondaire'}
+  addedQs: [],          // manually added {name, freq}
+  // freq per questionnaire: {name: freq}
+  freqMap: {},
+};
+
+const FREQ_OPTIONS = [
+  {value:'hebdomadaire', label:'Hebdomadaire'},
+  {value:'bimensuel',    label:'Toutes les 2 semaines'},
+  {value:'mensuel',      label:'Mensuel'},
+  {value:'trimestriel',  label:'Trimestriel'},
+  {value:'semestriel',   label:'Semestriel'},
+  {value:'ponctuel_debut_fin', label:'Démarrage + fin seulement'},
+];
+
+function openAddParcours() {
+  // Reset state
+  parcoursState = {contextes:[], type:'', subtype:{}, startDate:todayStr(),
+    duration:6, baseQs:[], specificQs:[], addedQs:[], freqMap:{}};
+  document.getElementById('parcours-type').value = '';
+  document.getElementById('parcours-start').value = todayStr();
+  document.getElementById('parcours-duration').value = '6';
+  document.getElementById('parcours-suboptions').style.display = 'none';
+  document.getElementById('parcours-suboptions').innerHTML = '';
+  document.getElementById('parcours-specific-area').style.display = 'none';
+  document.getElementById('parcours-freq-area').style.display = 'none';
+  renderParcoursContextes();
+  renderParcoursBaseQs();
+  renderParcoursAddQSelector();
+  renderParcoursFreqList();
+  openModal('m-add-parcours');
+}
+
+function renderParcoursContextes() {
+  const el = document.getElementById('parcours-contexte-list');
+  if(!el) return;
+  el.innerHTML = PARCOURS_CONFIG.contextes.map(c => {
+    const active = parcoursState.contextes.includes(c.code);
+    return '<button class="prot-btn'+(active?' active':'')+'" style="font-size:12px;padding:5px 10px" data-code="'+c.code+'" onclick="toggleParcoursContexte(this.dataset.code)" title="'+c.cat+'">'+c.label+'</button>';
+  }).join('');
+}
+
+function toggleParcoursContexte(code) {
+  const idx = parcoursState.contextes.indexOf(code);
+  if(idx >= 0) parcoursState.contextes.splice(idx, 1);
+  else parcoursState.contextes.push(code);
+  renderParcoursContextes();
+  renderParcoursSpecificQs();
+  renderParcoursFreqList();
+}
+
+function onParcoursTypeChange() {
+  const type = document.getElementById('parcours-type').value;
+  parcoursState.type = type;
+  parcoursState.subtype = {};
+  const subEl = document.getElementById('parcours-suboptions');
+  subEl.innerHTML = '';
+  subEl.style.display = 'none';
+  if(!type) return;
+  subEl.style.display = 'block';
+  let html = '';
+  if(type === 'medicament') {
+    html = '<div class="fg"><label>Stratégie</label>'
+      +'<div style="display:flex;flex-direction:column;gap:8px">'
+      +[['nouveau','Nouveau traitement','Introduction d\'une nouvelle molécule en monothérapie'],
+        ['addon','Stratégie d\'Add-on','Introduction d\'une nouvelle molécule en adjonction à un traitement existant'],
+        ['switch','Switch','Remplacement d\'un traitement existant']]
+      .map(([v,l,tip]) =>
+        '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px">'
+        +'<input type="radio" name="med-strat" value="'+v+'" data-v="'+v+'" onchange="onMedStrategieChange(this.dataset.v)" style="accent-color:var(--accent)"> '+l
+        +' <span title="'+tip+'" style="cursor:help;color:var(--text3);font-size:14px">ⓘ</span></label>'
+      ).join('')
+      +'</div></div>'
+      +'<div id="med-fields" style="display:none"></div>';
+  } else if(type === 'cpap') {
+    html = '<div class="fg"><label>Dispositif</label>'
+      +'<div style="display:flex;gap:8px">'
+      +['CPAP','OAM'].map(v =>
+        '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px">'
+        +'<input type="radio" name="cpap-type" value="'+v+'" data-v="'+v+'" onchange="parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent)"> '+v+'</label>'
+      ).join('')
+      +'</div></div>';
+  } else if(type === 'psychotherapie') {
+    html = '<div class="fg"><label>Type de psychothérapie</label>'
+      +'<select id="psycho-type" onchange="parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
+      +'<option value="">— Choisir —</option>'
+      +['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Thérapie des schémas','Intégration du cycle de vie','Autre']
+      .map(v => '<option value="'+v+'">'+v+'</option>').join('')
+      +'</select></div>'
+      +renderRythmField('psycho');
+  } else if(type === 'remediation') {
+    html = renderRythmField('rem');
+  } else if(type === 'groupe') {
+    html = '<div class="fg"><label>Description (optionnel)</label>'
+      +'<input type="text" id="groupe-desc" placeholder="Ex: Groupe TCC dépression, 8 séances" autocomplete="off" onchange="parcoursState.subtype.desc=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>'
+      +renderRythmField('groupe');
+  } else if(type === 'monitoring') {
+    html = '<div class="info-box" style="font-size:12px">Monitoring libre : choisissez les questionnaires et leur fréquence dans la section ci-dessous.</div>';
+  }
+  subEl.innerHTML = html;
+}
+
+function renderRythmField(prefix) {
+  return '<div class="fg"><label>Rythme des séances</label>'
+    +'<select id="'+prefix+'-rythme" onchange="parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
+    +'<option value="">— Choisir —</option>'
+    +[['1/semaine','Une fois par semaine'],['1/2semaines','Tous les 15 jours'],
+      ['1/mois','Tous les mois'],['autre','Autre']]
+    .map(([v,l]) => '<option value="'+v+'">'+l+'</option>').join('')
+    +'</select></div>';
+}
+
+function onMedStrategieChange(v) {
+  parcoursState.subtype.strategie = v;
+  const el = document.getElementById('med-fields');
+  if(!el) return;
+  let html = '';
+  if(v === 'switch') {
+    html = '<div class="g2">'
+      +'<div class="fg"><label>Traitement initial</label><input type="text" id="med-initial" autocomplete="off" placeholder="Nom du médicament" onchange="parcoursState.subtype.traitementInitial=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>'
+      +'<div class="fg"><label>Nouveau traitement</label><input type="text" id="med-nouveau" autocomplete="off" placeholder="Nom du médicament" onchange="parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>'
+      +'</div>';
+  } else {
+    html = '<div class="fg"><label>Nom du médicament</label><input type="text" id="med-nom" autocomplete="off" placeholder="Ex: Sertraline" onchange="parcoursState.subtype.medicament=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+  }
+  html += '<div class="fg"><label>Dose initiale</label><input type="text" id="med-dose" autocomplete="off" placeholder="Ex: 50 mg/j" onchange="parcoursState.subtype.dose=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
+
+function renderParcoursBaseQs() {
+  const el = document.getElementById('parcours-base-qs');
+  if(!el) return;
+  const base = PARCOURS_CONFIG.baseCommune;
+  el.innerHTML = base.map(q => {
+    const freq = parcoursState.freqMap[q] || 'ponctuel_debut_fin';
+    return '<div style="display:flex;align-items:center;gap:4px;background:var(--accent-bg);border:1px solid var(--accent-light);border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q+'</span>'
+      +'<select data-qname="'+q+'" onchange="parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f => '<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select></div>';
+  }).join('');
+}
+
+function renderParcoursSpecificQs() {
+  const area = document.getElementById('parcours-specific-area');
+  const el = document.getElementById('parcours-specific-qs');
+  if(!area || !el) return;
+  const codes = parcoursState.contextes;
+  if(!codes.length) { area.style.display='none'; return; }
+  area.style.display = 'block';
+  // Collect principal + secondaire for each selected context
+  const qs = [];
+  codes.forEach(code => {
+    const cfg = PARCOURS_CONFIG.byContexte[code];
+    if(!cfg) return;
+    if(cfg.principal && !qs.find(q=>q.name===cfg.principal)) qs.push({name:cfg.principal, role:'principal'});
+    if(cfg.secondaire && !qs.find(q=>q.name===cfg.secondaire)) qs.push({name:cfg.secondaire, role:'secondaire'});
+  });
+  parcoursState.specificQs = qs;
+  el.innerHTML = qs.map(q => {
+    const freq = parcoursState.freqMap[q.name] || 'mensuel';
+    const roleColor = q.role==='principal' ? 'var(--green-bg)' : 'var(--surface2)';
+    const roleBorder = q.role==='principal' ? 'var(--green)' : 'var(--border2)';
+    return '<div style="display:flex;align-items:center;gap:4px;background:'+roleColor+';border:1px solid '+roleBorder+';border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q.name+'</span><span style="font-size:10px;color:var(--text3)">'+q.role+'</span>'
+      +'<select data-qname="'+q.name+'" onchange="parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f => '<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select></div>';
+  }).join('') || '<span style="font-size:12px;color:var(--text3)">Aucun questionnaire spécifique défini pour ce contexte</span>';
+}
+
+function renderParcoursAddQSelector() {
+  const sel = document.getElementById('parcours-add-q-sel');
+  if(!sel) return;
+  const allQs = Object.keys(QUESTIONNAIRES).filter(q =>
+    q !== 'PEM' && q !== 'Consentement rTMS' && QUESTIONNAIRES[q].questions && QUESTIONNAIRES[q].questions.length
+  ).sort();
+  sel.innerHTML = '<option value="">Choisir un questionnaire…</option>'
+    + allQs.map(q => '<option value="'+q+'">'+q+'</option>').join('');
+}
+
+function renderParcoursAddedQs() {
+  const el = document.getElementById('parcours-added-qs');
+  if(!el) return;
+  if(!parcoursState.addedQs.length) { el.innerHTML=''; return; }
+  el.innerHTML = parcoursState.addedQs.map((q, i) => {
+    const freq = parcoursState.freqMap[q.name] || 'mensuel';
+    return '<div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q.name+'</span>'
+      +'<select data-qname="'+q.name+'" onchange="parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f => '<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select>'
+      +'<button onclick="parcoursRemoveQ('+i+')" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:12px;padding:0 2px">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+function parcoursAddQ() {
+  const sel = document.getElementById('parcours-add-q-sel');
+  if(!sel || !sel.value) return;
+  const name = sel.value;
+  const alreadyIn = [
+    ...PARCOURS_CONFIG.baseCommune,
+    ...parcoursState.specificQs.map(q=>q.name),
+    ...parcoursState.addedQs.map(q=>q.name)
+  ];
+  if(!alreadyIn.includes(name)) {
+    parcoursState.addedQs.push({name});
+    if(!parcoursState.freqMap[name]) parcoursState.freqMap[name] = 'mensuel';
+  }
+  sel.value = '';
+  renderParcoursAddedQs();
+}
+
+function parcoursRemoveQ(idx) {
+  parcoursState.addedQs.splice(idx, 1);
+  renderParcoursAddedQs();
+}
+
+function renderParcoursFreqList() {
+  // Frequency list is now inline in each pill — this function kept for compatibility
+}
+
+async function confirmAddParcours() {
+  const p = NS.currentPatient; if(!p) return;
+  const type = document.getElementById('parcours-type').value;
+  const startDate = document.getElementById('parcours-start').value;
+  const duration = parseInt(document.getElementById('parcours-duration').value) || 0;
+
+  if(!type) { alert('Veuillez choisir un type de parcours.'); return; }
+  if(!startDate) { alert('Veuillez indiquer une date de démarrage.'); return; }
+
+  // Build questionnaire list with frequencies
+  const allQs = [];
+  // Base commune
+  PARCOURS_CONFIG.baseCommune.forEach(name => {
+    allQs.push({name, freq: parcoursState.freqMap[name] || 'ponctuel_debut_fin', role: 'base'});
+  });
+  // Specific
+  parcoursState.specificQs.forEach(q => {
+    allQs.push({name: q.name, freq: parcoursState.freqMap[q.name] || 'mensuel', role: q.role});
+  });
+  // Added
+  parcoursState.addedQs.forEach(q => {
+    if(!allQs.find(a=>a.name===q.name))
+      allQs.push({name: q.name, freq: parcoursState.freqMap[q.name] || 'mensuel', role: 'optionnel'});
+  });
+
+  const parcoursObj = {
+    id: 'parc_' + Date.now(),
+    type,
+    subtype: parcoursState.subtype,
+    contextes: parcoursState.contextes,
+    startDate,
+    duration,
+    endDate: duration > 0 ? (() => { const d=new Date(startDate); d.setMonth(d.getMonth()+duration); return d.toISOString().split('T')[0]; })() : null,
+    questionnaires: allQs,
+    status: 'actif',
+    createdAt: todayStr(),
+  };
+
+  // Generate schedule slots for this parcours
+  const newSlots = genParcoursSlotsSlots(parcoursObj);
+
+  // Merge into existing schedule (no duplicates)
+  const existingSchedule = p.schedule || [];
+  const mergedSchedule = [...existingSchedule];
+  newSlots.forEach(ns => {
+    const existing = mergedSchedule.find(s => s.date===ns.date && s.type===ns.type && s.parcoursId===ns.parcoursId);
+    if(!existing) mergedSchedule.push({...ns});
+    else {
+      const newQs = (ns.questionnaires||[]).filter(q=>!existing.questionnaires.includes(q));
+      existing.questionnaires = [...existing.questionnaires, ...newQs];
+    }
+  });
+  mergedSchedule.sort((a,b)=>a.date<b.date?-1:1);
+
+  // Store parcours in patient.parcours array
+  const existingParcours = p.parcours || [];
+  const newParcours = [...existingParcours, parcoursObj];
+
+  showLoading('Création du parcours…');
+  try {
+    await db.doc('patients/'+p.id).update({
+      parcours: newParcours,
+      schedule: mergedSchedule,
+      status: p.status || 'cure',
+    });
+    logAccess('add_parcours', p.code + ' · ' + type + ' · ' + startDate);
+    closeModal('m-add-parcours');
+    const fresh = await db.doc('patients/'+p.id).get();
+    NS.currentPatient = {id: p.id, ...fresh.data()};
+    renderPatientDetail();
+  } catch(e) { showError('Erreur : ' + e.message, 5000); }
+  hideLoading();
+}
+
+function genParcoursSlotsSlots(parc) {
+  const slots = [];
+  const startDate = parc.startDate;
+  const endDate = parc.endDate;
+  const parcoursId = parc.id;
+
+  // Separate questionnaires by frequency
+  const byFreq = {};
+  parc.questionnaires.forEach(q => {
+    const f = q.freq || 'mensuel';
+    if(!byFreq[f]) byFreq[f] = [];
+    byFreq[f].push(q.name);
+  });
+
+  // ponctuel_debut_fin: slot at startDate and endDate
+  if(byFreq['ponctuel_debut_fin']) {
+    const qs = byFreq['ponctuel_debut_fin'];
+    slots.push({date:startDate, questionnaires:[...qs], hetero:[], done:[], type:'parcours', parcoursId, label:'Bilan initial — Parcours'});
+    if(endDate) slots.push({date:endDate, questionnaires:[...qs], hetero:[], done:[], type:'parcours_end', parcoursId, label:'Bilan final — Parcours'});
+  }
+
+  const freqToMonths = {
+    'hebdomadaire': 0.25,
+    'bimensuel': 0.5,
+    'mensuel': 1,
+    'trimestriel': 3,
+    'semestriel': 6,
+  };
+
+  Object.entries(freqToMonths).forEach(([freq, months]) => {
+    const qs = byFreq[freq];
+    if(!qs || !qs.length) return;
+    let current = new Date(startDate);
+    const end = endDate ? new Date(endDate) : null;
+    let iter = 1;
+    while(true) {
+      if(months < 1) {
+        current = new Date(startDate);
+        current.setDate(current.getDate() + Math.round(months * 4 * 7) * iter);
+      } else {
+        current = new Date(startDate);
+        current.setMonth(current.getMonth() + months * iter);
+      }
+      if(end && current > end) break;
+      if(!end && iter > 24) break; // safety limit for indefinite parcours
+      const dateStr = current.toISOString().split('T')[0];
+      const label = 'Parcours — ' + (months < 1 ? 'S+'+Math.round(months*4*iter) : 'M+'+Math.round(months*iter));
+      const existing = slots.find(s => s.date===dateStr && s.parcoursId===parcoursId && s.type==='parcours_suivi');
+      if(existing) {
+        qs.forEach(q => { if(!existing.questionnaires.includes(q)) existing.questionnaires.push(q); });
+      } else {
+        slots.push({date:dateStr, questionnaires:[...qs], hetero:[], done:[], type:'parcours_suivi', parcoursId, label});
+      }
+      iter++;
+    }
+  });
+
+  return slots;
+}
+
 function openAddProtocolToPatient() {
   const p = NS.currentPatient; if(!p) return;
   document.getElementById('add-proto-name').value = '';
@@ -5848,14 +6425,21 @@ function openInterruptCure() {
   const dateEl = document.getElementById('interrupt-date');
   if(dateEl) dateEl.value = todayStr();
 
-  // Build protocol selector
+  // Build protocol + parcours selector
   const sel = document.getElementById('interrupt-protocol-sel');
   if(sel) {
-    sel.innerHTML = '<option value="all">Tous les protocoles</option>'
-      + protos.map(pr => '<option value="'+pr.name+'">'+(PROTOCOLS[pr.name]?.name||pr.name)+'</option>').join('')
-      + (p.status==='postcure'||p.consolidation ? '<option value="postcure">Suivi post-cure</option>' : '');
+    const parcoursList = (p.parcours||[]).filter(parc=>parc.status!=='interrompu');
+    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Thérapie groupe',monitoring:'📈 Monitoring'};
+    sel.innerHTML = '<option value="all">Tous les suivis actifs</option>'
+      + (protos.length ? '<optgroup label="Cure rTMS">'
+          + protos.map(pr => '<option value="rtms_'+pr.name+'">'+(PROTOCOLS[pr.name]?.name||pr.name)+'</option>').join('')
+          + '</optgroup>' : '')
+      + (parcoursList.length ? '<optgroup label="Parcours">'
+          + parcoursList.map(parc => '<option value="parc_'+parc.id+'">'+(PARCOURS_LABELS[parc.type]||parc.type)+(parc.startDate?' · '+fmtDate(parc.startDate):'')+'</option>').join('')
+          + '</optgroup>' : '')
+      + (p.status==='postcure'||p.consolidation ? '<option value="postcure">📆 Consolidation/maintien</option>' : '');
     const selArea = document.getElementById('interrupt-protocol-area');
-    if(selArea) selArea.style.display = protos.length > 1 || p.status==='postcure' ? 'block' : 'none';
+    if(selArea) selArea.style.display = protos.length + parcoursList.length > 1 || p.status==='postcure' ? 'block' : 'none';
   }
   openModal('m-interrupt-cure');
 }
@@ -5866,6 +6450,9 @@ async function confirmInterruptCure() {
   const reason = document.getElementById('interrupt-reason')?.value || '';
   const doPostcure = document.getElementById('interrupt-postcure')?.value === 'yes';
   const whichProto = document.getElementById('interrupt-protocol-sel')?.value || 'all';
+  const isParcoursSel = whichProto.startsWith('parc_');
+  const isRtmsSel = whichProto.startsWith('rtms_');
+  const rtmsProtoName = isRtmsSel ? whichProto.replace('rtms_', '') : null;
 
   if(!interruptDate) { alert('Veuillez indiquer la date d\'interruption.'); return; }
 
@@ -5884,10 +6471,29 @@ async function confirmInterruptCure() {
       };
     }).filter(s => s.questionnaires?.length>0||s.hetero?.length>0||s.done?.length>0);
     updateData = {status:'termine', schedule, postcureInterruptDate: interruptDate};
+  } else if(isParcoursSel) {
+    // Interrupt a specific parcours
+    const parcId = whichProto; // already 'parc_...'
+    const parcours = (p.parcours||[]).map(parc =>
+      parc.id === parcId ? {...parc, status:'interrompu', interruptDate, interruptReason:reason} : parc
+    );
+    // Remove future slots for this parcours
+    const schedule = (p.schedule||[]).map(s => {
+      if(s.parcoursId !== parcId) return s;
+      if(s.date > interruptDate) return {...s, questionnaires:[], hetero:[]};
+      const done=s.done||[], ign=s.ignored||[];
+      return {...s,
+        questionnaires:(s.questionnaires||[]).filter(q=>done.includes(q)||ign.includes(q)),
+        hetero:(s.hetero||[]).filter(q=>done.includes(q)||ign.includes(q))
+      };
+    }).filter(s=>s.questionnaires?.length>0||s.hetero?.length>0||s.done?.length>0);
+    updateData = {parcours, schedule};
   } else {
-    // Interrupt one or all cure protocols
+    // Interrupt one or all rTMS cure protocols
     const protos = normalizeProtocols(p);
-    const protosToInterrupt = whichProto === 'all' ? protos.map(pr=>pr.name) : [whichProto];
+    const protosToInterrupt = whichProto === 'all'
+      ? protos.map(pr=>pr.name)
+      : (rtmsProtoName ? [rtmsProtoName] : protos.map(pr=>pr.name));
 
     // Determine which questionnaires belong exclusively to interrupted protocols
     // (not shared with remaining active protocols)
@@ -6004,10 +6610,10 @@ async function saveConsolidation() {
     if(currentDate > endPostcure) break;
 
     const label = freq < 1
-      ? 'Post-cure S+' + Math.round(iteration * freq * 4)
+      ? 'Consolidation S+' + Math.round(iteration * freq * 4)
       : freq === 1
-        ? 'Post-cure M+' + (iteration * freq)
-        : 'Post-cure M+' + Math.round(iteration * freq);
+        ? 'Consolidation M+' + (iteration * freq)
+        : 'Consolidation M+' + Math.round(iteration * freq);
 
     schedule.push({
       date: currentDate.toISOString().split('T')[0],
@@ -7182,7 +7788,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         <div class="fg"><label>Statut</label>
           <select id="edit-status">
             <option value="cure">En cure</option>
-            <option value="postcure">Post-cure</option>
+            <option value="postcure">Consolidation/maintien</option>
             <option value="termine">Terminé</option>
           </select>
         </div>
@@ -7329,10 +7935,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 <!-- MODAL: CONSOLIDATION POST-CURE -->
 <div id="m-consolidation" class="overlay">
   <div class="modal fade">
-    <div class="mh"><div class="mh-title">Consolidation post-cure</div><button class="close-btn" onclick="closeModal('m-consolidation')">✕</button></div>
+    <div class="mh"><div class="mh-title">Consolidation / Maintien</div><button class="close-btn" onclick="closeModal('m-consolidation')">✕</button></div>
     <div class="mb">
-      <div class="info-box" style="margin-bottom:14px">Configurer le suivi post-cure. Par défaut : PHQ-9 + GAD-7 + questionnaires spécifiques × 6 mois.</div>
-      <div class="fg"><label>Date de début du suivi post-cure</label>
+      <div class="info-box" style="margin-bottom:14px">Configurer le suivi de consolidation/maintien. Les questionnaires et la fréquence sont configurables.</div>
+      <div class="fg"><label>Date de début</label>
         <input type="date" id="cons-start-date">
       </div>
       <div class="fg"><label>Durée du suivi</label>
