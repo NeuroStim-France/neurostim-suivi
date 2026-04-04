@@ -1285,27 +1285,78 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <!-- Step 2 -->
       <div id="ps2" style="display:none">
-        <div class="step-label">Étape 2 — Protocole(s) &amp; dates</div>
+        <div class="step-label">Étape 2 — Type de suivi &amp; dates</div>
         <!-- Mode selector -->
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="mode-cure-btn" class="btn btn-primary btn-sm" onclick="setPatientMode('cure')" style="flex:1">🩺 Cure rTMS</button>
-          <button id="mode-postcure-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('postcure')" style="flex:1">📆 Consolidation directe</button>
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+          <button id="mode-cure-btn" class="btn btn-primary btn-sm" onclick="setPatientMode('cure')" style="flex:1;min-width:120px">🧠 Cure rTMS</button>
+          <button id="mode-postcure-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('postcure')" style="flex:1;min-width:120px">📆 Consolidation</button>
+          <button id="mode-parcours-btn" class="btn btn-secondary btn-sm" onclick="setPatientMode('parcours')" style="flex:1;min-width:120px">🗺️ Parcours</button>
         </div>
-        <!-- Protocol list (dynamic) -->
-        <div id="proto-list-area"></div>
-        <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
-        <!-- Post-cure direct start date -->
+
+        <!-- Cure rTMS area -->
+        <div id="ps2-cure-area">
+          <div id="proto-list-area"></div>
+          <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
+          <div id="sched-area" style="display:none">
+            <div class="divider"></div>
+            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Questionnaires générés automatiquement</div>
+            <div class="sched-phase"><div class="sched-phase-title">J1</div><div class="sched-tags" id="sched-auto"></div></div>
+            <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires</div><div class="sched-tags" id="sched-hetero"></div></div>
+            <div class="sched-phase"><div class="sched-phase-title">Chaque vendredi en cure</div><div class="sched-tags" id="sched-weekly"></div></div>
+            <div class="sched-phase"><div class="sched-phase-title">Mensuel × 6 mois consolidation</div><div class="sched-tags" id="sched-monthly"></div></div>
+          </div>
+        </div>
+
+        <!-- Consolidation directe area -->
         <div id="postcure-startdate-area" style="display:none">
           <div class="fg"><label>Date de début *</label><input type="date" id="p-postcure-start"></div>
+          <div id="ps2-consolidation-proto">
+            <div id="proto-list-area-cons"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
+          </div>
         </div>
-        <!-- Schedule preview -->
-        <div id="sched-area" style="display:none">
-          <div class="divider"></div>
-          <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Questionnaires générés automatiquement</div>
-          <div class="sched-phase"><div class="sched-phase-title">J1</div><div class="sched-tags" id="sched-auto"></div></div>
-          <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires</div><div class="sched-tags" id="sched-hetero"></div></div>
-          <div class="sched-phase"><div class="sched-phase-title">Chaque vendredi en cure</div><div class="sched-tags" id="sched-weekly"></div></div>
-          <div class="sched-phase"><div class="sched-phase-title">Mensuel × 6 mois post-cure</div><div class="sched-tags" id="sched-monthly"></div></div>
+
+        <!-- Parcours area (reuses parcours modal logic inline) -->
+        <div id="ps2-parcours-area" style="display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;color:var(--text3)">(multi-sélection)</span></div>
+          <div id="ps2-contexte-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+          <div class="fg">
+            <label>Parcours *</label>
+            <select id="ps2-parcours-type" onchange="onPs2ParcoursTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
+              <option value="">— Choisir un parcours —</option>
+              <option value="medicament">💊 Intervention médicamenteuse</option>
+              <option value="cpap">🛏️ CPAP ou OAM</option>
+              <option value="psychotherapie">🗣️ Psychothérapie</option>
+              <option value="remediation">🧠 Remédiation cognitive</option>
+              <option value="groupe">👥 Thérapie de groupe</option>
+              <option value="monitoring">📈 Monitoring simple</option>
+            </select>
+          </div>
+          <div id="ps2-parcours-suboptions" style="display:none"></div>
+          <div class="g2" style="margin-top:8px">
+            <div class="fg"><label>Date de démarrage *</label><input type="date" id="ps2-parcours-start" autocomplete="off"></div>
+            <div class="fg">
+              <label>Durée du suivi</label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="number" id="ps2-parcours-duration" min="0" max="120" value="6" style="width:70px;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px;text-align:center">
+                <span style="font-size:13px;color:var(--text2)">mois <span style="color:var(--text3);font-size:11px">(0 = indéfini)</span></span>
+              </div>
+            </div>
+          </div>
+          <!-- Questionnaires -->
+          <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;margin-top:4px">Questionnaires</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px">Base commune</div>
+          <div id="ps2-base-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div id="ps2-specific-area" style="display:none">
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px">Spécifiques au contexte</div>
+            <div id="ps2-specific-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px">Ajouter</div>
+          <div id="ps2-added-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:6px;margin-bottom:4px">
+            <select id="ps2-add-q-sel" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></select>
+            <button class="btn btn-secondary btn-sm" onclick="ps2ParcoursAddQ()">+ Ajouter</button>
+          </div>
         </div>
       </div>
       <!-- Step 3 -->
@@ -2916,7 +2967,7 @@ async function qFinish() {
 }
 
 function openAddPatient() {
-  newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure'};
+  newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure', parcoursState:null, parcoursConfig:null};
   ['p-prenom','p-nom','p-dob'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const cp=document.getElementById('code-prev'); if(cp){cp.textContent='XXX-XXX-AAAAMMJJ';cp.style.opacity='.4';}
   const sa=document.getElementById('sched-area'); if(sa) sa.style.display='none';
@@ -2950,7 +3001,16 @@ function renderPatSummary() {
   const code=genCode(document.getElementById('p-prenom').value,document.getElementById('p-nom').value,document.getElementById('p-dob').value);
   document.getElementById('c-code').textContent=code;
   const valid = newPat.protocols.filter(p=>p.name);
-  if(newPat.mode === 'postcure') {
+  if(newPat.mode === 'parcours') {
+    document.getElementById('c-details').style.display='none';
+    document.getElementById('c-postcure-details').style.display='';
+    const pc = newPat.parcoursConfig || {};
+    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Groupe',monitoring:'📈 Monitoring'};
+    document.getElementById('c-prots2').textContent = (PARCOURS_LABELS[pc.type]||pc.type||'—') + (pc.contextes&&pc.contextes.length?' · '+pc.contextes.join(', '):'');
+    document.getElementById('c-postcure-start').textContent = fmtDate(pc.startDate);
+    const durEl = document.getElementById('c-postcure-details');
+    if(durEl) durEl.querySelector('strong') && (durEl.innerHTML = durEl.innerHTML.replace('Post-cure directe','Parcours'));
+  } else if(newPat.mode === 'postcure') {
     document.getElementById('c-details').style.display='none';
     document.getElementById('c-postcure-details').style.display='';
     document.getElementById('c-prots2').textContent = valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ')||'—';
@@ -2987,13 +3047,159 @@ const PROTO_OPTIONS = [
   {value:'add_aut', label:'Addiction — Autre'},
 ];
 
+// ── PS2 Parcours inline state ──
+function ps2InitParcoursState() {
+  if(!newPat.parcoursState) newPat.parcoursState = {contextes:[], subtype:{}, freqMap:{}, specificQs:[], addedQs:[]};
+}
+
+function ps2RenderContextes() {
+  ps2InitParcoursState();
+  const el = document.getElementById('ps2-contexte-list'); if(!el) return;
+  el.innerHTML = PARCOURS_CONFIG.contextes.map(c => {
+    const active = newPat.parcoursState.contextes.includes(c.code);
+    return '<button class="prot-btn'+(active?' active':'')+'" style="font-size:12px;padding:5px 10px" data-code="'+c.code+'" onclick="ps2ToggleContexte(this.dataset.code)" title="'+c.cat+'">'+c.label+'</button>';
+  }).join('');
+}
+
+function ps2ToggleContexte(code) {
+  ps2InitParcoursState();
+  const idx = newPat.parcoursState.contextes.indexOf(code);
+  if(idx >= 0) newPat.parcoursState.contextes.splice(idx, 1);
+  else newPat.parcoursState.contextes.push(code);
+  ps2RenderContextes();
+  ps2RenderSpecificQs();
+}
+
+function ps2RenderBaseQs() {
+  ps2InitParcoursState();
+  const el = document.getElementById('ps2-base-qs'); if(!el) return;
+  el.innerHTML = PARCOURS_CONFIG.baseCommune.map(q => {
+    const freq = newPat.parcoursState.freqMap[q] || 'ponctuel_debut_fin';
+    return '<div style="display:flex;align-items:center;gap:4px;background:var(--accent-bg);border:1px solid var(--accent-light);border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q+'</span>'
+      +'<select data-qname="'+q+'" onchange="newPat.parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f=>'<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select></div>';
+  }).join('');
+}
+
+function ps2RenderSpecificQs() {
+  ps2InitParcoursState();
+  const area = document.getElementById('ps2-specific-area');
+  const el = document.getElementById('ps2-specific-qs');
+  if(!area||!el) return;
+  const codes = newPat.parcoursState.contextes;
+  if(!codes.length) { area.style.display='none'; return; }
+  area.style.display = 'block';
+  const qs = [];
+  codes.forEach(code => {
+    const cfg = PARCOURS_CONFIG.byContexte[code];
+    if(!cfg) return;
+    if(cfg.principal && !qs.find(q=>q.name===cfg.principal)) qs.push({name:cfg.principal, role:'principal'});
+    if(cfg.secondaire && !qs.find(q=>q.name===cfg.secondaire)) qs.push({name:cfg.secondaire, role:'secondaire'});
+  });
+  newPat.parcoursState.specificQs = qs;
+  el.innerHTML = qs.map(q => {
+    const freq = newPat.parcoursState.freqMap[q.name] || 'mensuel';
+    const bg = q.role==='principal' ? 'var(--green-bg)' : 'var(--surface2)';
+    const border = q.role==='principal' ? 'var(--green)' : 'var(--border2)';
+    return '<div style="display:flex;align-items:center;gap:4px;background:'+bg+';border:1px solid '+border+';border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q.name+'</span><span style="font-size:10px;color:var(--text3)">'+q.role+'</span>'
+      +'<select data-qname="'+q.name+'" onchange="newPat.parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f=>'<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select></div>';
+  }).join('') || '<span style="font-size:12px;color:var(--text3)">Aucun questionnaire défini pour ce contexte</span>';
+}
+
+function ps2RenderAddQSelector() {
+  const sel = document.getElementById('ps2-add-q-sel'); if(!sel) return;
+  const allQs = Object.keys(QUESTIONNAIRES).filter(q =>
+    q!=='PEM'&&q!=='Consentement rTMS'&&QUESTIONNAIRES[q].questions&&QUESTIONNAIRES[q].questions.length
+  ).sort();
+  sel.innerHTML = '<option value="">Choisir un questionnaire…</option>'
+    + allQs.map(q=>'<option value="'+q+'">'+q+'</option>').join('');
+}
+
+function ps2ParcoursAddQ() {
+  ps2InitParcoursState();
+  const sel = document.getElementById('ps2-add-q-sel');
+  if(!sel||!sel.value) return;
+  const name = sel.value;
+  const alreadyIn = [...PARCOURS_CONFIG.baseCommune, ...newPat.parcoursState.specificQs.map(q=>q.name), ...newPat.parcoursState.addedQs.map(q=>q.name)];
+  if(!alreadyIn.includes(name)) {
+    newPat.parcoursState.addedQs.push({name});
+    if(!newPat.parcoursState.freqMap[name]) newPat.parcoursState.freqMap[name]='mensuel';
+  }
+  sel.value='';
+  ps2RenderAddedQs();
+}
+
+function ps2RenderAddedQs() {
+  const el = document.getElementById('ps2-added-qs'); if(!el) return;
+  if(!newPat.parcoursState.addedQs.length) { el.innerHTML=''; return; }
+  el.innerHTML = newPat.parcoursState.addedQs.map((q,i) => {
+    const freq = newPat.parcoursState.freqMap[q.name]||'mensuel';
+    return '<div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:3px 10px;font-size:12px">'
+      +'<span>'+q.name+'</span>'
+      +'<select data-qname="'+q.name+'" onchange="newPat.parcoursState.freqMap[this.dataset.qname]=this.value" style="border:none;background:transparent;font-size:11px;color:var(--text2);cursor:pointer;outline:none">'
+      +FREQ_OPTIONS.map(f=>'<option value="'+f.value+'"'+(freq===f.value?' selected':'')+'>'+f.label+'</option>').join('')
+      +'</select>'
+      +'<button data-i="'+i+'" onclick="ps2RemoveAddedQ(Number(this.dataset.i))" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:12px;padding:0 2px">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+function ps2RemoveAddedQ(idx) {
+  newPat.parcoursState.addedQs.splice(idx,1);
+  ps2RenderAddedQs();
+}
+
+function onPs2ParcoursTypeChange() {
+  ps2InitParcoursState();
+  const type = document.getElementById('ps2-parcours-type').value;
+  newPat.parcoursState.subtype = {};
+  const subEl = document.getElementById('ps2-parcours-suboptions');
+  subEl.innerHTML=''; subEl.style.display='none';
+  if(!type) return;
+  subEl.style.display='block';
+  // Reuse the same sub-option rendering logic as the modal
+  // Temporarily set parcoursState to newPat.parcoursState and use existing render
+  const saved = parcoursState;
+  parcoursState = newPat.parcoursState;
+  parcoursState.type = type;
+  const fakeEl = {innerHTML:''};
+  // Build html inline (simplified — same options as modal)
+  let html = '';
+  if(type==='cpap') {
+    html='<div class="fg"><label>Dispositif</label><div style="display:flex;gap:8px">'
+      +['CPAP','OAM'].map(v=>'<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px"><input type="radio" name="ps2-cpap" data-v="'+v+'" onchange="newPat.parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent)"> '+v+'</label>').join('')
+      +'</div></div>';
+  } else if(type==='psychotherapie') {
+    html='<div class="fg"><label>Type</label><select id="ps2-psycho-type" onchange="newPat.parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">— Choisir —</option>'+['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Schémas','ICV','Autre'].map(v=>'<option>'+v+'</option>').join('')+'</select></div>'
+      +'<div class="fg"><label>Rythme</label><select id="ps2-psycho-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
+  } else if(type==='remediation'||type==='groupe') {
+    html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
+    if(type==='groupe') html+='<div class="fg"><label>Description (optionnel)</label><input type="text" autocomplete="off" placeholder="Ex: Groupe TCC" onchange="newPat.parcoursState.subtype.desc=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
+  }
+  subEl.innerHTML = html;
+  parcoursState = saved;
+}
+
 function setPatientMode(mode) {
   newPat.mode = mode;
   document.getElementById('mode-cure-btn').className = 'btn btn-sm ' + (mode==='cure' ? 'btn-primary' : 'btn-secondary');
   document.getElementById('mode-postcure-btn').className = 'btn btn-sm ' + (mode==='postcure' ? 'btn-primary' : 'btn-secondary');
-  document.getElementById('postcure-startdate-area').style.display = mode==='postcure' ? 'block' : 'none';
-  renderProtocolList();
-  updateSchedPreview();
+  const parcoursBtn = document.getElementById('mode-parcours-btn');
+  if(parcoursBtn) parcoursBtn.className = 'btn btn-sm ' + (mode==='parcours' ? 'btn-primary' : 'btn-secondary');
+  // Show/hide area sections
+  const cureArea = document.getElementById('ps2-cure-area');
+  const consArea = document.getElementById('postcure-startdate-area');
+  const parcArea = document.getElementById('ps2-parcours-area');
+  if(cureArea) cureArea.style.display = mode==='cure' ? 'block' : 'none';
+  if(consArea) consArea.style.display = mode==='postcure' ? 'block' : 'none';
+  if(parcArea) parcArea.style.display = mode==='parcours' ? 'block' : 'none';
+  if(mode === 'cure') { renderProtocolList(); updateSchedPreview(); }
+  if(mode === 'parcours') { ps2RenderContextes(); ps2RenderBaseQs(); ps2RenderAddQSelector(); }
 }
 
 function addProtocolEntry() {
@@ -3084,7 +3290,7 @@ async function createPatient() {
     const patientId='NS-'+new Date().getFullYear()+'-'+String(snap.size+1).padStart(5,'0');
 
     // Build schedule
-    let schedule, status, j1Date, endDate;
+    let schedule, status, j1Date, endDate, parcours = [];
     if(newPat.mode === 'postcure') {
       const startDate = document.getElementById('p-postcure-start')?.value || todayStr();
       validProtos.forEach(p => p.startDate = startDate);
@@ -3092,6 +3298,38 @@ async function createPatient() {
       status = 'postcure';
       j1Date = startDate;
       endDate = startDate;
+    } else if(newPat.mode === 'parcours') {
+      const pc = newPat.parcoursConfig || {};
+      const startDate = pc.startDate || todayStr();
+      const duration = pc.duration || 6;
+      // Build questionnaire list from parcoursState
+      const allQs = [];
+      PARCOURS_CONFIG.baseCommune.forEach(name => {
+        allQs.push({name, freq: (pc.freqMap||{})[name] || 'ponctuel_debut_fin', role:'base'});
+      });
+      (pc.specificQs||[]).forEach(q => {
+        allQs.push({name:q.name, freq:(pc.freqMap||{})[q.name]||'mensuel', role:q.role});
+      });
+      (pc.addedQs||[]).forEach(q => {
+        if(!allQs.find(a=>a.name===q.name))
+          allQs.push({name:q.name, freq:(pc.freqMap||{})[q.name]||'mensuel', role:'optionnel'});
+      });
+      const parcoursObj = {
+        id: 'parc_'+Date.now(),
+        type: pc.type,
+        subtype: pc.subtype||{},
+        contextes: pc.contextes||[],
+        startDate, duration,
+        endDate: duration>0 ? (()=>{const d=new Date(startDate);d.setMonth(d.getMonth()+duration);return d.toISOString().split('T')[0];})() : null,
+        questionnaires: allQs,
+        status:'actif',
+        createdAt:todayStr(),
+      };
+      parcours = [parcoursObj];
+      schedule = genParcoursSlotsSlots(parcoursObj);
+      status = 'cure';
+      j1Date = startDate;
+      endDate = parcoursObj.endDate || '';
     } else {
       schedule = genSchedule({protocols: validProtos});
       status = 'cure';
@@ -3103,7 +3341,8 @@ async function createPatient() {
       code, patientId, dob, j1Date, endDate, cabinet,
       prenom: prenom,
       nom: nom,
-      protocols: validProtos,
+      protocols: newPat.mode==='parcours' ? [] : validProtos,
+      parcours,
       status,
       notes:[], responses:{},
       schedule,
@@ -5541,13 +5780,32 @@ function validatePatientStep1() {
 
 function validatePatientStep2() {
   clearFieldErrors();
+
+  if(newPat.mode === 'parcours') {
+    const type = document.getElementById('ps2-parcours-type')?.value;
+    const start = document.getElementById('ps2-parcours-start')?.value;
+    if(!type) { showError('Veuillez choisir un type de parcours.', 3000); return false; }
+    if(!start) { showError('Veuillez indiquer une date de démarrage.', 3000); return false; }
+    // Store parcours config in newPat for createPatient
+    newPat.parcoursConfig = {
+      type,
+      startDate: start,
+      duration: parseInt(document.getElementById('ps2-parcours-duration')?.value) || 6,
+      contextes: [...(newPat.parcoursState?.contextes||[])],
+      subtype: {...(newPat.parcoursState?.subtype||{})},
+      freqMap: {...(newPat.parcoursState?.freqMap||{})},
+      specificQs: [...(newPat.parcoursState?.specificQs||[])],
+      addedQs: [...(newPat.parcoursState?.addedQs||[])],
+    };
+    return true;
+  }
+
   const valid = newPat.protocols.filter(p=>p.name);
   if(!valid.length) { showError('Veuillez sélectionner au moins un protocole.', 3000); return false; }
 
   if(newPat.mode === 'postcure') {
     const start = document.getElementById('p-postcure-start')?.value;
     if(!start) { showError('Veuillez indiquer la date de début du suivi de consolidation.', 3000); return false; }
-    // Store start date into protocols
     newPat.protocols.forEach(p => { if(p.name) p.startDate = start; });
     return true;
   }
