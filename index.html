@@ -192,6 +192,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 /* NOTES */
 .dropdown-item{display:block;width:100%;text-align:left;padding:8px 14px;background:none;border:none;font-family:inherit;font-size:13px;color:var(--text);cursor:pointer;white-space:nowrap}
 .dropdown-item:hover{background:var(--surface2)}
+.ctx-dropdown{position:relative;width:100%;margin-bottom:14px}
+.ctx-dropdown-btn{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface);font-family:inherit;font-size:14px;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ctx-dropdown-btn:hover{border-color:var(--accent)}
+.ctx-dropdown-menu{display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:300;max-height:280px;overflow-y:auto;padding:4px 0}
+.ctx-dropdown-menu.open{display:block}
+.ctx-dropdown-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text)}
+.ctx-dropdown-item:hover{background:var(--surface2)}
+.ctx-dropdown-item input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0}
+.ctx-dropdown-group{padding:6px 14px 2px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 .note-item{padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
 .note-item.note-lecture{background:var(--purple-bg);border-color:var(--purple-border)}
 .note-meta{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
@@ -1319,7 +1328,13 @@ body.role-saisie .analyse-only { display:none !important; }
         <!-- Parcours area (reuses parcours modal logic inline) -->
         <div id="ps2-parcours-area" style="display:none">
           <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;color:var(--text3)">(multi-sélection)</span></div>
-          <div id="ps2-contexte-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+          <div class="ctx-dropdown" id="ps2-ctx-dropdown">
+            <button type="button" class="ctx-dropdown-btn" onclick="toggleCtxDropdown('ps2-ctx-dropdown')">
+              <span id="ps2-ctx-label" style="color:var(--text3)">— Sélectionner un ou plusieurs troubles —</span>
+              <span style="font-size:10px;color:var(--text3)">▾</span>
+            </button>
+            <div class="ctx-dropdown-menu" id="ps2-ctx-menu"></div>
+          </div>
           <div class="fg">
             <label>Parcours *</label>
             <select id="ps2-parcours-type" onchange="onPs2ParcoursTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
@@ -1558,8 +1573,14 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mb" style="max-height:75vh;overflow-y:auto">
 
       <!-- Contexte clinique -->
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif — multi-sélection possible)</span></div>
-      <div id="parcours-contexte-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif — multi-sélection)</span></div>
+      <div class="ctx-dropdown" id="modal-ctx-dropdown" style="margin-bottom:14px">
+        <button type="button" class="ctx-dropdown-btn" onclick="toggleCtxDropdown('modal-ctx-dropdown')">
+          <span id="modal-ctx-label" style="color:var(--text3)">— Sélectionner un ou plusieurs troubles —</span>
+          <span style="font-size:10px;color:var(--text3)">▾</span>
+        </button>
+        <div class="ctx-dropdown-menu" id="modal-ctx-menu"></div>
+      </div>
 
       <!-- Type de parcours -->
       <div class="fg">
@@ -2538,6 +2559,72 @@ async function deleteNote(idx) {
   renderLastNote();
 }
 
+// ── Contexte clinique dropdown-checkbox ──
+function buildCtxDropdown(menuId, labelId, selectedCodes, onToggle) {
+  const menu = document.getElementById(menuId);
+  const labelEl = document.getElementById(labelId);
+  if(!menu) return;
+
+  // Group contexts by category
+  const groups = {};
+  PARCOURS_CONFIG.contextes.forEach(c => {
+    if(!groups[c.cat]) groups[c.cat] = [];
+    groups[c.cat].push(c);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([cat, items]) => {
+    html += '<div class="ctx-dropdown-group">'+cat+'</div>';
+    items.forEach(c => {
+      const checked = selectedCodes.includes(c.code);
+      html += '<label class="ctx-dropdown-item">'
+        + '<input type="checkbox" '+(checked?'checked':'')
+        + ' data-code="'+c.code+'" data-menu="'+menuId+'" data-label="'+labelId+'"'
+        + ' onchange="onCtxCheckChange(this)">'
+        + '<span>'+c.label+'</span>'
+        + '</label>';
+    });
+  });
+  menu.innerHTML = html;
+
+  // Update label
+  if(labelEl) {
+    labelEl.style.color = selectedCodes.length ? 'var(--text)' : 'var(--text3)';
+    labelEl.textContent = selectedCodes.length
+      ? selectedCodes.map(code => {
+          const c = PARCOURS_CONFIG.contextes.find(x=>x.code===code);
+          return c ? c.label : code;
+        }).join(', ')
+      : '— Sélectionner un ou plusieurs troubles —';
+  }
+
+  // Store callback on menu element for use in onCtxCheckChange
+  menu._onToggle = onToggle;
+}
+
+function onCtxCheckChange(checkbox) {
+  const code = checkbox.dataset.code;
+  const menuId = checkbox.dataset.menu;
+  const menu = document.getElementById(menuId);
+  if(menu && menu._onToggle) menu._onToggle(code);
+}
+
+function toggleCtxDropdown(wrapperId) {
+  const menu = document.getElementById(
+    wrapperId === 'ps2-ctx-dropdown' ? 'ps2-ctx-menu' : 'modal-ctx-menu'
+  );
+  if(!menu) return;
+  menu.classList.toggle('open');
+}
+
+// Close ctx dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.ctx-dropdown-menu.open').forEach(m => {
+    const wrapper = m.closest('.ctx-dropdown');
+    if(wrapper && !wrapper.contains(e.target)) m.classList.remove('open');
+  });
+});
+
 function toggleAddDropdown() {
   const menu = document.getElementById('add-dropdown-menu');
   if(!menu) return;
@@ -3054,11 +3141,14 @@ function ps2InitParcoursState() {
 
 function ps2RenderContextes() {
   ps2InitParcoursState();
-  const el = document.getElementById('ps2-contexte-list'); if(!el) return;
-  el.innerHTML = PARCOURS_CONFIG.contextes.map(c => {
-    const active = newPat.parcoursState.contextes.includes(c.code);
-    return '<button class="prot-btn'+(active?' active':'')+'" style="font-size:12px;padding:5px 10px" data-code="'+c.code+'" onclick="ps2ToggleContexte(this.dataset.code)" title="'+c.cat+'">'+c.label+'</button>';
-  }).join('');
+  buildCtxDropdown('ps2-ctx-menu', 'ps2-ctx-label', newPat.parcoursState.contextes,
+    function(code) {
+      const idx = newPat.parcoursState.contextes.indexOf(code);
+      if(idx>=0) newPat.parcoursState.contextes.splice(idx,1); else newPat.parcoursState.contextes.push(code);
+      ps2RenderContextes();
+      ps2RenderSpecificQs();
+    }
+  );
 }
 
 function ps2ToggleContexte(code) {
@@ -6281,12 +6371,14 @@ function openAddParcours() {
 }
 
 function renderParcoursContextes() {
-  const el = document.getElementById('parcours-contexte-list');
-  if(!el) return;
-  el.innerHTML = PARCOURS_CONFIG.contextes.map(c => {
-    const active = parcoursState.contextes.includes(c.code);
-    return '<button class="prot-btn'+(active?' active':'')+'" style="font-size:12px;padding:5px 10px" data-code="'+c.code+'" onclick="toggleParcoursContexte(this.dataset.code)" title="'+c.cat+'">'+c.label+'</button>';
-  }).join('');
+  buildCtxDropdown('modal-ctx-menu', 'modal-ctx-label', parcoursState.contextes,
+    function(code, active) {
+      const idx = parcoursState.contextes.indexOf(code);
+      if(idx>=0) parcoursState.contextes.splice(idx,1); else parcoursState.contextes.push(code);
+      renderParcoursContextes();
+      renderParcoursSpecificQs();
+    }
+  );
 }
 
 function toggleParcoursContexte(code) {
