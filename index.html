@@ -1715,27 +1715,6 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="fg"><label>Questionnaire</label>
         <select id="single-q-name">
           <option value="">-- Sélectionner --</option>
-          <option value="PHQ-9">PHQ-9 — Dépression</option>
-          <option value="GAD-7">GAD-7 — Anxiété</option>
-          <option value="BDI-2">BDI-2 — Dépression (Beck)</option>
-          <option value="ISI">ISI — Insomnie</option>
-          <option value="EQ-5D-5L">EQ-5D-5L — Qualité de vie</option>
-          <option value="Ricci-Gagnon">Ricci &amp; Gagnon — Activité physique</option>
-          <option value="PCL-5">PCL-5 — PTSD</option>
-          <option value="Y-BOCS-SR">Y-BOCS-SR — TOC</option>
-          <option value="STAI-E">STAI état — Anxiété</option>
-          <option value="STAI-T">STAI trait — Anxiété</option>
-          <option value="STAI">STAI — Anxiété (complet)</option>
-          <option value="Maudsley">Maudsley — Résistance (hétéro)</option>
-          <option value="MADRS">MADRS — Dépression (hétéro)</option>
-          <option value="AHRS">AHRS — Hallucinations (hétéro)</option>
-          <option value="SANS">SANS — Symptômes négatifs (hétéro)</option>
-          <option value="QCD">QCD — Douleur</option>
-          <option value="FIQ">FIQ — Fibromyalgie</option>
-          <option value="DSM5">DSM5 — Addiction</option>
-          <option value="EVA craving">EVA craving</option>
-          <option value="OCDS">OCDS — Alcool</option>
-          <option value="Consentement rTMS">Consentement rTMS</option>
         </select>
       </div>
       <div class="fg"><label>Date souhaitée</label><input type="date" id="single-q-date"></div>
@@ -7109,6 +7088,7 @@ function openConsolidation() {
   // Default start date = endDate or today
   const startEl = document.getElementById('cons-start-date');
   if(startEl) startEl.value = p.endDate || p.interruptDate || todayStr();
+  buildQSelectOptions('cons-add-q', false); // auto only for consolidation
   openModal('m-consolidation');
 }
 
@@ -7168,11 +7148,27 @@ async function saveConsolidation() {
 // ════════════════════════════════════════════════
 // QUESTIONNAIRE UNIQUE PONCTUEL
 // ════════════════════════════════════════════════
+function buildQSelectOptions(selId, includeHetero) {
+  const sel = document.getElementById(selId);
+  if(!sel) return;
+  const sorted = Object.keys(QUESTIONNAIRES).sort();
+  sel.innerHTML = '<option value="">-- Sélectionner --</option>'
+    + sorted.map(function(k) {
+        const qi = QUESTIONNAIRES[k];
+        if(!qi || !qi.questions || !qi.questions.length) return '';
+        if(!includeHetero && qi.type === 'hetero') return '';
+        const tag = qi.type === 'hetero' ? ' (hétéro)' : '';
+        const domain = qi.domain ? ' — ' + qi.domain : '';
+        return '<option value="' + k + '">' + k + domain + tag + '</option>';
+      }).join('');
+}
+
 function openAddSingleQ() {
   const dateEl = document.getElementById('single-q-date');
   if(dateEl) dateEl.value = todayStr();
   const labelEl = document.getElementById('single-q-label');
   if(labelEl) labelEl.value = '';
+  buildQSelectOptions('single-q-name', true); // include hetero
   const nameEl = document.getElementById('single-q-name');
   if(nameEl) nameEl.value = '';
   openModal('m-add-single-q');
@@ -8492,9 +8488,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div style="display:flex;gap:6px;margin-bottom:14px">
         <select id="cons-add-q" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;outline:none">
           <option value="">Ajouter un questionnaire…</option>
-          <option>PHQ-9</option><option>GAD-7</option><option>BDI-2</option><option>ISI</option>
-          <option>EQ-5D-5L</option><option>Ricci-Gagnon</option><option>STAI-E</option><option>STAI-T</option>
-          <option>PCL-5</option><option>Y-BOCS-SR</option>
         </select>
         <button class="btn btn-secondary btn-sm" onclick="consAddQ()">Ajouter</button>
       </div>
