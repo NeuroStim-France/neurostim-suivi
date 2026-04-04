@@ -1969,9 +1969,123 @@ const QUESTIONNAIRES = {
       if(s >= 40) return {label: s + '% — Modéré', color: 'amber'};
       return {label: s + '% — Faible', color: 'red'};
     }
+  },
+
+  // ── DIVA-5-SR : auto-questionnaire TDAH adulte ──────────────────────
+  'DIVA-5-SR': {
+    name: 'DIVA-5-SR',
+    fullName: "DIVA-5-SR \u2014 Auto-questionnaire TDAH adulte",
+    type: 'auto',
+    domain: 'TDAH',
+    instructions: "Ce questionnaire explore votre fonctionnement habituel. Pour chaque question, choisissez la description qui vous correspond le mieux. R\u00e9pondez en pensant \u00e0 votre fonctionnement habituel, et non \u00e0 une journ\u00e9e exceptionnelle.",
+    questions: [
+      "A1. Erreurs d'inattention \u2014 Quand vous r\u00e9alisez une t\u00e2che r\u00e9p\u00e9titive ou n\u00e9cessitant de la pr\u00e9cision, que se passe-t-il ?",
+      "A2. Maintien de l'attention \u2014 Lorsque vous devez rester concentr\u00e9(e) longtemps sur une t\u00e2che, comment cela se passe-t-il ?",
+      "A3. \u00c9coute directe \u2014 Quand quelqu'un vous parle directement, que se passe-t-il le plus souvent ?",
+      "A4. Suivre des consignes \u2014 Quand vous devez accomplir une t\u00e2che en plusieurs \u00e9tapes, comment cela se passe-t-il ?",
+      "A5. Organisation \u2014 Dans votre vie quotidienne, comment d\u00e9cririez-vous votre organisation ?",
+      "A6. \u00c9vitement / procrastination \u2014 Lorsque vous devez commencer une t\u00e2che longue ou peu stimulante, que se passe-t-il ?",
+      "A7. Perte d'objets \u2014 Vous arrive-t-il d'\u00e9garer des objets importants (cl\u00e9s, t\u00e9l\u00e9phone, papiers...) ?",
+      "A8. Distractibilit\u00e9 \u2014 \u00c0 quel point \u00eates-vous facilement distrait(e) par ce qui se passe autour de vous ?",
+      "A9. Oublis fr\u00e9quents \u2014 Vous arrive-t-il d'oublier des rendez-vous, choses \u00e0 faire, engagements pris ?",
+      "H/I 1. Remuement physique \u2014 Avez-vous du mal \u00e0 rester physiquement immobile (mains, pieds) ?",
+      "H/I 2. Rester assis(e) \u2014 Vous levez-vous souvent dans des situations o\u00f9 vous \u00eates suppos\u00e9(e) rester assis(e) ?",
+      "H/I 3. Agitation int\u00e9rieure \u2014 Vous sentez-vous souvent agit\u00e9(e) int\u00e9rieurement ?",
+      "H/I 4. Activit\u00e9s calmes \u2014 Trouvez-vous difficile de profiter tranquillement d'un moment de d\u00e9tente ?",
+      "H/I 5. Sur la br\u00e8che \u2014 Avez-vous l'impression d'\u00eatre \u00ab dirig\u00e9(e) par un moteur \u00bb ?",
+      "H/I 6. Parler trop \u2014 Parlez-vous souvent trop, au point que les autres le remarquent ?",
+      "H/I 7. R\u00e9ponse avant fin de question \u2014 Laissez-vous \u00e9chapper la r\u00e9ponse avant que la question soit enti\u00e8rement pos\u00e9e ?",
+      "H/I 8. Attendre son tour \u2014 Trouvez-vous difficile d'attendre votre tour dans des situations de groupe ?",
+      "H/I 9. Interrompre \u2014 Interrompez-vous souvent les autres ou imposez-vous votre pr\u00e9sence ?",
+    ],
+    optionsPerQuestion: [
+      ["Je suis g\u00e9n\u00e9ralement attentif(ve) (0)", "Je fais parfois de petites erreurs (1)", "Je fais souvent des erreurs, sauf effort important (2)", "Je dois compenser en permanence pour \u00e9viter les erreurs (3)"],
+      ["Je reste concentr\u00e9(e) sans difficult\u00e9 (0)", "Mon attention d\u00e9croche parfois (1)", "Je pars mentalement ailleurs sans m'en rendre compte (2)", "Incapable de maintenir l'attention m\u00eame en essayant (3)"],
+      ["Je suis g\u00e9n\u00e9ralement attentif(ve) (0)", "Je dois parfois me reconcentrer (1)", "Je r\u00e9alise ensuite que je n'ai pas int\u00e9gr\u00e9 l'information (2)", "Je d\u00e9croche facilement m\u00eame face \u00e0 face (3)"],
+      ["Je suis capable de suivre et d'aller au bout (0)", "Je r\u00e9ussis si je note tout ou structure rigidement (1)", "J'oublie une partie ou laisse la t\u00e2che inachev\u00e9e (2)", "Je me disperse syst\u00e9matiquement ou perds le fil (3)"],
+      ["Je suis globalement organis\u00e9(e) (0)", "Cela me co\u00fbte beaucoup d'\u00e9nergie de compenser (1)", "Je me laisse d\u00e9border facilement (2)", "J'ai souvent du mal \u00e0 organiser les t\u00e2ches dans un ordre logique (3)"],
+      ["Je peux m'y mettre normalement (0)", "Je finis par faire la t\u00e2che mais avec tension \u00e9norme (1)", "Je tourne autour sans r\u00e9ussir \u00e0 m'y mettre vraiment (2)", "Je repousse syst\u00e9matiquement jusqu'au dernier moment (3)"],
+      ["Je retrouve g\u00e9n\u00e9ralement facilement mes affaires (0)", "J'ai mis en place des strat\u00e9gies strictes pour ne pas perdre (1)", "Je passe souvent du temps \u00e0 chercher (2)", "Je perds ou cherche r\u00e9guli\u00e8rement des objets importants (3)"],
+      ["Je reste g\u00e9n\u00e9ralement centr\u00e9(e) sur ce que je fais (0)", "Je suis parfois distrait(e) par mes propres pens\u00e9es (1)", "Je passe vite d'une chose \u00e0 une autre sans l'avoir pr\u00e9vu (2)", "Un bruit ou une id\u00e9e d\u00e9tourne facilement mon attention (3)"],
+      ["J'oublie rarement (0)", "J'utilise beaucoup de syst\u00e8mes de rappel pour compenser (1)", "J'oublie malgr\u00e9 les rappels (2)", "J'oublie r\u00e9guli\u00e8rement des choses importantes (3)"],
+      ["Non, je reste immobile sans difficult\u00e9 (0)", "Parfois, mais je contr\u00f4le (1)", "Souvent, j'agite les mains ou les pieds (2)", "En permanence, du mal \u00e0 rester assis(e) immobile (3)"],
+      ["Non, je reste assis(e) sans difficult\u00e9 (0)", "Parfois je cherche des excuses pour me lever (1)", "Souvent, j'\u00e9vite les r\u00e9unions longues (2)", "Tr\u00e8s souvent, je ne reste jamais longtemps assis(e) tranquille (3)"],
+      ["Non, je me sens g\u00e9n\u00e9ralement calme (0)", "Parfois une sensation d'avoir quelque chose \u00e0 faire (1)", "Souvent agit\u00e9(e) int\u00e9rieurement (2)", "En permanence, difficile de me relaxer (3)"],
+      ["Non, je profite facilement des moments calmes (0)", "Parfois du mal \u00e0 vraiment d\u00e9crocher (1)", "Souvent j'ai besoin de m'occuper (2)", "Je ne sais pas vraiment me d\u00e9tendre (3)"],
+      ["Non, je me sens globalement pos\u00e9(e) (0)", "Parfois trop actif(ve) (1)", "Souvent toujours occup\u00e9(e) (2)", "En permanence, incapable de ralentir (3)"],
+      ["Non, je parle normalement (0)", "Parfois on me dit que je parle beaucoup (1)", "Souvent, du mal \u00e0 m'arr\u00eater (2)", "Tr\u00e8s souvent, les autres me le font remarquer (3)"],
+      ["Non, j'attends la fin (0)", "Parfois je coupe involontairement (1)", "Souvent je r\u00e9ponds avant la fin de la phrase (2)", "Tr\u00e8s souvent, les autres me le signalent (3)"],
+      ["Non, j'attends patiemment (0)", "Parfois impatient(e) (1)", "Souvent du mal \u00e0 attendre (2)", "Tr\u00e8s souvent, je suis le(la) premier(\u00e8re) \u00e0 agir (3)"],
+      ["Non (0)", "Parfois sans le vouloir (1)", "Souvent (2)", "Tr\u00e8s souvent, les autres le remarquent (3)"],
+    ],
+    maxScore: 18,
+    scoreLabel: 'items positifs',
+    interpret: function(s) {
+      if(s <= 2)  return {label: 'Peu \u00e9vocateur', color: 'green'};
+      if(s <= 4)  return {label: 'Partiellement \u00e9vocateur', color: 'amber'};
+      if(s <= 7)  return {label: '\u00c9vocateur', color: 'orange'};
+      return {label: 'Fortement \u00e9vocateur', color: 'red'};
+    },
+    calcScore: function(answers) {
+      return answers.filter(function(a) { return typeof a === 'number' && a >= 2; }).length;
+    }
+  },
+
+  // ── DIVA-5 : hétéro-questionnaire clinicien TDAH ─────────────────────
+  'DIVA-5': {
+    name: 'DIVA-5',
+    fullName: "DIVA-5 \u2014 Entretien diagnostic TDAH adulte (clinicien)",
+    type: 'hetero',
+    domain: 'TDAH',
+    instructions: "Pour chaque crit\u00e8re, coter la pr\u00e9sence \u00e0 l'adulte ET dans l'enfance (5-12 ans). Seuil adulte (\u226517 ans) : \u22655/9. Seuil enfance : \u22653/9 dans au moins un domaine.",
+    questions: [
+      "A1 [ADULTE] Erreurs d'\u00e9tourderie dans le travail ou d'autres activit\u00e9s",
+      "A2 [ADULTE] Difficult\u00e9 \u00e0 maintenir l'attention sur des t\u00e2ches",
+      "A3 [ADULTE] Impression de ne pas \u00e9couter lorsqu'on parle directement",
+      "A4 [ADULTE] Difficult\u00e9 \u00e0 suivre les consignes et \u00e0 mener les t\u00e2ches \u00e0 terme",
+      "A5 [ADULTE] Difficult\u00e9 \u00e0 organiser les t\u00e2ches ou les activit\u00e9s",
+      "A6 [ADULTE] \u00c9vitement des t\u00e2ches n\u00e9cessitant un effort mental soutenu",
+      "A7 [ADULTE] Perte d'objets n\u00e9cessaires au travail ou aux activit\u00e9s",
+      "A8 [ADULTE] Distractibilit\u00e9 par des stimuli externes",
+      "A9 [ADULTE] Oublis fr\u00e9quents dans les activit\u00e9s quotidiennes",
+      "H/I 1 [ADULTE] Remuement des mains/pieds ou tortillement sur si\u00e8ge",
+      "H/I 2 [ADULTE] Se l\u00e8ve dans des situations o\u00f9 il faut rester assis(e)",
+      "H/I 3 [ADULTE] Se sent souvent agit\u00e9(e)",
+      "H/I 4 [ADULTE] Difficult\u00e9 \u00e0 profiter tranquillement d'un moment de d\u00e9tente",
+      "H/I 5 [ADULTE] Sur la br\u00e8che ou dirig\u00e9(e) par un moteur",
+      "H/I 6 [ADULTE] Parle souvent trop",
+      "H/I 7 [ADULTE] Laisse \u00e9chapper la r\u00e9ponse avant fin de question",
+      "H/I 8 [ADULTE] Difficult\u00e9 \u00e0 attendre son tour",
+      "H/I 9 [ADULTE] Interrompt les autres ou s'impose",
+      "A1 [ENFANCE] Erreurs d'\u00e9tourderie dans le travail scolaire",
+      "A2 [ENFANCE] Difficult\u00e9 \u00e0 maintenir l'attention sur les t\u00e2ches ou jeux",
+      "A3 [ENFANCE] Impression de ne pas \u00e9couter",
+      "A4 [ENFANCE] Difficult\u00e9 \u00e0 suivre les consignes dans le travail scolaire",
+      "A5 [ENFANCE] Difficult\u00e9 d'organisation",
+      "A6 [ENFANCE] \u00c9vitement des t\u00e2ches demandant un effort mental",
+      "A7 [ENFANCE] Perte d'objets (mat\u00e9riel scolaire, jouets, etc.)",
+      "A8 [ENFANCE] Distractibilit\u00e9",
+      "A9 [ENFANCE] Oublis fr\u00e9quents",
+      "H/I 1 [ENFANCE] Remuement / tortillement",
+      "H/I 2 [ENFANCE] Se l\u00e8ve en classe ou pendant les repas",
+      "H/I 3 [ENFANCE] Court ou grimpe de fa\u00e7on excessive",
+      "H/I 4 [ENFANCE] Difficult\u00e9 \u00e0 jouer tranquillement",
+      "H/I 5 [ENFANCE] Toujours en mouvement, mont\u00e9(e) sur ressorts",
+      "H/I 6 [ENFANCE] Parle trop, connu(e) comme moulin \u00e0 paroles",
+      "H/I 7 [ENFANCE] Donne la premi\u00e8re r\u00e9ponse qui vient, interrompt",
+      "H/I 8 [ENFANCE] Difficult\u00e9 \u00e0 attendre son tour",
+      "H/I 9 [ENFANCE] Interrompt les autres dans jeux ou activit\u00e9s",
+    ],
+    options: ["Absent (0)", "Pr\u00e9sent (1)"],
+    maxScore: 36,
+    interpret: function(s) {
+      if(s < 5)  return {label: 'Sous le seuil', color: 'green'};
+      if(s < 10) return {label: 'Quelques crit\u00e8res pr\u00e9sents', color: 'amber'};
+      if(s < 16) return {label: '\u00c9vocateur TDAH', color: 'orange'};
+      return {label: 'Fortement \u00e9vocateur TDAH', color: 'red'};
+    }
   }
 };
-
 const Q_DESC = {
   'PHQ-9':'dépression','GAD-7':'anxiété','BDI-2':'dépression','ISI':'insomnie',
   'EQ-5D-5L':'qualité de vie','Ricci-Gagnon':'activité physique','Y-BOCS-SR':'TOC',
@@ -1979,7 +2093,9 @@ const Q_DESC = {
   'Maudsley':'résistance thérapeutique','MADRS':'dépression','AHRS':'hallucinations',
   'SANS':'symptômes négatifs','QCD':'douleur','FIQ':'fibromyalgie',
   'DSM5':'addiction','EVA craving':'craving','OCDS':'alcool',
-  'Consentement rTMS':'consentement'
+  'Consentement rTMS':'consentement',
+  'DIVA-5-SR':'TDAH auto-questionnaire',
+  'DIVA-5':'TDAH entretien clinicien'
 };
 function codeInitials(code) {
   if(!code) return '??';
@@ -4146,12 +4262,15 @@ async function pqFinish() {
   if(pqState.answers[pqState.idx]===undefined){alert('Veuillez faire un choix.');return;}
   const qi = QUESTIONNAIRES[pqState.qName];
   const qi2 = QUESTIONNAIRES[pqState.qName];
-  const score = pqState.answers.reduce((a,b,i)=>{
-    const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
-    if(t==='multi') return a;
-    if(typeof b === 'number') return a+b;
-    return a;
-  }, 0);
+  // Use custom calcScore if defined (e.g. DIVA-5-SR counts positive items)
+  const score = (qi2 && typeof qi2.calcScore === 'function')
+    ? qi2.calcScore(pqState.answers)
+    : pqState.answers.reduce((a,b,i)=>{
+        const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
+        if(t==='multi') return a;
+        if(typeof b === 'number') return a+b;
+        return a;
+      }, 0);
   const answersToStore = pqState.answers.map((a,i)=>{
     const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
     if(t==='multi') return Array.isArray(a) ? a.join('; ') : (a||'');
