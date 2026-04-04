@@ -2109,16 +2109,16 @@ const QUESTIONNAIRES = {
     ],
     // calcScore: somme des scores finaux convertis (résultat entre 0 et ~1)
     calcScore: function(answers) {
-      var tbl = QUESTIONNAIRES['15D'].scoreTableByIndex;
+      var tbl = this.scoreTableByIndex || QUESTIONNAIRES['15D'].scoreTableByIndex;
+      if(!tbl) return 0;
       var total = 0;
       answers.forEach(function(a, i) {
         if(typeof a === 'number' && tbl[i]) {
-          // a = index du bouton cliqué (0-based), correspond au niveau 1-5
           var idx = Math.max(0, Math.min(4, Math.round(a)));
           total += tbl[i][idx];
         }
       });
-      return Math.round(total * 10000) / 10000; // 4 decimal places
+      return Math.round(total * 10000) / 10000;
     },
     interpret: function(s) {
       // Score global 0-1, interprétation basée sur la valeur absolue
@@ -5039,6 +5039,8 @@ function applyParcoursConfig(wb) {
 function applyExcelQuestionnairesFromFirestore(parsedQs) {
   for(const [qKey, data] of Object.entries(parsedQs)) {
     if(!QUESTIONNAIRES[qKey] || !data.questions || !data.questions.length) continue;
+    // Don't overwrite questionnaires with custom calcScore (e.g. 15D, DIVA-5-SR)
+    if(typeof QUESTIONNAIRES[qKey].calcScore === 'function') continue;
     // Rebuild questionTypes, sliderConfigs, multiOptions from stored questions
     const questionTypes = data.questions.map(q =>
       q.isMulti ? 'multi' : q.isSlider ? 'slider' : 'radio'
@@ -5582,6 +5584,8 @@ function applyExcelQuestionnaires(parsedQs) {
   let updated = 0;
   for(const [qKey, data] of Object.entries(parsedQs)) {
     if(!QUESTIONNAIRES[qKey]) continue;
+    // Don't overwrite questionnaires with custom calcScore (e.g. 15D, DIVA-5-SR)
+    if(typeof QUESTIONNAIRES[qKey].calcScore === 'function') continue;
     if(data.instructions) QUESTIONNAIRES[qKey].instructions = data.instructions;
     if(data.questions && data.questions.length) {
       QUESTIONNAIRES[qKey].questions = data.questions.map(q=>q.text);
