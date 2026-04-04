@@ -203,8 +203,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .ctx-dropdown-group{padding:6px 14px 2px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 .note-item{padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
 .note-item.note-lecture{background:var(--purple-bg);border-color:var(--purple-border)}
+.note-item.note-admin{background:var(--accent-bg);border-color:var(--accent-light)}
 .note-meta{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
 .note-meta.note-lecture-meta{color:var(--purple)}
+.note-meta.note-admin-meta{color:var(--accent)}
 .note-body{font-size:13px;line-height:1.5}
 
 /* SCORES */
@@ -2498,12 +2500,18 @@ function renderNotes() {
   el.innerHTML=[...notes].map((n,i)=>{
     const realIdx=notes.length-1-i;
     const isLecture = n.role === 'lecture';
+    const isAdmin = n.role === 'admin';
     const isOwn = n.authorEmail === myEmail;
     // Admin/saisie can edit all; lecteurs can only edit their own
     const canEdit = myRole !== 'lecture' || isOwn;
-    const itemCls = isLecture ? 'note-item note-lecture' : 'note-item';
-    const metaCls = isLecture ? 'note-meta note-lecture-meta' : 'note-meta';
-    const roleTag = isLecture ? ' <span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);border-radius:3px;padding:1px 5px">Lecture</span>' : '';
+    // Color: lecture = purple, admin = blue accent, saisie = neutral
+    const itemCls = isLecture ? 'note-item note-lecture' : isAdmin ? 'note-item note-admin' : 'note-item';
+    const metaCls = isLecture ? 'note-meta note-lecture-meta' : isAdmin ? 'note-meta note-admin-meta' : 'note-meta';
+    const roleTag = isLecture
+      ? ' <span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);border-radius:3px;padding:1px 5px">Lecture</span>'
+      : isAdmin
+        ? ' <span style="font-size:10px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-light);border-radius:3px;padding:1px 5px">Admin</span>'
+        : '';
     const modifiedStr = n.modifiedDate ? '<span style="font-size:10px;opacity:.7"> · modifiée le '+fmtDate(n.modifiedDate)+'</span>' : '';
     const editBtn = canEdit
       ? '<button class="btn btn-xs btn-ghost" style="color:var(--text3)" onclick="openEditNote('+realIdx+')">✏️</button>'
@@ -2643,7 +2651,7 @@ document.addEventListener('click', function(e) {
 async function saveNote() {
   const p=NS.currentPatient, text=document.getElementById('note-input').value.trim();
   if(!text) return;
-  const role = NS.userProfile.role || 'saisie';
+  const role = NS.userProfile.role || 'saisie'; // 'admin', 'saisie', or 'lecture'
   const note={text, date:todayStr(), author:NS.userProfile.displayName||NS.userProfile.email, authorEmail:NS.userProfile.email, role};
   const notes=[...(p.notes||[]),note];
   await db.doc('patients/'+p.id).update({notes});
@@ -6407,18 +6415,19 @@ function onParcoursTypeChange() {
         ['addon','Stratégie d\'Add-on','Introduction d\'une nouvelle molécule en adjonction à un traitement existant'],
         ['switch','Switch','Remplacement d\'un traitement existant']]
       .map(([v,l,tip]) =>
-        '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px">'
-        +'<input type="radio" name="med-strat" value="'+v+'" data-v="'+v+'" onchange="onMedStrategieChange(this.dataset.v)" style="accent-color:var(--accent)"> '+l
-        +' <span title="'+tip+'" style="cursor:help;color:var(--text3);font-size:14px">ⓘ</span></label>'
+        '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%;overflow:hidden">'
+        +'<input type="radio" name="med-strat" value="'+v+'" data-v="'+v+'" onchange="onMedStrategieChange(this.dataset.v)" style="accent-color:var(--accent);flex-shrink:0">'
+        +'<span style="flex:1;min-width:0">'+l+'</span>'
+        +' <span title="'+tip+'" style="cursor:help;color:var(--text3);font-size:13px;flex-shrink:0">ⓘ</span></label>'
       ).join('')
       +'</div></div>'
       +'<div id="med-fields" style="display:none"></div>';
   } else if(type === 'cpap') {
     html = '<div class="fg"><label>Dispositif</label>'
-      +'<div style="display:flex;gap:8px">'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
       +['CPAP','OAM'].map(v =>
-        '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px">'
-        +'<input type="radio" name="cpap-type" value="'+v+'" data-v="'+v+'" onchange="parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent)"> '+v+'</label>'
+        '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 16px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box">'
+        +'<input type="radio" name="cpap-type" value="'+v+'" data-v="'+v+'" onchange="parcoursState.subtype.dispositif=this.dataset.v" style="accent-color:var(--accent);flex-shrink:0"> '+v+'</label>'
       ).join('')
       +'</div></div>';
   } else if(type === 'psychotherapie') {
@@ -6785,7 +6794,7 @@ function openInterruptCure() {
           + protos.map(pr => '<option value="rtms_'+pr.name+'">'+(PROTOCOLS[pr.name]?.name||pr.name)+'</option>').join('')
           + '</optgroup>' : '')
       + (parcoursList.length ? '<optgroup label="Parcours">'
-          + parcoursList.map(parc => '<option value="parc_'+parc.id+'">'+(PARCOURS_LABELS[parc.type]||parc.type)+(parc.startDate?' · '+fmtDate(parc.startDate):'')+'</option>').join('')
+          + parcoursList.map(parc => '<option value="'+parc.id+'">'+(PARCOURS_LABELS[parc.type]||parc.type)+(parc.startDate?' · '+fmtDate(parc.startDate):'')+'</option>').join('')
           + '</optgroup>' : '')
       + (p.status==='postcure'||p.consolidation ? '<option value="postcure">📆 Consolidation/maintien</option>' : '');
     const selArea = document.getElementById('interrupt-protocol-area');
@@ -6800,7 +6809,7 @@ async function confirmInterruptCure() {
   const reason = document.getElementById('interrupt-reason')?.value || '';
   const doPostcure = document.getElementById('interrupt-postcure')?.value === 'yes';
   const whichProto = document.getElementById('interrupt-protocol-sel')?.value || 'all';
-  const isParcoursSel = whichProto.startsWith('parc_');
+  const isParcoursSel = whichProto.startsWith('parc_') && whichProto !== 'parc_all';
   const isRtmsSel = whichProto.startsWith('rtms_');
   const rtmsProtoName = isRtmsSel ? whichProto.replace('rtms_', '') : null;
 
@@ -6823,7 +6832,7 @@ async function confirmInterruptCure() {
     updateData = {status:'termine', schedule, postcureInterruptDate: interruptDate};
   } else if(isParcoursSel) {
     // Interrupt a specific parcours
-    const parcId = whichProto; // already 'parc_...'
+    const parcId = whichProto; // parc.id value directly
     const parcours = (p.parcours||[]).map(parc =>
       parc.id === parcId ? {...parc, status:'interrompu', interruptDate, interruptReason:reason} : parc
     );
