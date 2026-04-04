@@ -257,7 +257,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;overflow-x:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15)}
 .modal.sm{max-width:460px}
 .mh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;border-radius:14px 14px 0 0}
 .mh-title{font-size:15px;font-weight:600;letter-spacing:-.1px}
@@ -1349,7 +1349,7 @@ body.role-saisie .analyse-only { display:none !important; }
               <option value="monitoring">📈 Monitoring simple</option>
             </select>
           </div>
-          <div id="ps2-parcours-suboptions" style="display:none"></div>
+          <div id="ps2-parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
           <div class="g2" style="margin-top:8px">
             <div class="fg"><label>Date de démarrage *</label><input type="date" id="ps2-parcours-start" autocomplete="off"></div>
             <div class="fg">
@@ -1599,7 +1599,7 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
 
       <!-- Sous-options dynamiques selon le type -->
-      <div id="parcours-suboptions" style="display:none"></div>
+      <div id="parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
 
       <!-- Dates & durée -->
       <div class="g2" style="margin-top:8px">
@@ -3272,7 +3272,7 @@ function onPs2ParcoursTypeChange() {
      {v:'switch',  l:'Switch',               tip:"Remplacement d'un traitement existant"}
     ].forEach(function(s) {
       const lbl=document.createElement('label');
-      lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%';
+      lbl.style.cssText='display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box';
       const inp=document.createElement('input'); inp.type='radio'; inp.name='ps2-med-strat'; inp.value=s.v;
       inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
       inp.addEventListener('change',function(){
@@ -6441,7 +6441,7 @@ function onParcoursTypeChange() {
   subEl.style.display = 'block';
   let html = '';
   if(type === 'medicament') {
-    subEl.innerHTML = '<div class="fg"><label>Stratégie</label><div id="med-strat-list" style="display:flex;flex-direction:column;gap:8px"></div></div><div id="med-fields" style="display:none"></div>';
+    subEl.innerHTML = '<div class="fg" style="box-sizing:border-box;width:100%"><label>Stratégie</label><div id="med-strat-list" style="display:flex;flex-direction:column;gap:6px;width:100%;box-sizing:border-box"></div></div><div id="med-fields" style="display:none"></div>';
     const stratList = subEl.querySelector('#med-strat-list');
     const strats = [
       {v:'nouveau', l:'Nouveau traitement',  tip:"Introduction d'une nouvelle molécule en monothérapie"},
@@ -6450,7 +6450,7 @@ function onParcoursTypeChange() {
     ];
     strats.forEach(function(s) {
       const lbl = document.createElement('label');
-      lbl.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box;width:100%';
+      lbl.style.cssText = 'display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;box-sizing:border-box';
       const inp = document.createElement('input');
       inp.type='radio'; inp.name='med-strat'; inp.value=s.v;
       inp.style.cssText='accent-color:var(--accent);flex-shrink:0';
