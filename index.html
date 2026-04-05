@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-13h11</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-13h14</span>
       </div>
     </div>
   </div>
@@ -705,6 +705,12 @@ body.role-saisie .analyse-only { display:none !important; }
           <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="5"/><path d="M15 15l-3-3"/></svg>
           <input type="text" placeholder="Code patient, ID…" oninput="renderPatientList({search:this.value})">
         </div>
+        <select id="pt-sort" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({sort:this.value})">
+          <option value="code">Tri : Code A→Z</option>
+          <option value="j1_desc">Tri : Début récent</option>
+          <option value="j1_asc">Tri : Début ancien</option>
+          <option value="retard">Tri : En retard d'abord</option>
+        </select>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({status:this.value})">
           <option value="all">Tous les statuts</option><option value="cure">En cours de suivi</option><option value="postcure">Consolidation/maintien</option><option value="termine">Terminé</option>
         </select>
@@ -2332,10 +2338,24 @@ function loadPatients() {
 
 function renderPatientList(filter={}) {
   const list=document.getElementById('patient-list'); if(!list) return;
-  let pts=[...NS.patients].filter(p=>!p.archived); // exclude archived by default
-  if(filter.status&&filter.status!=='all') pts=pts.filter(p=>p.status===filter.status);
-  if(filter.protocol&&filter.protocol!=='all') pts=pts.filter(p=>normalizeProtocols(p).some(pr=>pr.name===filter.protocol));
-  if(filter.search) { const s=filter.search.toLowerCase(); pts=pts.filter(p=>p.code?.toLowerCase().includes(s)||p.patientId?.toLowerCase().includes(s)); }
+  // Persist filters across calls
+  if(filter.status!==undefined) NS._ptFilter = {...(NS._ptFilter||{}), status:filter.status};
+  if(filter.protocol!==undefined) NS._ptFilter = {...(NS._ptFilter||{}), protocol:filter.protocol};
+  if(filter.search!==undefined) NS._ptFilter = {...(NS._ptFilter||{}), search:filter.search};
+  if(filter.sort!==undefined) NS._ptFilter = {...(NS._ptFilter||{}), sort:filter.sort};
+  const f = NS._ptFilter || {};
+  let pts=[...NS.patients].filter(p=>!p.archived);
+  if(f.status&&f.status!=='all') pts=pts.filter(p=>p.status===f.status);
+  if(f.protocol&&f.protocol!=='all') pts=pts.filter(p=>normalizeProtocols(p).some(pr=>pr.name===f.protocol));
+  if(f.search) { const s=f.search.toLowerCase(); pts=pts.filter(p=>p.code?.toLowerCase().includes(s)||p.patientId?.toLowerCase().includes(s)); }
+  // Sort
+  const sort = f.sort || document.getElementById('pt-sort')?.value || 'code';
+  const tod = todayStr();
+  const hasOverdue = (p) => (p.schedule||[]).some(s => s.date < tod && (s.questionnaires||[]).some(q => !(s.done||[]).includes(q) && !(s.ignored||[]).includes(q)));
+  if(sort==='j1_desc') pts.sort((a,b)=>(b.j1Date||'').localeCompare(a.j1Date||''));
+  else if(sort==='j1_asc') pts.sort((a,b)=>(a.j1Date||'').localeCompare(b.j1Date||''));
+  else if(sort==='retard') pts.sort((a,b)=>(hasOverdue(b)?1:0)-(hasOverdue(a)?1:0));
+  else pts.sort((a,b)=>(a.code||'').localeCompare(b.code||'','fr'));
   list.innerHTML=pts.length===0?'<div class="empty"><p>Aucun patient trouvé</p></div>':pts.map(patRowHTML).join('');
 }
 
@@ -2384,7 +2404,7 @@ function loadDashboard() {
   document.getElementById('stat-today').textContent=todayItems.length;
   document.getElementById('stat-overdue').textContent=overdueItems.length;
   document.getElementById('stat-upcoming').textContent=upcomingItems.length;
-  document.getElementById('stat-total').textContent=pts.filter(p=>p.status==='cure').length;
+  document.getElementById('stat-total').textContent=pts.filter(p=>p.status==='cure'||(p.status!=='termine'&&(p.parcours||[]).some(parc=>parc.status==='actif'))).length;
   const badge=document.getElementById('nav-badge');
   const urgent=overdueItems.length+todayItems.length;
   badge.textContent=urgent; badge.style.display=urgent>0?'inline':'none';
@@ -2828,7 +2848,7 @@ function renderScores() {
     const qi=QUESTIONNAIRES[q]; if(!qi) return;
     scores.sort((a,b)=>a.date.localeCompare(b.date));
     const last=scores[scores.length-1]?.score, first=scores[0]?.score;
-    const delta=scores.length>1?last-first:null;
+    const delta=scores.length>1?Math.round((last-first)*100)/100:null;
     const interp=qi.interpret?qi.interpret(last):{label:'',color:'gray'};
     html+='<div class="score-card"><div class="score-card-header"><div class="score-card-name">'+q+'</div><span class="badge b-'+interp.color+'">'+interp.label+'</span></div>'
       +'<div class="score-card-vals">'
@@ -2842,7 +2862,7 @@ function renderScores() {
           +(q!=='PEM'?'<div style="font-size:9px;color:var(--text3);margin-top:1px">détail →</div>':'')
           +'</div>';
       }).join('')
-      +(delta!==null?'<div class="score-delta '+(delta<0?'good':delta>0?'bad':'')+'">'+((delta>0?'+':'')+delta)+'</div>':'')
+      +(delta!==null?'<div class="score-delta '+(delta<0?'good':delta>0?'bad':'')+'">'+((delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2)))+'</div>':'')
       +'</div></div>';
   });
   el.innerHTML=html;
@@ -3061,7 +3081,7 @@ function renderQuestion() {
   const qi=QUESTIONNAIRES[currentQ.qName]; if(!qi) return;
   const idx=currentQ.currentIdx, total=qi.questions.length;
   document.getElementById('q-progress-bar').style.width=((idx/total)*100)+'%';
-  document.getElementById('q-progress-text').textContent=(idx+1)+' / '+total;
+  document.getElementById('q-progress-text').textContent=(qi.name||currentQ.qName)+' — '+(idx+1)+' / '+total;
   document.getElementById('q-question').textContent=qi.questions[idx];
 
   const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
@@ -4210,7 +4230,7 @@ function renderPQQuestion() {
   const qi = QUESTIONNAIRES[pqState.qName];
   const idx = pqState.idx, total = qi.questions.length;
   document.getElementById('pq-bar').style.width = ((idx/total)*100)+'%';
-  document.getElementById('pq-progress').textContent = (idx+1)+' / '+total;
+  document.getElementById('pq-progress').textContent = (qi.name||pqState.qName)+' — '+(idx+1)+' / '+total;
   document.getElementById('pq-question').textContent = qi.questions[idx];
 
   const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
@@ -4552,7 +4572,7 @@ async function loadCohorte() {
     +'</tr></thead><tbody>'
     +patientScores.map(ps=>{
       const first=ps.scores[0]?.score, last=ps.scores[ps.scores.length-1]?.score;
-      const delta=ps.scores.length>1?last-first:null;
+      const delta=ps.scores.length>1?Math.round((last-first)*100)/100:null;
       const interp=qi?.interpret?qi.interpret(last):{label:'',color:'gray'};
       return '<tr style="border-bottom:1px solid var(--border)">'
         +'<td style="padding:6px 4px;font-family:monospace;font-weight:600">'+ps.code+'</td>'
@@ -5799,7 +5819,7 @@ function renderScoreCharts(byQ) {
       +'<div style="font-size:13px;font-weight:600">'+q+'</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span class="badge b-'+interp.color+'" style="font-size:10px">'+interp.label+'</span>'
-      +'<span style="font-size:12px;font-weight:700;color:'+(delta<0?'var(--green)':delta>0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+delta+'</span>'
+      +'<span style="font-size:12px;font-weight:700;color:'+(delta<0?'var(--green)':delta>0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2))+'</span>'
       +'</div></div>'
       +'<div style="position:relative;height:130px"><canvas id="'+canvasId+'"></canvas></div>';
     grid.appendChild(card);
@@ -6412,6 +6432,7 @@ async function ignoreQuestionnaire(patientId, qName, date) {
     renderTimeline();
   }
   loadDashboard();
+  showError('✓ ' + qName + ' marqué comme non applicable.', 2500);
 }
 
 function renderLastNote() {
