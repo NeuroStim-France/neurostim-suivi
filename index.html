@@ -4405,11 +4405,14 @@ function pqMultiToggle(checkbox) {
 }
 function pqNext() {
   const qi = QUESTIONNAIRES[pqState.qName];
+  const total = qi ? qi.questions.length : 0;
   const idx = pqState.idx;
   const qType = (qi && qi.questionTypes && qi.questionTypes[idx]) || 'radio';
   if(qType === 'radio' && pqState.answers[idx] === undefined) {
     alert('Veuillez faire un choix.'); return;
   }
+  // Last question → call pqFinish instead of advancing
+  if(idx >= total - 1) { pqFinish(); return; }
   pqState.idx++; renderPQQuestion();
 }
 
