@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-11h27</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-11h38</span>
       </div>
     </div>
   </div>
@@ -6914,10 +6914,15 @@ function genParcoursSlotsSlots(parc) {
   });
 
   // ponctuel_debut_fin: slot at startDate and endDate
-  if(byFreq['ponctuel_debut_fin']) {
-    const qs = byFreq['ponctuel_debut_fin'];
-    slots.push({date:startDate, questionnaires:[...qs], hetero:[], done:[], type:'parcours', parcoursId, label:'Bilan initial — Parcours'});
-    if(endDate) slots.push({date:endDate, questionnaires:[...qs], hetero:[], done:[], type:'parcours_end', parcoursId, label:'Bilan final — Parcours'});
+  // Also include principal/secondaire questionnaires in bilan initial/final
+  const bilanQs = [
+    ...(byFreq['ponctuel_debut_fin'] || []),
+    ...parc.questionnaires.filter(q => q.role === 'principal' || q.role === 'secondaire').map(q => q.name)
+      .filter(n => !(byFreq['ponctuel_debut_fin'] || []).includes(n)) // dedupe
+  ];
+  if(bilanQs.length) {
+    slots.push({date:startDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours', parcoursId, label:'Bilan initial — Parcours'});
+    if(endDate) slots.push({date:endDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours_end', parcoursId, label:'Bilan final — Parcours'});
   }
 
   const freqToMonths = {
