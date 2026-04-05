@@ -1950,178 +1950,15 @@ const QUESTIONNAIRES = {
     }
   },
 
-  // ── 15D : Qualité de vie 15 dimensions ─────────────────────────────
+  // ── 15D : Qualité de vie 15 dimensions (chargé depuis xlsx) ───────────
   '15D': {
-    name: '15D',
-    fullName: '15D — Questionnaire de qualité de vie (15 dimensions)',
-    type: 'auto',
-    domain: 'Qualité de vie',
-    instructions: "Lisez toutes les possibilités de réponse pour chaque question avant de choisir. Sélectionnez la réponse qui décrit le mieux votre état de santé ACTUEL. Ne donnez qu'une seule réponse à chaque fois.",
-    questions: [
-      "1. Mobilité — Je suis capable de marcher…",
-      "2. Vue — Je vois…",
-      "3. Ouïe — J'entends…",
-      "4. Respiration — Je respire…",
-      "5. Sommeil — Je dors…",
-      "6. Repas — Je mange…",
-      "7. Parole — Je parle…",
-      "8. Toilettes — Je vais aux toilettes / je m'occupe de mon hygiène personnelle…",
-      "9. Activités habituelles — Je réalise mes activités habituelles…",
-      "10. Facultés mentales — Mes facultés mentales (mémoire, raisonnement…) sont…",
-      "11. Gêne et symptômes — Je ressens des douleurs ou d'autres symptômes gênants…",
-      "12. Humeur / Dépression — Mon humeur est…",
-      "13. Anxiété — Je ressens de l'anxiété ou de l'inquiétude…",
-      "14. Vitalité — Mon niveau d'énergie / vitalité est…",
-      "15. Activité sexuelle — Mon intérêt pour la sexualité et/ou mon activité sexuelle sont…",
-    ],
-    optionsPerQuestion: [
-      // Q1 Mobilité
-      ["1 — Normalement à l'intérieur et à l'extérieur, escaliers sans difficulté",
-       "2 — Normalement à l'intérieur, quelques difficultés dehors / escaliers",
-       "3 — À l'intérieur sans aide, beaucoup de difficultés dehors ou besoin d'aide",
-       "4 — À l'intérieur uniquement avec l'aide de quelqu'un",
-       "5 — Totalement confiné(e) au lit, incapable de me déplacer"],
-      // Q2 Vue
-      ["1 — Normalement : je lis journaux et sous-titres TV sans difficulté (avec/sans lunettes)",
-       "2 — Quelques difficultés à lire journaux et/ou sous-titres TV",
-       "3 — Beaucoup de difficultés à lire journaux et/ou sous-titres TV",
-       "4 — Incapable de lire, mais je vois assez pour me déplacer seul(e)",
-       "5 — Pas assez pour me déplacer sans guide : presque ou totalement aveugle"],
-      // Q3 Ouïe
-      ["1 — Normalement quand les gens parlent normalement (avec/sans prothèse)",
-       "2 — Un peu de mal quand les gens parlent normalement",
-       "3 — Beaucoup de mal, mais j'entends si on parle fort ou répète",
-       "4 — Très peu, même si l'on me parle fort et/ou répète",
-       "5 — Très peu ou rien du tout, même avec prothèse auditive"],
-      // Q4 Respiration
-      ["1 — Normalement, sans aucune difficulté",
-       "2 — Un peu de mal quand je marche vite ou monte une pente légère",
-       "3 — Beaucoup de mal quand je marche vite ou monte les escaliers",
-       "4 — Beaucoup de mal dans toutes les activités, y compris les activités légères",
-       "5 — Beaucoup de mal, même au repos"],
-      // Q5 Sommeil
-      ["1 — Normalement, sans aucun problème de sommeil",
-       "2 — Quelques problèmes : un peu de mal à m'endormir ou réveils occasionnels",
-       "3 — Problèmes modérés : souvent du mal à m'endormir ou beaucoup de réveils",
-       "4 — Gros problèmes : souvent une grande partie de la nuit sans dormir",
-       "5 — Très gros problèmes : presque pas de sommeil, même avec médicaments"],
-      // Q6 Repas
-      ["1 — Normalement : je mange seul(e) sans aucune difficulté",
-       "2 — Seul(e) avec peu de difficultés (ex. couper la viande)",
-       "3 — Seul(e) avec quelques difficultés : mange lentement, avec précaution",
-       "4 — Avec l'aide de quelqu'un",
-       "5 — Je ne suis pas en mesure de manger seul(e) du tout"],
-      // Q7 Parole
-      ["1 — Normalement : clairement et sans aucune difficulté",
-       "2 — Quelques problèmes (ex. parle trop doucement ou voix rauque)",
-       "3 — Beaucoup de problèmes qui compliquent la communication",
-       "4 — Très peu de communication, les autres me comprennent peu",
-       "5 — Ne peut pas du tout parler : même les proches ne comprennent presque rien"],
-      // Q8 Toilettes
-      ["1 — Sans aucune aide ni aucune difficulté",
-       "2 — Seul(e) mais avec quelques difficultés",
-       "3 — Seul(e) mais avec beaucoup de difficultés",
-       "4 — Avec l'aide d'une autre personne",
-       "5 — Totalement incapable de le faire seul(e)"],
-      // Q9 Activités habituelles
-      ["1 — Sans aucune difficulté (travail, études, ménage, loisirs…)",
-       "2 — Avec quelques difficultés",
-       "3 — Avec beaucoup de difficultés",
-       "4 — Incapable de réaliser la plupart de mes activités habituelles",
-       "5 — Incapable de réaliser aucune de mes activités habituelles"],
-      // Q10 Facultés mentales
-      ["1 — Très bonnes, aucune difficulté de mémoire ni de concentration",
-       "2 — Légèrement diminuées : quelques difficultés de mémoire ou concentration",
-       "3 — Assez fortement diminuées : souvent oublis, difficultés à raisonner",
-       "4 — Très fortement diminuées : souvent confus(e), oublis très fréquents",
-       "5 — Extrêmement diminuées : incapable de se souvenir ou de raisonner"],
-      // Q11 Gêne et symptômes
-      ["1 — Pas du tout : aucune douleur ni autre symptôme",
-       "2 — Légèrement",
-       "3 — Modérément",
-       "4 — Beaucoup",
-       "5 — Extrêmement"],
-      // Q12 Humeur / Dépression
-      ["1 — Excellente : pas d'anxiété, de dépression ni autre trouble de l'humeur",
-       "2 — Légèrement abaissée",
-       "3 — Assez fortement abaissée",
-       "4 — Fortement abaissée : souvent très déprimé(e)",
-       "5 — Extrêmement abaissée : me sens au plus bas"],
-      // Q13 Anxiété
-      ["1 — Pas du tout",
-       "2 — Légèrement",
-       "3 — Modérément",
-       "4 — Beaucoup",
-       "5 — Extrêmement : toujours très anxieux/se"],
-      // Q14 Vitalité
-      ["1 — Très bon : je me sens plein(e) d'énergie et vif(ve)",
-       "2 — Assez bon",
-       "3 — Modéré : parfois énergique, parfois non",
-       "4 — Faible",
-       "5 — Très faible : je me sens tout le temps épuisé(e)"],
-      // Q15 Activité sexuelle
-      ["1 — Normaux compte tenu de mon âge",
-       "2 — Légèrement réduits",
-       "3 — Modérément réduits",
-       "4 — Fortement réduits",
-       "5 — Extrêmement réduits ou aucun intérêt ni activité sexuelle"],
-    ],
-    // Score global = somme des 15 scores FINAUX (table de conversion officielle)
-    // Les réponses brutes (1-5) sont converties via scoreTable avant sommation
-    // maxScore représente la valeur maximale théorique (somme des max de chaque dim)
-    maxScore: 1,
-    scoreLabel: 'score qualité de vie',
-    // Table de conversion scores finaux (score initial 1→5, index 0→4)
-    scoreTable: {
-      'Mobilité':            [0.0704, 0.0440, 0.0236, 0.0104, 0.0027],
-      'Vue':                [0.0518, 0.0444, 0.0309, 0.0210, 0.0078],
-      'Ouïe':               [0.0590, 0.0540, 0.0401, 0.0232, 0.0106],
-      'Respiration':        [0.0839, 0.0562, 0.0373, 0.0195, 0.0065],
-      'Sommeil':            [0.0695, 0.0555, 0.0391, 0.0239, 0.0091],
-      'Repas':              [0.0707, 0.0384, 0.0224, 0.0090, 0.0029],
-      'Parole':             [0.0664, 0.0459, 0.0277, 0.0156, 0.0081],
-      'Toilettes':          [0.0615, 0.0379, 0.0196, 0.0080, 0.0024],
-      'Activités habituelles': [0.0760, 0.0515, 0.0274, 0.0137, 0.0048],
-      'Facultés mentales':  [0.0852, 0.0445, 0.0214, 0.0096, 0.0021],
-      'Gêne et symptômes':  [0.0624, 0.0395, 0.0198, 0.0096, 0.0027],
-      'Humeur/Dépression':  [0.0520, 0.0458, 0.0350, 0.0229, 0.0125],
-      'Anxiété':            [0.0610, 0.0487, 0.0347, 0.0203, 0.0101],
-      'Vitalité':           [0.0756, 0.0596, 0.0408, 0.0239, 0.0111],
-      'Activité sexuelle':  [0.0546, 0.0489, 0.0363, 0.0228, 0.0128],
-    },
-    // scoreTableByIndex: same as scoreTable but indexed by question order (0-14)
-    scoreTableByIndex: [
-      [0.0704, 0.0440, 0.0236, 0.0104, 0.0027], // Q1  Mobilité
-      [0.0518, 0.0444, 0.0309, 0.0210, 0.0078], // Q2  Vue
-      [0.0590, 0.0540, 0.0401, 0.0232, 0.0106], // Q3  Ouïe
-      [0.0839, 0.0562, 0.0373, 0.0195, 0.0065], // Q4  Respiration
-      [0.0695, 0.0555, 0.0391, 0.0239, 0.0091], // Q5  Sommeil
-      [0.0707, 0.0384, 0.0224, 0.0090, 0.0029], // Q6  Repas
-      [0.0664, 0.0459, 0.0277, 0.0156, 0.0081], // Q7  Parole
-      [0.0615, 0.0379, 0.0196, 0.0080, 0.0024], // Q8  Toilettes
-      [0.0760, 0.0515, 0.0274, 0.0137, 0.0048], // Q9  Activités habituelles
-      [0.0852, 0.0445, 0.0214, 0.0096, 0.0021], // Q10 Facultés mentales
-      [0.0624, 0.0395, 0.0198, 0.0096, 0.0027], // Q11 Gêne et symptômes
-      [0.0520, 0.0458, 0.0350, 0.0229, 0.0125], // Q12 Humeur/Dépression
-      [0.0610, 0.0487, 0.0347, 0.0203, 0.0101], // Q13 Anxiété
-      [0.0756, 0.0596, 0.0408, 0.0239, 0.0111], // Q14 Vitalité
-      [0.0546, 0.0489, 0.0363, 0.0228, 0.0128], // Q15 Activité sexuelle
-    ],
-    // calcScore: somme des scores finaux convertis (résultat entre 0 et ~1)
-    calcScore: function(answers) {
-      var tbl = this.scoreTableByIndex || QUESTIONNAIRES['15D'].scoreTableByIndex;
-      if(!tbl) return 0;
-      var total = 0;
-      answers.forEach(function(a, i) {
-        if(typeof a === 'number' && tbl[i]) {
-          var idx = Math.max(0, Math.min(4, Math.round(a)));
-          total += tbl[i][idx];
-        }
-      });
-      return Math.round(total * 10000) / 10000;
-    },
+    name: '15D', fullName: "15D — Questionnaire de qualité de vie (15 dimensions)",
+    type: 'auto', domain: 'Qualité de vie',
+    instructions: "Lisez toutes les possibilités de réponse pour chaque question avant de choisir. Sélectionnez la réponse qui décrit le mieux votre état de santé ACTUEL.",
+    questions: [], options: [],
+    maxScore: 1, scoreLabel: 'score qualité de vie',
+    _calcType: 'conversion_table',
     interpret: function(s) {
-      // Score global 0-1, interprétation basée sur la valeur absolue
       if(s >= 0.85) return {label: 'Très bonne QdV', color: 'green'};
       if(s >= 0.70) return {label: 'Bonne QdV', color: 'green'};
       if(s >= 0.55) return {label: 'QdV modérée', color: 'amber'};
@@ -2130,118 +1967,35 @@ const QUESTIONNAIRES = {
     }
   },
 
-  // ── DIVA-5-SR : auto-questionnaire TDAH adulte ──────────────────────
+    // ── DIVA-5-SR : auto-questionnaire TDAH (chargé depuis xlsx) ──────────
   'DIVA-5-SR': {
-    name: 'DIVA-5-SR',
-    fullName: "DIVA-5-SR \u2014 Auto-questionnaire TDAH adulte",
-    type: 'auto',
-    domain: 'TDAH',
-    instructions: "Ce questionnaire explore votre fonctionnement habituel. Pour chaque question, choisissez la description qui vous correspond le mieux. R\u00e9pondez en pensant \u00e0 votre fonctionnement habituel, et non \u00e0 une journ\u00e9e exceptionnelle.",
-    questions: [
-      "A1. Erreurs d'inattention \u2014 Quand vous r\u00e9alisez une t\u00e2che r\u00e9p\u00e9titive ou n\u00e9cessitant de la pr\u00e9cision, que se passe-t-il ?",
-      "A2. Maintien de l'attention \u2014 Lorsque vous devez rester concentr\u00e9(e) longtemps sur une t\u00e2che, comment cela se passe-t-il ?",
-      "A3. \u00c9coute directe \u2014 Quand quelqu'un vous parle directement, que se passe-t-il le plus souvent ?",
-      "A4. Suivre des consignes \u2014 Quand vous devez accomplir une t\u00e2che en plusieurs \u00e9tapes, comment cela se passe-t-il ?",
-      "A5. Organisation \u2014 Dans votre vie quotidienne, comment d\u00e9cririez-vous votre organisation ?",
-      "A6. \u00c9vitement / procrastination \u2014 Lorsque vous devez commencer une t\u00e2che longue ou peu stimulante, que se passe-t-il ?",
-      "A7. Perte d'objets \u2014 Vous arrive-t-il d'\u00e9garer des objets importants (cl\u00e9s, t\u00e9l\u00e9phone, papiers...) ?",
-      "A8. Distractibilit\u00e9 \u2014 \u00c0 quel point \u00eates-vous facilement distrait(e) par ce qui se passe autour de vous ?",
-      "A9. Oublis fr\u00e9quents \u2014 Vous arrive-t-il d'oublier des rendez-vous, choses \u00e0 faire, engagements pris ?",
-      "H/I 1. Remuement physique \u2014 Avez-vous du mal \u00e0 rester physiquement immobile (mains, pieds) ?",
-      "H/I 2. Rester assis(e) \u2014 Vous levez-vous souvent dans des situations o\u00f9 vous \u00eates suppos\u00e9(e) rester assis(e) ?",
-      "H/I 3. Agitation int\u00e9rieure \u2014 Vous sentez-vous souvent agit\u00e9(e) int\u00e9rieurement ?",
-      "H/I 4. Activit\u00e9s calmes \u2014 Trouvez-vous difficile de profiter tranquillement d'un moment de d\u00e9tente ?",
-      "H/I 5. Sur la br\u00e8che \u2014 Avez-vous l'impression d'\u00eatre \u00ab dirig\u00e9(e) par un moteur \u00bb ?",
-      "H/I 6. Parler trop \u2014 Parlez-vous souvent trop, au point que les autres le remarquent ?",
-      "H/I 7. R\u00e9ponse avant fin de question \u2014 Laissez-vous \u00e9chapper la r\u00e9ponse avant que la question soit enti\u00e8rement pos\u00e9e ?",
-      "H/I 8. Attendre son tour \u2014 Trouvez-vous difficile d'attendre votre tour dans des situations de groupe ?",
-      "H/I 9. Interrompre \u2014 Interrompez-vous souvent les autres ou imposez-vous votre pr\u00e9sence ?",
-    ],
-    optionsPerQuestion: [
-      ["Je suis g\u00e9n\u00e9ralement attentif(ve) (0)", "Je fais parfois de petites erreurs (1)", "Je fais souvent des erreurs, sauf effort important (2)", "Je dois compenser en permanence pour \u00e9viter les erreurs (3)"],
-      ["Je reste concentr\u00e9(e) sans difficult\u00e9 (0)", "Mon attention d\u00e9croche parfois (1)", "Je pars mentalement ailleurs sans m'en rendre compte (2)", "Incapable de maintenir l'attention m\u00eame en essayant (3)"],
-      ["Je suis g\u00e9n\u00e9ralement attentif(ve) (0)", "Je dois parfois me reconcentrer (1)", "Je r\u00e9alise ensuite que je n'ai pas int\u00e9gr\u00e9 l'information (2)", "Je d\u00e9croche facilement m\u00eame face \u00e0 face (3)"],
-      ["Je suis capable de suivre et d'aller au bout (0)", "Je r\u00e9ussis si je note tout ou structure rigidement (1)", "J'oublie une partie ou laisse la t\u00e2che inachev\u00e9e (2)", "Je me disperse syst\u00e9matiquement ou perds le fil (3)"],
-      ["Je suis globalement organis\u00e9(e) (0)", "Cela me co\u00fbte beaucoup d'\u00e9nergie de compenser (1)", "Je me laisse d\u00e9border facilement (2)", "J'ai souvent du mal \u00e0 organiser les t\u00e2ches dans un ordre logique (3)"],
-      ["Je peux m'y mettre normalement (0)", "Je finis par faire la t\u00e2che mais avec tension \u00e9norme (1)", "Je tourne autour sans r\u00e9ussir \u00e0 m'y mettre vraiment (2)", "Je repousse syst\u00e9matiquement jusqu'au dernier moment (3)"],
-      ["Je retrouve g\u00e9n\u00e9ralement facilement mes affaires (0)", "J'ai mis en place des strat\u00e9gies strictes pour ne pas perdre (1)", "Je passe souvent du temps \u00e0 chercher (2)", "Je perds ou cherche r\u00e9guli\u00e8rement des objets importants (3)"],
-      ["Je reste g\u00e9n\u00e9ralement centr\u00e9(e) sur ce que je fais (0)", "Je suis parfois distrait(e) par mes propres pens\u00e9es (1)", "Je passe vite d'une chose \u00e0 une autre sans l'avoir pr\u00e9vu (2)", "Un bruit ou une id\u00e9e d\u00e9tourne facilement mon attention (3)"],
-      ["J'oublie rarement (0)", "J'utilise beaucoup de syst\u00e8mes de rappel pour compenser (1)", "J'oublie malgr\u00e9 les rappels (2)", "J'oublie r\u00e9guli\u00e8rement des choses importantes (3)"],
-      ["Non, je reste immobile sans difficult\u00e9 (0)", "Parfois, mais je contr\u00f4le (1)", "Souvent, j'agite les mains ou les pieds (2)", "En permanence, du mal \u00e0 rester assis(e) immobile (3)"],
-      ["Non, je reste assis(e) sans difficult\u00e9 (0)", "Parfois je cherche des excuses pour me lever (1)", "Souvent, j'\u00e9vite les r\u00e9unions longues (2)", "Tr\u00e8s souvent, je ne reste jamais longtemps assis(e) tranquille (3)"],
-      ["Non, je me sens g\u00e9n\u00e9ralement calme (0)", "Parfois une sensation d'avoir quelque chose \u00e0 faire (1)", "Souvent agit\u00e9(e) int\u00e9rieurement (2)", "En permanence, difficile de me relaxer (3)"],
-      ["Non, je profite facilement des moments calmes (0)", "Parfois du mal \u00e0 vraiment d\u00e9crocher (1)", "Souvent j'ai besoin de m'occuper (2)", "Je ne sais pas vraiment me d\u00e9tendre (3)"],
-      ["Non, je me sens globalement pos\u00e9(e) (0)", "Parfois trop actif(ve) (1)", "Souvent toujours occup\u00e9(e) (2)", "En permanence, incapable de ralentir (3)"],
-      ["Non, je parle normalement (0)", "Parfois on me dit que je parle beaucoup (1)", "Souvent, du mal \u00e0 m'arr\u00eater (2)", "Tr\u00e8s souvent, les autres me le font remarquer (3)"],
-      ["Non, j'attends la fin (0)", "Parfois je coupe involontairement (1)", "Souvent je r\u00e9ponds avant la fin de la phrase (2)", "Tr\u00e8s souvent, les autres me le signalent (3)"],
-      ["Non, j'attends patiemment (0)", "Parfois impatient(e) (1)", "Souvent du mal \u00e0 attendre (2)", "Tr\u00e8s souvent, je suis le(la) premier(\u00e8re) \u00e0 agir (3)"],
-      ["Non (0)", "Parfois sans le vouloir (1)", "Souvent (2)", "Tr\u00e8s souvent, les autres le remarquent (3)"],
-    ],
-    maxScore: 18,
-    scoreLabel: 'items positifs',
+    name: 'DIVA-5-SR', fullName: "DIVA-5-SR — Auto-questionnaire TDAH adulte",
+    type: 'auto', domain: 'TDAH',
+    instructions: "Ce questionnaire explore votre fonctionnement habituel. Répondez en pensant à votre fonctionnement habituel.",
+    questions: [], options: [],
+    maxScore: 18, scoreLabel: 'items positifs',
+    _calcType: 'comptage_seuil', _calcThreshold: 2,
     interpret: function(s) {
-      if(s <= 2)  return {label: 'Peu \u00e9vocateur', color: 'green'};
-      if(s <= 4)  return {label: 'Partiellement \u00e9vocateur', color: 'amber'};
-      if(s <= 7)  return {label: '\u00c9vocateur', color: 'orange'};
-      return {label: 'Fortement \u00e9vocateur', color: 'red'};
-    },
-    calcScore: function(answers) {
-      return answers.filter(function(a) { return typeof a === 'number' && a >= 2; }).length;
+      if(s <= 2)  return {label: 'Peu évocateur', color: 'green'};
+      if(s <= 4)  return {label: 'Partiellement évocateur', color: 'amber'};
+      if(s <= 7)  return {label: 'Évocateur', color: 'orange'};
+      return {label: 'Fortement évocateur', color: 'red'};
     }
   },
 
-  // ── DIVA-5 : hétéro-questionnaire clinicien TDAH ─────────────────────
+    // ── DIVA-5 : hétéro-questionnaire clinicien TDAH (chargé depuis xlsx) ──
   'DIVA-5': {
-    name: 'DIVA-5',
-    fullName: "DIVA-5 \u2014 Entretien diagnostic TDAH adulte (clinicien)",
-    type: 'hetero',
-    domain: 'TDAH',
-    instructions: "Pour chaque crit\u00e8re, coter la pr\u00e9sence \u00e0 l'adulte ET dans l'enfance (5-12 ans). Seuil adulte (\u226517 ans) : \u22655/9. Seuil enfance : \u22653/9 dans au moins un domaine.",
-    questions: [
-      "A1 [ADULTE] Erreurs d'\u00e9tourderie dans le travail ou d'autres activit\u00e9s",
-      "A2 [ADULTE] Difficult\u00e9 \u00e0 maintenir l'attention sur des t\u00e2ches",
-      "A3 [ADULTE] Impression de ne pas \u00e9couter lorsqu'on parle directement",
-      "A4 [ADULTE] Difficult\u00e9 \u00e0 suivre les consignes et \u00e0 mener les t\u00e2ches \u00e0 terme",
-      "A5 [ADULTE] Difficult\u00e9 \u00e0 organiser les t\u00e2ches ou les activit\u00e9s",
-      "A6 [ADULTE] \u00c9vitement des t\u00e2ches n\u00e9cessitant un effort mental soutenu",
-      "A7 [ADULTE] Perte d'objets n\u00e9cessaires au travail ou aux activit\u00e9s",
-      "A8 [ADULTE] Distractibilit\u00e9 par des stimuli externes",
-      "A9 [ADULTE] Oublis fr\u00e9quents dans les activit\u00e9s quotidiennes",
-      "H/I 1 [ADULTE] Remuement des mains/pieds ou tortillement sur si\u00e8ge",
-      "H/I 2 [ADULTE] Se l\u00e8ve dans des situations o\u00f9 il faut rester assis(e)",
-      "H/I 3 [ADULTE] Se sent souvent agit\u00e9(e)",
-      "H/I 4 [ADULTE] Difficult\u00e9 \u00e0 profiter tranquillement d'un moment de d\u00e9tente",
-      "H/I 5 [ADULTE] Sur la br\u00e8che ou dirig\u00e9(e) par un moteur",
-      "H/I 6 [ADULTE] Parle souvent trop",
-      "H/I 7 [ADULTE] Laisse \u00e9chapper la r\u00e9ponse avant fin de question",
-      "H/I 8 [ADULTE] Difficult\u00e9 \u00e0 attendre son tour",
-      "H/I 9 [ADULTE] Interrompt les autres ou s'impose",
-      "A1 [ENFANCE] Erreurs d'\u00e9tourderie dans le travail scolaire",
-      "A2 [ENFANCE] Difficult\u00e9 \u00e0 maintenir l'attention sur les t\u00e2ches ou jeux",
-      "A3 [ENFANCE] Impression de ne pas \u00e9couter",
-      "A4 [ENFANCE] Difficult\u00e9 \u00e0 suivre les consignes dans le travail scolaire",
-      "A5 [ENFANCE] Difficult\u00e9 d'organisation",
-      "A6 [ENFANCE] \u00c9vitement des t\u00e2ches demandant un effort mental",
-      "A7 [ENFANCE] Perte d'objets (mat\u00e9riel scolaire, jouets, etc.)",
-      "A8 [ENFANCE] Distractibilit\u00e9",
-      "A9 [ENFANCE] Oublis fr\u00e9quents",
-      "H/I 1 [ENFANCE] Remuement / tortillement",
-      "H/I 2 [ENFANCE] Se l\u00e8ve en classe ou pendant les repas",
-      "H/I 3 [ENFANCE] Court ou grimpe de fa\u00e7on excessive",
-      "H/I 4 [ENFANCE] Difficult\u00e9 \u00e0 jouer tranquillement",
-      "H/I 5 [ENFANCE] Toujours en mouvement, mont\u00e9(e) sur ressorts",
-      "H/I 6 [ENFANCE] Parle trop, connu(e) comme moulin \u00e0 paroles",
-      "H/I 7 [ENFANCE] Donne la premi\u00e8re r\u00e9ponse qui vient, interrompt",
-      "H/I 8 [ENFANCE] Difficult\u00e9 \u00e0 attendre son tour",
-      "H/I 9 [ENFANCE] Interrompt les autres dans jeux ou activit\u00e9s",
-    ],
-    options: ["Absent (0)", "Pr\u00e9sent (1)"],
+    name: 'DIVA-5', fullName: "DIVA-5 — Entretien diagnostic TDAH adulte (clinicien)",
+    type: 'hetero', domain: 'TDAH',
+    instructions: "Pour chaque critère, coter la présence à l'adulte ET dans l'enfance (5-12 ans). Seuil adulte : ≥5/9. Seuil enfance : ≥3/9.",
+    questions: [], options: ["Absent (0)", "Présent (1)"],
     maxScore: 36,
+    _calcType: 'somme',
     interpret: function(s) {
       if(s < 5)  return {label: 'Sous le seuil', color: 'green'};
-      if(s < 10) return {label: 'Quelques crit\u00e8res pr\u00e9sents', color: 'amber'};
-      if(s < 16) return {label: '\u00c9vocateur TDAH', color: 'orange'};
-      return {label: 'Fortement \u00e9vocateur TDAH', color: 'red'};
+      if(s < 10) return {label: 'Quelques critères présents', color: 'amber'};
+      if(s < 16) return {label: 'Évocateur TDAH', color: 'orange'};
+      return {label: 'Fortement évocateur TDAH', color: 'red'};
     }
   }
 };
@@ -3287,14 +3041,8 @@ async function qFinish() {
   const idx=currentQ.currentIdx;
   const qType=(qi&&qi.questionTypes&&qi.questionTypes[idx])||'radio';
   if(qType==='radio' && currentQ.answers[idx]===undefined){alert('Veuillez sélectionner une réponse.');return;}
-  // Calculate score: use custom calcScore if defined, else sum numeric answers
-  const score = (qi && typeof qi.calcScore === 'function')
-    ? qi.calcScore(currentQ.answers)
-    : currentQ.answers.reduce((a,b)=>{
-        if(Array.isArray(b)) return a;
-        if(typeof b === 'number') return a+b;
-        return a;
-      }, 0);
+  // Calculate score using central computeScore (handles all calc types)
+  const score = computeScore(currentQ.qName, currentQ.answers);
   // Store multi answers as joined string in answers array for display
   const answersToStore = currentQ.answers.map((a,i)=>{
     const t = (qi&&qi.questionTypes&&qi.questionTypes[i])||'radio';
@@ -4428,15 +4176,8 @@ async function pqFinish() {
   if(pqState.answers[pqState.idx]===undefined){alert('Veuillez faire un choix.');return;}
   const qi = QUESTIONNAIRES[pqState.qName];
   const qi2 = QUESTIONNAIRES[pqState.qName];
-  // Use custom calcScore if defined (e.g. DIVA-5-SR counts positive items)
-  const score = (qi2 && typeof qi2.calcScore === 'function')
-    ? qi2.calcScore(pqState.answers)
-    : pqState.answers.reduce((a,b,i)=>{
-        const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
-        if(t==='multi') return a;
-        if(typeof b === 'number') return a+b;
-        return a;
-      }, 0);
+  // Calculate score using central computeScore (handles all calc types)
+  const score = computeScore(pqState.qName, pqState.answers);
   const answersToStore = pqState.answers.map((a,i)=>{
     const t = (qi2&&qi2.questionTypes&&qi2.questionTypes[i])||'radio';
     if(t==='multi') return Array.isArray(a) ? a.join('; ') : (a||'');
@@ -4742,6 +4483,18 @@ async function uploadExcelConfig(input) {
         applyParcoursConfig(workbook);
         const sheetName = 'Règles envoi des questionnaires';
 
+        // Parse TYPE_CALCUL from CALCUL DE SCORES sheet
+        const typeMap = {};
+        if(workbook.SheetNames.includes('CALCUL DE SCORES')) {
+          const wsCalc = workbook.Sheets['CALCUL DE SCORES'];
+          const calcRows = XLSX.utils.sheet_to_json(wsCalc, {header:1, defval:null});
+          calcRows.forEach(function(row) {
+            const key = row[0] ? String(row[0]).trim() : '';
+            const typeVal = row[7] ? String(row[7]).trim() : '';
+            if(key && typeVal && typeVal !== 'TYPE_CALCUL') typeMap[key] = typeVal;
+          });
+        }
+
         if(!workbook.SheetNames.includes(sheetName)) {
           statusEl.textContent = 'Feuille "' + sheetName + '" introuvable dans le fichier.';
           return;
@@ -4881,7 +4634,7 @@ async function uploadExcelConfig(input) {
         if(NS.currentPatient) { renderTimeline(); renderScores(); }
         // Also parse questionnaire sheets
         const parsedQs = parseExcelQuestionnaires(workbook);
-        const qUpdated = applyExcelQuestionnaires(parsedQs);
+        const qUpdated = applyExcelQuestionnaires(parsedQs, typeMap);
         // Save parsed questions to Firestore too
         if(qUpdated > 0) {
           const qsToSave = {};
@@ -5587,12 +5340,29 @@ function parseExcelQuestionnaires(workbook) {
   return parsed;
 }
 
-function applyExcelQuestionnaires(parsedQs) {
+function applyExcelQuestionnaires(parsedQs, typeMap) {
+  typeMap = typeMap || {};
   let updated = 0;
   for(const [qKey, data] of Object.entries(parsedQs)) {
-    if(!QUESTIONNAIRES[qKey]) continue;
-    // Don't overwrite questionnaires with custom calcScore (e.g. 15D, DIVA-5-SR)
-    if(typeof QUESTIONNAIRES[qKey].calcScore === 'function') continue;
+    if(!QUESTIONNAIRES[qKey] && !data.questions) continue;
+    // Create entry if not exists (e.g. 15D loaded from xlsx)
+    if(!QUESTIONNAIRES[qKey]) {
+      QUESTIONNAIRES[qKey] = {name:qKey, fullName:qKey, type:'auto', domain:'', questions:[], options:[]};
+    }
+    const calcType = typeMap[qKey] || 'somme';
+    // Build calcScore based on TYPE_CALCUL
+    if(calcType === 'conversion_table') {
+      // Score = sum of per-option conversion values (stored as option scores)
+      // options scores are the conversion values, not 0/1/2/3
+      QUESTIONNAIRES[qKey]._calcType = 'conversion_table';
+    } else if(calcType.startsWith('comptage_seuil')) {
+      // Score = count of answers >= threshold
+      const threshold = parseInt(calcType.split('|')[1]) || 2;
+      QUESTIONNAIRES[qKey]._calcType = 'comptage_seuil';
+      QUESTIONNAIRES[qKey]._calcThreshold = threshold;
+    } else {
+      QUESTIONNAIRES[qKey]._calcType = 'somme';
+    }
     if(data.instructions) QUESTIONNAIRES[qKey].instructions = data.instructions;
     if(data.questions && data.questions.length) {
       QUESTIONNAIRES[qKey].questions = data.questions.map(q=>q.text);
@@ -5622,11 +5392,50 @@ function applyExcelQuestionnaires(parsedQs) {
         QUESTIONNAIRES[qKey].optionsPerQuestion = data.questions.map(q=>q.options.map(o=>o.text+' ('+o.score+')'));
         delete QUESTIONNAIRES[qKey].options;
       }
+      // Store raw option scores for calcScore (needed for conversion_table)
+      QUESTIONNAIRES[qKey]._optionScores = data.questions.map(q => q.options.map(o => o.score));
       updated++;
     }
   }
   console.log('Updated '+updated+' questionnaires from Excel');
   return updated;
+}
+
+// Central score computation — used by both qFinish and pqFinish
+function computeScore(qKey, answers) {
+  const qi = QUESTIONNAIRES[qKey];
+  if(!qi) return 0;
+  // Custom calcScore (legacy, kept for compatibility)
+  if(typeof qi.calcScore === 'function') return qi.calcScore(answers);
+  const calcType = qi._calcType || 'somme';
+  if(calcType === 'conversion_table') {
+    // Each answer index maps to a conversion score stored in _optionScores
+    const scores = qi._optionScores;
+    if(!scores) return 0;
+    var total = 0;
+    answers.forEach(function(a, i) {
+      if(typeof a === 'number' && scores[i]) {
+        var idx = Math.max(0, Math.min(scores[i].length-1, Math.round(a)));
+        total += scores[i][idx];
+      }
+    });
+    return Math.round(total * 10000) / 10000;
+  } else if(calcType === 'comptage_seuil') {
+    var threshold = qi._calcThreshold || 2;
+    return answers.filter(function(a) { return typeof a === 'number' && a >= threshold; }).length;
+  } else {
+    // somme : sum the option scores (stored in _optionScores) or raw answer values
+    const scores = qi._optionScores;
+    return answers.reduce(function(total, a, i) {
+      if(Array.isArray(a)) return total;
+      if(typeof a !== 'number') return total;
+      if(scores && scores[i]) {
+        var idx = Math.max(0, Math.min(scores[i].length-1, Math.round(a)));
+        return total + (scores[i][idx] || 0);
+      }
+      return total + a;
+    }, 0);
+  }
 }
 
 
