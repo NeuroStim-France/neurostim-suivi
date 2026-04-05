@@ -100,6 +100,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
 .stat-card.urgent .stat-value{color:var(--red)}
 .stat-card.warn .stat-value{color:var(--amber)}
+.stat-spark{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:8px}
+.stat-spark-bar{width:7px;border-radius:2px;flex-shrink:0}
+.stat-delta-badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:20px;white-space:nowrap;line-height:1}
+.stat-delta-badge.up{background:var(--red-bg);color:var(--red)}
+.stat-delta-badge.down{background:var(--green-bg);color:var(--green)}
+.stat-delta-badge.up-good{background:var(--green-bg);color:var(--green)}
+.stat-delta-badge.neutral{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
 
 /* BADGES */
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
@@ -627,7 +634,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-13h14</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-15h30</span>
       </div>
     </div>
   </div>
@@ -647,23 +654,39 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="g4" style="margin-bottom:14px">
         <div class="stat-card urgent" style="cursor:pointer" onclick="scrollToSection('overdue-section')">
           <div class="stat-label">⚠ En retard</div>
-          <div class="stat-value" id="stat-overdue">0</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="stat-value" id="stat-overdue">0</div>
+            <span class="stat-delta-badge" id="delta-overdue" style="display:none"></span>
+          </div>
           <div class="stat-sub">Questionnaires non faits</div>
+          <div class="stat-spark" id="spark-overdue"></div>
         </div>
         <div class="stat-card" style="cursor:pointer;border-color:var(--accent-light)" onclick="scrollToSection('today-section')">
           <div class="stat-label" style="color:var(--accent)">● Aujourd'hui</div>
-          <div class="stat-value" id="stat-today">0</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="stat-value" id="stat-today">0</div>
+            <span class="stat-delta-badge" id="delta-today" style="display:none"></span>
+          </div>
           <div class="stat-sub">À compléter ce jour</div>
+          <div class="stat-spark" id="spark-today"></div>
         </div>
         <div class="stat-card" onclick="scrollToSection('week-section')" style="cursor:pointer">
           <div class="stat-label">📅 Cette semaine</div>
-          <div class="stat-value" id="stat-upcoming">0</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="stat-value" id="stat-upcoming">0</div>
+            <span class="stat-delta-badge" id="delta-upcoming" style="display:none"></span>
+          </div>
           <div class="stat-sub">Prévus sur 7 jours</div>
+          <div class="stat-spark" id="spark-upcoming"></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">👥 En cours de suivi</div>
-          <div class="stat-value" id="stat-total">0</div>
+          <div style="display:flex;align-items:baseline;gap:8px">
+            <div class="stat-value" id="stat-total">0</div>
+            <span class="stat-delta-badge" id="delta-total" style="display:none"></span>
+          </div>
           <div class="stat-sub">Patients actifs</div>
+          <div class="stat-spark" id="spark-total"></div>
         </div>
       </div>
       <!-- Today section -->
@@ -2280,6 +2303,8 @@ function showApp() {
   cabSel.innerHTML='';
   const cabs=p.role==='admin'?['NeuroStim Bastille','NeuroStim Étoile','NeuroStim Luxembourg']:(p.cabinets||[]);
   cabs.sort().forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; cabSel.appendChild(o); });
+  // Restaurer le dernier cabinet choisi (persistance multi-session via Firestore)
+  if(p.lastCabinet && cabs.includes(p.lastCabinet)) cabSel.value=p.lastCabinet;
   // Apply role class to body for CSS-based hiding
   document.body.classList.remove('role-lecture','role-saisie','role-admin');
   document.body.classList.add('role-'+p.role);
@@ -2401,15 +2426,88 @@ function loadDashboard() {
       else if(s.date>tod&&s.date<=addDays(tod,7)) upcomingItems.push(item);
     });
   });
+  const totalActive=pts.filter(p=>p.status==='cure'||(p.status!=='termine'&&(p.parcours||[]).some(parc=>parc.status==='actif'))).length;
   document.getElementById('stat-today').textContent=todayItems.length;
   document.getElementById('stat-overdue').textContent=overdueItems.length;
   document.getElementById('stat-upcoming').textContent=upcomingItems.length;
-  document.getElementById('stat-total').textContent=pts.filter(p=>p.status==='cure'||(p.status!=='termine'&&(p.parcours||[]).some(parc=>parc.status==='actif'))).length;
+  document.getElementById('stat-total').textContent=totalActive;
   const badge=document.getElementById('nav-badge');
   const urgent=overdueItems.length+todayItems.length;
   badge.textContent=urgent; badge.style.display=urgent>0?'inline':'none';
   renderTodayList(todayItems,overdueItems);
   renderWeekView();
+  // ── Sparklines + deltas ──
+  _renderStatEnhancements(pts, overdueItems.length, todayItems.length, upcomingItems.length, totalActive, tod);
+}
+
+function _renderStatEnhancements(pts, overdueNow, todayNow, upcomingNow, totalNow, tod) {
+  // Calcul des valeurs sur les 7 dernières semaines (lundi de chaque semaine)
+  function getMondayOf(dateStr) {
+    const d=new Date(dateStr+'T12:00:00'); const day=d.getDay(); const diff=day===0?-6:1-day;
+    d.setDate(d.getDate()+diff); return d.toISOString().split('T')[0];
+  }
+  function addDaysLocal(dateStr,n) {
+    const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0];
+  }
+  const todMon=getMondayOf(tod);
+  const prevMon=addDaysLocal(todMon,-7);
+
+  // Pour overdue/today/upcoming : on simule depuis le schedule des patients
+  function countForWeek(weekStart) {
+    const weekEnd=addDaysLocal(weekStart,6);
+    let overdue=0,today=0,upcoming=0;
+    pts.forEach(p=>{
+      const activeCure=p.status==='cure'||!p.status;
+      (p.schedule||[]).forEach(s=>{
+        const done=s.done||[],ignored=s.ignored||[],rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
+        if(rem.length===0) return;
+        if(!activeCure&&s.type!=='monthly') return;
+        // On considère "overdue" pour cette semaine = slots en retard au début de la semaine
+        if(s.date<weekStart) overdue++;
+        else if(s.date===weekStart) today++;
+        else if(s.date>weekStart&&s.date<=weekEnd) upcoming++;
+      });
+    });
+    return {overdue,today,upcoming};
+  }
+
+  // Sparklines sur 7 semaines glissantes
+  const weeks=[]; for(let i=6;i>=0;i--) weeks.push(addDaysLocal(todMon,-i*7));
+  const sparkData={overdue:[],today:[],upcoming:[],total:[]};
+  weeks.forEach(function(wk){ const c=countForWeek(wk); sparkData.overdue.push(c.overdue); sparkData.today.push(c.today); sparkData.upcoming.push(c.upcoming); sparkData.total.push(totalNow); });
+  // Pour total on utilise une valeur fixe (on n'a pas l'historique), on la signale visuellement neutre
+  const prevWeek=countForWeek(prevMon);
+
+  function renderSpark(id, data, color, lastColor) {
+    const el=document.getElementById(id); if(!el) return;
+    const max=Math.max(...data,1);
+    el.innerHTML=data.map(function(v,i){
+      const h=Math.max(3,Math.round((v/max)*20));
+      const c=i===data.length-1?lastColor:color;
+      return '<div class="stat-spark-bar" style="height:'+h+'px;background:'+c+'"></div>';
+    }).join('');
+  }
+  function renderDelta(id, current, prev, lowerIsBetter) {
+    const el=document.getElementById(id); if(!el) return;
+    const diff=current-prev;
+    if(diff===0){ el.textContent='= S-1'; el.className='stat-delta-badge neutral'; el.style.display='inline'; return; }
+    const sign=diff>0?'+':'';
+    const better=(lowerIsBetter&&diff<0)||(!lowerIsBetter&&diff>0);
+    el.textContent=sign+diff+' vs S-1';
+    el.className='stat-delta-badge '+(better?'down':'up');
+    el.style.display='inline';
+  }
+
+  renderSpark('spark-overdue', sparkData.overdue, '#f09595', '#e24b4a');
+  renderSpark('spark-today',   sparkData.today,   '#c5d6f0', '#1a4d8f');
+  renderSpark('spark-upcoming',sparkData.upcoming, 'var(--border2)', 'var(--text3)');
+  renderSpark('spark-total',   sparkData.total,    'var(--border2)', 'var(--text3)');
+
+  renderDelta('delta-overdue',  overdueNow,  prevWeek.overdue,  true);
+  renderDelta('delta-today',    todayNow,    prevWeek.today,    false);
+  renderDelta('delta-upcoming', upcomingNow, prevWeek.upcoming, false);
+  // Pour total : pas de delta hebdo fiable, on n'affiche pas
+  document.getElementById('delta-total').style.display='none';
 }
 
 function renderTodayList(todayItems,overdueItems) {
@@ -5146,6 +5244,8 @@ async function loadCabinetsList() {
     const names = cabinets.map(function(c){return c.name;});
     const userCabs = NS.userProfile.role==='admin' ? names : (NS.userProfile.cabinets||[]);
     userCabs.forEach(function(c){ const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===current) o.selected=true; cabSel.appendChild(o); });
+    // Restaurer lastCabinet si le select n'a pas encore de valeur cohérente
+    if(!current && NS.userProfile.lastCabinet && userCabs.includes(NS.userProfile.lastCabinet)) cabSel.value=NS.userProfile.lastCabinet;
   }
 }
 async function saveCabinets(list) {
@@ -8558,7 +8658,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
   const cabSel=document.getElementById('cabinet-sel');
-  if(cabSel) cabSel.addEventListener('change',loadPatients);
+  if(cabSel) cabSel.addEventListener('change',function(){
+    loadPatients();
+    if(NS.user) db.doc('users/'+NS.user.uid).update({lastCabinet: cabSel.value}).catch(()=>{});
+  });
   const pwd=document.getElementById('login-pwd');
   if(pwd) pwd.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
   // Attach login button click handler explicitly
