@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-12h40</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-13h11</span>
       </div>
     </div>
   </div>
@@ -1975,7 +1975,7 @@ const QUESTIONNAIRES = {
 
   // ── SDS : Échelle d'invalidité de Sheehan ──────────────────────────────
   'SDS': {
-    name: 'SDS', fullName: "SDS — Échelle d'invalidité de Sheehan",
+    name: 'SDS', fullName: "SDS / Sheehan — Échelle d'invalidité",
     type: 'auto', domain: 'Fonctionnement',
     instructions: "Tous les énoncés se rapportent aux 14 derniers jours. Pour chacune des 3 questions suivantes, déplacez le curseur pour indiquer à quel point vos symptômes ont perturbé ce domaine de votre vie.",
     questions: [
@@ -2070,6 +2070,7 @@ const Q_DESC = {
   'SANS':'symptômes négatifs','QCD':'douleur','FIQ':'fibromyalgie',
   'DSM5':'addiction','EVA craving':'craving','OCDS':'alcool',
   'Consentement rTMS':'consentement',
+  'SDS':'invalidité / Sheehan',
   'DIVA-5-SR':'TDAH auto-questionnaire',
   'DIVA-5':'TDAH entretien clinicien'
 };
