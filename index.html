@@ -2594,7 +2594,6 @@ function renderTimeline() {
     return !!NS.timelineShowAll;
   });
   const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
-  const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
 
   // ── Inner function: render a single slot ──
   function slotHTML(s) {
