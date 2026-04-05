@@ -3276,6 +3276,8 @@ function qNext() {
   if(qType === 'radio' && currentQ.answers[idx] === undefined) {
     alert('Veuillez sélectionner une réponse.'); return;
   }
+  const total2 = qi ? qi.questions.length : 0;
+  if(currentQ.currentIdx >= total2 - 1) { qFinish(); return; }
   currentQ.currentIdx++; renderQuestion();
 }
 function qPrev() { if(currentQ.currentIdx>0){currentQ.currentIdx--;renderQuestion();} }
@@ -3285,12 +3287,14 @@ async function qFinish() {
   const idx=currentQ.currentIdx;
   const qType=(qi&&qi.questionTypes&&qi.questionTypes[idx])||'radio';
   if(qType==='radio' && currentQ.answers[idx]===undefined){alert('Veuillez sélectionner une réponse.');return;}
-  // Calculate score: sum numeric answers, skip multi (string arrays)
-  const score = currentQ.answers.reduce((a,b)=>{
-    if(Array.isArray(b)) return a; // multi = no score contribution
-    if(typeof b === 'number') return a+b;
-    return a;
-  }, 0);
+  // Calculate score: use custom calcScore if defined, else sum numeric answers
+  const score = (qi && typeof qi.calcScore === 'function')
+    ? qi.calcScore(currentQ.answers)
+    : currentQ.answers.reduce((a,b)=>{
+        if(Array.isArray(b)) return a;
+        if(typeof b === 'number') return a+b;
+        return a;
+      }, 0);
   // Store multi answers as joined string in answers array for display
   const answersToStore = currentQ.answers.map((a,i)=>{
     const t = (qi&&qi.questionTypes&&qi.questionTypes[i])||'radio';
