@@ -626,6 +626,9 @@ body.role-saisie .analyse-only { display:none !important; }
       <div style="margin-top:4px">
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
+      <div style="margin-top:6px;text-align:center">
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">v2025.04.05</span>
+      </div>
     </div>
   </div>
 
@@ -5300,13 +5303,20 @@ async function rgpdExportPatient() {
 // EXCEL ADVANCED — READ QUESTIONS FROM SHEETS
 // ════════════════════════════════════════════════
 function parseExcelQuestionnaires(workbook) {
+  // sheetToQ : nom de l'onglet xlsx → clé dans QUESTIONNAIRES
+  // Étendu dynamiquement : tous les onglets présents dans QUESTIONNAIRES sont ajoutés
   const sheetToQ = {
     'PHQ-9':'PHQ-9','GAD-7':'GAD-7','BDI-2':'BDI-2','ISI':'ISI',
     'EQ5D':'EQ-5D-5L','Ricci & Gagnon':'Ricci-Gagnon','Y-BOCS-SR':'Y-BOCS-SR',
     'PCL-5':'PCL-5','STAI':'STAI','Hétéro - Echelle de Maudsley':'Maudsley',
     'MADRS':'MADRS','AHRS':'AHRS','SANS':'SANS','QCD':'QCD','FIQ':'FIQ',
-    'DSM5':'DSM5','EVA craving':'EVA craving','OCDS':'OCDS'
+    'DSM5':'DSM5','EVA craving':'EVA craving','OCDS':'OCDS',
+    '15D':'15D','DIVA-5':'DIVA-5','DIVA-5-SR':'DIVA-5-SR'
   };
+  // Auto-add any xlsx sheet whose name matches a QUESTIONNAIRES key not already mapped
+  workbook.SheetNames.forEach(function(sn) {
+    if(QUESTIONNAIRES[sn] && !sheetToQ[sn]) sheetToQ[sn] = sn;
+  });
 
   const parsed = {};
   for(const [sheetName, qKey] of Object.entries(sheetToQ)) {
