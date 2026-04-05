@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">v2025.04.05</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b001</span>
       </div>
     </div>
   </div>
@@ -2503,7 +2503,7 @@ function renderTimeline() {
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):(resp.score+'/'+(qi&&qi.maxScore||'?')+' — '+lbl))+'</div>'
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? resp.score+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
@@ -2752,7 +2752,7 @@ function openScoreDetail(qName, date) {
   const interp = qi.interpret?qi.interpret(resp.score):{label:'',color:'gray'};
   document.getElementById('sd-title').textContent = qi.fullName||qName;
   document.getElementById('sd-date').textContent = fmtDate(date);
-  document.getElementById('sd-score').textContent = resp.score+' / '+(qi.maxScore||'?');
+  document.getElementById('sd-score').textContent = qi.scoreLabel ? resp.score+' '+qi.scoreLabel : resp.score+' / '+(qi.maxScore||'?');
   document.getElementById('sd-score').style.color = 'var(--'+interp.color+')';
   document.getElementById('sd-label').textContent = interp.label;
   // Render answer detail
@@ -5394,12 +5394,15 @@ function applyExcelQuestionnaires(parsedQs, typeMap) {
       QUESTIONNAIRES[qKey].multiOptions = data.questions.map(q=>q.isMulti ? q.multiOpts : null);
       // Check if all have same options
       const allSame = new Set(data.questions.map(q=>JSON.stringify(q.options.map(o=>o.text)))).size === 1;
+      // For conversion_table type: don't show raw conversion scores in option labels
+      const hideScore = (QUESTIONNAIRES[qKey]._calcType === 'conversion_table');
+      const optLabel = (o) => hideScore ? o.text : o.text + (o.score !== undefined && o.score !== '' ? ' (' + o.score + ')' : '');
       if(allSame && data.questions[0].options.length) {
         const opts = data.questions[0].options;
-        QUESTIONNAIRES[qKey].options = opts.map(o=>o.text+' ('+o.score+')');
+        QUESTIONNAIRES[qKey].options = opts.map(optLabel);
         delete QUESTIONNAIRES[qKey].optionsPerQuestion;
       } else {
-        QUESTIONNAIRES[qKey].optionsPerQuestion = data.questions.map(q=>q.options.map(o=>o.text+' ('+o.score+')'));
+        QUESTIONNAIRES[qKey].optionsPerQuestion = data.questions.map(q=>q.options.map(optLabel));
         delete QUESTIONNAIRES[qKey].options;
       }
       // Store raw option scores for calcScore (needed for conversion_table)
