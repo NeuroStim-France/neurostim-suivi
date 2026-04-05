@@ -100,13 +100,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
 .stat-card.urgent .stat-value{color:var(--red)}
 .stat-card.warn .stat-value{color:var(--amber)}
-.stat-spark{display:flex;align-items:flex-end;gap:2px;height:20px;margin-top:8px}
-.stat-spark-bar{width:7px;border-radius:2px;flex-shrink:0}
-.stat-delta-badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:20px;white-space:nowrap;line-height:1}
-.stat-delta-badge.up{background:var(--red-bg);color:var(--red)}
-.stat-delta-badge.down{background:var(--green-bg);color:var(--green)}
-.stat-delta-badge.up-good{background:var(--green-bg);color:var(--green)}
-.stat-delta-badge.neutral{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
 
 /* BADGES */
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
@@ -634,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-15h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-HHhMM</span>
       </div>
     </div>
   </div>
@@ -654,39 +647,23 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="g4" style="margin-bottom:14px">
         <div class="stat-card urgent" style="cursor:pointer" onclick="scrollToSection('overdue-section')">
           <div class="stat-label">⚠ En retard</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <div class="stat-value" id="stat-overdue">0</div>
-            <span class="stat-delta-badge" id="delta-overdue" style="display:none"></span>
-          </div>
+          <div class="stat-value" id="stat-overdue">0</div>
           <div class="stat-sub">Questionnaires non faits</div>
-          <div class="stat-spark" id="spark-overdue"></div>
         </div>
         <div class="stat-card" style="cursor:pointer;border-color:var(--accent-light)" onclick="scrollToSection('today-section')">
           <div class="stat-label" style="color:var(--accent)">● Aujourd'hui</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <div class="stat-value" id="stat-today">0</div>
-            <span class="stat-delta-badge" id="delta-today" style="display:none"></span>
-          </div>
+          <div class="stat-value" id="stat-today">0</div>
           <div class="stat-sub">À compléter ce jour</div>
-          <div class="stat-spark" id="spark-today"></div>
         </div>
         <div class="stat-card" onclick="scrollToSection('week-section')" style="cursor:pointer">
           <div class="stat-label">📅 Cette semaine</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <div class="stat-value" id="stat-upcoming">0</div>
-            <span class="stat-delta-badge" id="delta-upcoming" style="display:none"></span>
-          </div>
+          <div class="stat-value" id="stat-upcoming">0</div>
           <div class="stat-sub">Prévus sur 7 jours</div>
-          <div class="stat-spark" id="spark-upcoming"></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">👥 En cours de suivi</div>
-          <div style="display:flex;align-items:baseline;gap:8px">
-            <div class="stat-value" id="stat-total">0</div>
-            <span class="stat-delta-badge" id="delta-total" style="display:none"></span>
-          </div>
+          <div class="stat-value" id="stat-total">0</div>
           <div class="stat-sub">Patients actifs</div>
-          <div class="stat-spark" id="spark-total"></div>
         </div>
       </div>
       <!-- Today section -->
@@ -855,7 +832,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <div id="tc-notes" class="tab-content">
         <div class="card" style="margin-bottom:12px">
           <div class="fg" style="margin-bottom:8px"><label>Nouvelle note</label><textarea id="note-input" rows="3" placeholder="Observation clinique, événement notable…" autocomplete="off"></textarea></div>
-          <button class="btn btn-primary btn-sm" onclick="saveNote()">Enregistrer la note</button>
+          <button class="btn btn-primary btn-sm" onclick="btnLoading(this,saveNote())">Enregistrer la note</button>
         </div>
         <div id="notes-list"></div>
       </div>
@@ -1535,7 +1512,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="cabinet-check" value="NeuroStim Étoile"> NeuroStim Étoile</label>
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="cabinet-check" value="NeuroStim Luxembourg"> NeuroStim Luxembourg</label>
     </div>
-    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('m-add-user')">Annuler</button><button class="btn btn-primary" onclick="createUser()">Créer le compte</button></div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('m-add-user')">Annuler</button><button class="btn btn-primary" onclick="btnLoading(this,createUser())">Créer le compte</button></div>
   </div>
 </div>
 
@@ -1753,7 +1730,7 @@ body.role-saisie .analyse-only { display:none !important; }
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-add-pem')">Annuler</button>
-      <button class="btn btn-primary" onclick="savePEM()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,savePEM())">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1774,7 +1751,7 @@ body.role-saisie .analyse-only { display:none !important; }
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-add-single-q')">Annuler</button>
-      <button class="btn btn-primary" onclick="addSingleQuestionnaire()">Ajouter au calendrier</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,addSingleQuestionnaire())">Ajouter au calendrier</button>
     </div>
   </div>
 </div>
@@ -2436,79 +2413,9 @@ function loadDashboard() {
   badge.textContent=urgent; badge.style.display=urgent>0?'inline':'none';
   renderTodayList(todayItems,overdueItems);
   renderWeekView();
-  // ── Sparklines + deltas ──
-  _renderStatEnhancements(pts, overdueItems.length, todayItems.length, upcomingItems.length, totalActive, tod);
+
 }
 
-function _renderStatEnhancements(pts, overdueNow, todayNow, upcomingNow, totalNow, tod) {
-  // Calcul des valeurs sur les 7 dernières semaines (lundi de chaque semaine)
-  function getMondayOf(dateStr) {
-    const d=new Date(dateStr+'T12:00:00'); const day=d.getDay(); const diff=day===0?-6:1-day;
-    d.setDate(d.getDate()+diff); return d.toISOString().split('T')[0];
-  }
-  function addDaysLocal(dateStr,n) {
-    const d=new Date(dateStr+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0];
-  }
-  const todMon=getMondayOf(tod);
-  const prevMon=addDaysLocal(todMon,-7);
-
-  // Pour overdue/today/upcoming : on simule depuis le schedule des patients
-  function countForWeek(weekStart) {
-    const weekEnd=addDaysLocal(weekStart,6);
-    let overdue=0,today=0,upcoming=0;
-    pts.forEach(p=>{
-      const activeCure=p.status==='cure'||!p.status;
-      (p.schedule||[]).forEach(s=>{
-        const done=s.done||[],ignored=s.ignored||[],rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
-        if(rem.length===0) return;
-        if(!activeCure&&s.type!=='monthly') return;
-        // On considère "overdue" pour cette semaine = slots en retard au début de la semaine
-        if(s.date<weekStart) overdue++;
-        else if(s.date===weekStart) today++;
-        else if(s.date>weekStart&&s.date<=weekEnd) upcoming++;
-      });
-    });
-    return {overdue,today,upcoming};
-  }
-
-  // Sparklines sur 7 semaines glissantes
-  const weeks=[]; for(let i=6;i>=0;i--) weeks.push(addDaysLocal(todMon,-i*7));
-  const sparkData={overdue:[],today:[],upcoming:[],total:[]};
-  weeks.forEach(function(wk){ const c=countForWeek(wk); sparkData.overdue.push(c.overdue); sparkData.today.push(c.today); sparkData.upcoming.push(c.upcoming); sparkData.total.push(totalNow); });
-  // Pour total on utilise une valeur fixe (on n'a pas l'historique), on la signale visuellement neutre
-  const prevWeek=countForWeek(prevMon);
-
-  function renderSpark(id, data, color, lastColor) {
-    const el=document.getElementById(id); if(!el) return;
-    const max=Math.max(...data,1);
-    el.innerHTML=data.map(function(v,i){
-      const h=Math.max(3,Math.round((v/max)*20));
-      const c=i===data.length-1?lastColor:color;
-      return '<div class="stat-spark-bar" style="height:'+h+'px;background:'+c+'"></div>';
-    }).join('');
-  }
-  function renderDelta(id, current, prev, lowerIsBetter) {
-    const el=document.getElementById(id); if(!el) return;
-    const diff=current-prev;
-    if(diff===0){ el.textContent='= S-1'; el.className='stat-delta-badge neutral'; el.style.display='inline'; return; }
-    const sign=diff>0?'+':'';
-    const better=(lowerIsBetter&&diff<0)||(!lowerIsBetter&&diff>0);
-    el.textContent=sign+diff+' vs S-1';
-    el.className='stat-delta-badge '+(better?'down':'up');
-    el.style.display='inline';
-  }
-
-  renderSpark('spark-overdue', sparkData.overdue, '#f09595', '#e24b4a');
-  renderSpark('spark-today',   sparkData.today,   '#c5d6f0', '#1a4d8f');
-  renderSpark('spark-upcoming',sparkData.upcoming, 'var(--border2)', 'var(--text3)');
-  renderSpark('spark-total',   sparkData.total,    'var(--border2)', 'var(--text3)');
-
-  renderDelta('delta-overdue',  overdueNow,  prevWeek.overdue,  true);
-  renderDelta('delta-today',    todayNow,    prevWeek.today,    false);
-  renderDelta('delta-upcoming', upcomingNow, prevWeek.upcoming, false);
-  // Pour total : pas de delta hebdo fiable, on n'affiche pas
-  document.getElementById('delta-total').style.display='none';
-}
 
 function renderTodayList(todayItems,overdueItems) {
   const el=document.getElementById('today-list'); if(!el) return;
@@ -2687,9 +2594,10 @@ function renderTimeline() {
     return !!NS.timelineShowAll;
   });
   const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
-  _schedule.forEach(s=>{
-    // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
-    // But do NOT re-merge for interrupted patients — their schedule was already purged
+  const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
+
+  // ── Inner function: render a single slot ──
+  function slotHTML(s) {
     let slotQs = s.questionnaires||[];
     if(!isInterrupted) {
       if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
@@ -2703,10 +2611,9 @@ function renderTimeline() {
     const allDone=rem.length===0&&qs.length>0;
     const grpCls=allDone?'done':isPast?'overdue':isToday?'today-group':'upcoming';
     const icon=allDone?'✓':isPast?'⚠':isToday?'●':'○';
-    // Parcours slots get a purple accent
     const isParcours = s.type==='parcours'||s.type==='parcours_suivi'||s.type==='parcours_end';
     const grpStyle = isParcours ? ' style="border-left:3px solid var(--purple)"' : '';
-    html+='<div class="tl-group '+grpCls+'"'+grpStyle+'>'
+    let out='<div class="tl-group '+grpCls+'"'+grpStyle+'>'
       +'<div class="tl-group-header"><span class="tl-icon">'+icon+'</span>'
       +(isParcours?'<span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border-radius:3px;padding:1px 5px;margin-right:4px">Parcours</span>':'')
       +'<span class="tl-label">'+s.label+'</span>'
@@ -2725,14 +2632,15 @@ function renderTimeline() {
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
-             +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(\''+q+'\',\''+s.date+'\')">'
+              +((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel?(typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel:resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
+             +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(\''+q+'\',\''+s.date+'\')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
           +(!isDone&&NS.userProfile&&NS.userProfile.role!=='lecture'?'<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
-              +((isToday||isPast)?'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>':'')
-              +((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Avancer à aujourd\'hui">📅 Répondre maintenant</button>':'')
-              +'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Ignorer">✕ Ignorer</button>'
+              +((isToday||isPast)?'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')"> '+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>':'')
+              +((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">📅 Répondre maintenant</button>':'')
+              +'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">✕ Ignorer</button>'
               +'</div>':'')
           +'</div>';
       }).join('')
@@ -2741,7 +2649,43 @@ function renderTimeline() {
         +((isToday||isPast)?'<button class="btn btn-xs btn-ghost write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">📋 Remplir</button>':'')
         +'</div>').join('')
       +'</div></div>';
-  });
+    return out;
+  }
+
+  // ── Collapse by month when schedule > 10 visible slots ──
+  if(_schedule.length > 10) {
+    const byMonth={}, monthOrder=[];
+    _schedule.forEach(s=>{
+      const ym=s.date.substring(0,7);
+      if(!byMonth[ym]){byMonth[ym]=[];monthOrder.push(ym);}
+      byMonth[ym].push(s);
+    });
+    function mIsDone(slots){return slots.every(s=>{const qs=s.questionnaires||[],d=s.done||[];return s.date<tod&&qs.length>0&&qs.every(q=>d.includes(q));});}
+    function mLabel(ym){const pts=ym.split('-');return ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][parseInt(pts[1],10)-1]+' '+pts[0];}
+    if(!NS.tlCollapsed) NS.tlCollapsed={};
+    monthOrder.forEach(ym=>{
+      const slots=byMonth[ym];
+      const done=mIsDone(slots);
+      if(NS.tlCollapsed[ym]===undefined) NS.tlCollapsed[ym]=done;
+      const collapsed=NS.tlCollapsed[ym];
+      const doneN=slots.filter(s=>{const qs=s.questionnaires||[],d=s.done||[];return qs.length>0&&qs.every(q=>d.includes(q));}).length;
+      const hasOverdue=slots.some(s=>s.date<tod&&(s.questionnaires||[]).some(q=>!(s.done||[]).includes(q)));
+      const dot=done?'var(--green)':hasOverdue?'var(--red)':'var(--accent)';
+      const statusTxt=(done?'✓ ':'')+doneN+'/'+slots.length+' complété'+(doneN>1?'s':'');
+      html+='<div style="margin-bottom:8px">'
+        +'<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;user-select:none" onclick="if(!NS.tlCollapsed)NS.tlCollapsed={};NS.tlCollapsed[\''+ym+'\']= !NS.tlCollapsed[\''+ym+'\'];renderTimeline()">'
+        +'<span style="width:9px;height:9px;border-radius:50%;background:'+dot+';flex-shrink:0"></span>'
+        +'<span style="font-size:13px;font-weight:600;flex:1">'+mLabel(ym)+'</span>'
+        +'<span style="font-size:11px;color:var(--text3)">'+statusTxt+'</span>'
+        +'<span style="font-size:13px;color:var(--text3);margin-left:6px">'+(collapsed?'▶':'▼')+'</span>'
+        +'</div>'
+        +(collapsed?'':'<div style="padding-top:4px">'+slots.map(slotHTML).join('')+'</div>')
+        +'</div>';
+    });
+  } else {
+    _schedule.forEach(s=>{ html+=slotHTML(s); });
+  }
+
   if(_hiddenCount > 0 && !NS.timelineShowAll) {
     html += '<div style="text-align:center;padding:12px">'
       + '<button class="btn btn-ghost btn-sm" style="color:var(--text3);font-size:12px" onclick="NS.timelineShowAll=true;renderTimeline()">'
@@ -5814,6 +5758,21 @@ function computeScore(qKey, answers) {
 // ════════════════════════════════════════════════
 // ERROR HANDLING
 // ════════════════════════════════════════════════
+// ── Spinner inline sur bouton ──
+// Usage : btnLoading(btnElement, asyncFn())
+function btnLoading(btn, promise) {
+  if(!btn) return promise;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px">'
+    + '<span style="width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>'
+    + '<span>En cours…</span></span>';
+  return Promise.resolve(promise).finally(()=>{
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  });
+}
+
 function showError(msg, duration) {
   const banner = document.getElementById('error-banner');
   const msgEl = document.getElementById('error-banner-msg');
@@ -8725,7 +8684,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-patient')">Annuler</button>
-      <button class="btn btn-primary" onclick="saveEditPatient()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,saveEditPatient())">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8741,7 +8700,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-adjust-dates')">Annuler</button>
-      <button class="btn btn-primary" onclick="saveAdjustDates()">Recalculer le calendrier</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,saveAdjustDates())">Recalculer le calendrier</button>
     </div>
   </div>
 </div>
@@ -8757,7 +8716,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-note')">Annuler</button>
-      <button class="btn btn-primary" onclick="saveEditNote()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,saveEditNote())">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8879,7 +8838,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-consolidation')">Annuler</button>
-      <button class="btn btn-primary" onclick="saveConsolidation()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,saveConsolidation())">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8912,7 +8871,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-user')">Annuler</button>
-      <button class="btn btn-primary" onclick="saveEditUser()">Enregistrer</button>
+      <button class="btn btn-primary" onclick="btnLoading(this,saveEditUser())">Enregistrer</button>
     </div>
   </div>
 </div>
