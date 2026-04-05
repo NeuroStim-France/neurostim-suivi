@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-10h44</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-10h47</span>
       </div>
     </div>
   </div>
@@ -2503,7 +2503,7 @@ function renderTimeline() {
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'&&resp.score%1!==0?resp.score.toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
@@ -2752,7 +2752,7 @@ function openScoreDetail(qName, date) {
   const interp = qi.interpret?qi.interpret(resp.score):{label:'',color:'gray'};
   document.getElementById('sd-title').textContent = qi.fullName||qName;
   document.getElementById('sd-date').textContent = fmtDate(date);
-  const scoreDisplay = qi.scoreLabel ? (typeof resp.score==='number'&&resp.score%1!==0?resp.score.toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+' / '+(qi.maxScore||'?');
+  const scoreDisplay = qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+' / '+(qi.maxScore||'?');
   document.getElementById('sd-score').textContent = scoreDisplay;
   document.getElementById('sd-score').style.color = 'var(--'+interp.color+')';
   document.getElementById('sd-label').textContent = interp.label;
