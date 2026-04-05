@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-12h08</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-12h40</span>
       </div>
     </div>
   </div>
@@ -1477,7 +1477,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">QR Code séance</div><button class="close-btn" onclick="closeModal('m-qr')">✕</button></div>
     <div class="mb" style="text-align:center">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Questionnaire : <strong id="qr-qname">—</strong><br>Valide 30 minutes</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Questionnaire : <strong id="qr-qname">—</strong><br>Valide 5 jours</div>
       <img id="qr-img" src="" alt="QR Code" style="width:200px;height:200px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px">
       <div class="fg"><label>Lien direct</label><input type="text" id="qr-link" readonly onclick="this.select()" style="font-size:11px;font-family:monospace"></div>
       <p class="text-muted">Le patient peut scanner ce code depuis son téléphone ou utiliser la tablette.</p>
@@ -1973,7 +1973,47 @@ const QUESTIONNAIRES = {
     }
   },
 
-  // ── 15D : Qualité de vie 15 dimensions (chargé depuis xlsx) ───────────
+  // ── SDS : Échelle d'invalidité de Sheehan ──────────────────────────────
+  'SDS': {
+    name: 'SDS', fullName: "SDS — Échelle d'invalidité de Sheehan",
+    type: 'auto', domain: 'Fonctionnement',
+    instructions: "Tous les énoncés se rapportent aux 14 derniers jours. Pour chacune des 3 questions suivantes, déplacez le curseur pour indiquer à quel point vos symptômes ont perturbé ce domaine de votre vie.",
+    questions: [
+      "TRAVAIL / ÉTUDES — Vos symptômes ont perturbé votre travail / vos études :",
+      "VIE SOCIALE — Vos symptômes ont perturbé votre vie sociale / vos loisirs :",
+      "VIE FAMILIALE / TÂCHES DOMESTIQUES — Vos symptômes ont perturbé votre vie familiale / vos tâches domestiques :",
+      "JOURS D'INACTIVITÉ TOTALE — Combien de jours au cours de la dernière semaine vos symptômes vous ont-ils empêché(e) d'aller à l'école ou au travail, ou rendu(e) incapable d'assumer vos responsabilités quotidiennes ?",
+      "JOURS À EFFICACITÉ RÉDUITE — Combien de jours au cours de la dernière semaine vous êtes-vous senti(e) si affaibli(e) par vos symptômes que, même si vous êtes allé(e) à l'école ou au travail, votre efficacité était réduite ?",
+    ],
+    questionTypes: ['slider', 'slider', 'slider', 'slider', 'slider'],
+    sliderConfigs: [
+      {min:0, max:10, steps:11, labelMin:"Pas du tout", labelMax:"Énormément"},
+      {min:0, max:10, steps:11, labelMin:"Pas du tout", labelMax:"Énormément"},
+      {min:0, max:10, steps:11, labelMin:"Pas du tout", labelMax:"Énormément"},
+      {min:0, max:7, steps:8, labelMin:"0 jour", labelMax:"7 jours"},
+      {min:0, max:7, steps:8, labelMin:"0 jour", labelMax:"7 jours"},
+    ],
+    options: [],
+    maxScore: 30,
+    scoreLabel: '/ 30',
+    interpret: function(s) {
+      if(s <= 6)  return {label: 'Pas de handicap', color: 'green'};
+      if(s <= 12) return {label: 'Léger', color: 'green'};
+      if(s <= 18) return {label: 'Modéré', color: 'amber'};
+      if(s <= 24) return {label: 'Sévère', color: 'orange'};
+      return {label: 'Très sévère', color: 'red'};
+    },
+    // Score = sum of first 3 sliders only (not the "jours" items)
+    calcScore: function(answers) {
+      var total = 0;
+      for(var i = 0; i < 3; i++) {
+        if(typeof answers[i] === 'number') total += answers[i];
+      }
+      return Math.round(total * 10) / 10;
+    }
+  },
+
+    // ── 15D : Qualité de vie 15 dimensions (chargé depuis xlsx) ───────────
   '15D': {
     name: '15D', fullName: "15D — Questionnaire de qualité de vie (15 dimensions)",
     type: 'auto', domain: 'Qualité de vie',
@@ -3678,7 +3718,7 @@ function exportCSV() {
 }
 
 function showQR(patientId,qName,date) {
-  const token=btoa(JSON.stringify({patientId,qName,date,exp:Date.now()+30*60*1000}));
+  const token=btoa(JSON.stringify({patientId,qName,date,exp:Date.now()+5*24*60*60*1000}));
   const url=window.location.href.split('?')[0]+'?token='+token;
   document.getElementById('qr-img').src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(url);
   document.getElementById('qr-link').value=url;
