@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-11h18</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-11h27</span>
       </div>
     </div>
   </div>
@@ -5614,6 +5614,7 @@ function updateDashboardDate() {
 // SCORE CHARTS IN PATIENT DETAIL
 // ════════════════════════════════════════════════
 let patientCharts = {};
+let _chartGeneration = 0; // incremented on each renderScoreCharts call to cancel stale rAF
 
 function renderScoreCharts(byQ) {
   const el = document.getElementById('scores-charts');
@@ -5621,6 +5622,8 @@ function renderScoreCharts(byQ) {
   // Destroy existing charts
   Object.values(patientCharts).forEach(c => { try { c.destroy(); } catch(e) {} });
   patientCharts = {};
+  // Increment generation — stale rAF callbacks from previous patient will be ignored
+  const myGeneration = ++_chartGeneration;
 
   const qsWithMultiple = Object.entries(byQ).filter(([q, scores]) => scores.length >= 1);
   if(!qsWithMultiple.length) { el.innerHTML = ''; return; }
@@ -5650,8 +5653,9 @@ function renderScoreCharts(byQ) {
       +'<div style="position:relative;height:130px"><canvas id="'+canvasId+'"></canvas></div>';
     grid.appendChild(card);
 
-    // Render chart after DOM update
+    // Render chart after DOM update — skip if patient changed (stale callback)
     requestAnimationFrame(() => {
+      if(myGeneration !== _chartGeneration) return; // patient changed, abort
       const canvas = document.getElementById(canvasId);
       if(!canvas) return;
       patientCharts[q] = new Chart(canvas, {
