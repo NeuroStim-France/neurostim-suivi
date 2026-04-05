@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-0811</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-10h44</span>
       </div>
     </div>
   </div>
@@ -5467,7 +5467,7 @@ function computeScore(qKey, answers) {
         total += scores[i][idx];
       }
     });
-    return Math.round(total * 10000) / 10000;
+    return parseFloat(total.toFixed(4));
   } else if(calcType === 'comptage_seuil') {
     var threshold = qi._calcThreshold || 2;
     return answers.filter(function(a) { return typeof a === 'number' && a >= threshold; }).length;
