@@ -4644,7 +4644,7 @@ async function uploadExcelConfig(input) {
           for(const [k,v] of Object.entries(parsedQs)) {
             qsToSave[k] = {instructions:v.instructions, questions:v.questions.map(q=>({text:q.text,options:q.options,isSlider:q.isSlider||false,isMulti:q.isMulti||false,multiOpts:q.multiOpts||[]}))};
           }
-          await db.doc('config/questionnaires').set({data:JSON.stringify(qsToSave), updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+          await db.doc('config/questionnaires').set({data:JSON.stringify(qsToSave), typeMap:JSON.stringify(typeMap), updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
         }
         statusEl.textContent = 'Fichier actif : ' + file.name;
         previewEl.style.display = 'block';
@@ -4752,6 +4752,20 @@ async function loadExcelConfig() {
     if(snapQ.exists && snapQ.data().data) {
       try {
         const parsedQs = JSON.parse(snapQ.data().data);
+        // Restore typeMap and apply _calcType to stubs before loading questions
+        const savedTypeMap = snapQ.data().typeMap ? JSON.parse(snapQ.data().typeMap) : {};
+        for(const [k, calcType] of Object.entries(savedTypeMap)) {
+          if(QUESTIONNAIRES[k]) {
+            if(calcType === 'conversion_table') {
+              QUESTIONNAIRES[k]._calcType = 'conversion_table';
+            } else if(calcType.startsWith('comptage_seuil')) {
+              QUESTIONNAIRES[k]._calcType = 'comptage_seuil';
+              QUESTIONNAIRES[k]._calcThreshold = parseInt(calcType.split('|')[1]) || 2;
+            } else {
+              QUESTIONNAIRES[k]._calcType = 'somme';
+            }
+          }
+        }
         applyExcelQuestionnairesFromFirestore(parsedQs);
       } catch(e) { console.warn('Could not apply questionnaires from Firestore:', e); }
     }
@@ -4801,9 +4815,12 @@ function applyParcoursConfig(wb) {
 
 function applyExcelQuestionnairesFromFirestore(parsedQs) {
   for(const [qKey, data] of Object.entries(parsedQs)) {
-    if(!QUESTIONNAIRES[qKey] || !data.questions || !data.questions.length) continue;
-    // Don't overwrite questionnaires with custom calcScore (e.g. 15D, DIVA-5-SR)
-    if(typeof QUESTIONNAIRES[qKey].calcScore === 'function') continue;
+    if(!data.questions || !data.questions.length) continue;
+    // Create stub if questionnaire not yet in QUESTIONNAIRES
+    if(!QUESTIONNAIRES[qKey]) {
+      QUESTIONNAIRES[qKey] = {name:qKey, fullName:qKey, type:'auto', domain:'', questions:[], options:[]};
+    }
+    const qi = QUESTIONNAIRES[qKey];
     // Rebuild questionTypes, sliderConfigs, multiOptions from stored questions
     const questionTypes = data.questions.map(q =>
       q.isMulti ? 'multi' : q.isSlider ? 'slider' : 'radio'
@@ -4820,10 +4837,27 @@ function applyExcelQuestionnairesFromFirestore(parsedQs) {
     const multiOptions = data.questions.map(q =>
       q.isMulti ? (q.multiOpts || []) : null
     );
-    QUESTIONNAIRES[qKey].questionTypes = questionTypes;
-    QUESTIONNAIRES[qKey].sliderConfigs = sliderConfigs;
-    QUESTIONNAIRES[qKey].multiOptions = multiOptions;
-    if(data.instructions) QUESTIONNAIRES[qKey].instructions = data.instructions;
+    qi.questionTypes = questionTypes;
+    qi.sliderConfigs = sliderConfigs;
+    qi.multiOptions = multiOptions;
+    if(data.instructions) qi.instructions = data.instructions;
+    // Also restore questions and options (needed for stubs like 15D, DIVA)
+    if(!qi.questions || !qi.questions.length) {
+      qi.questions = data.questions.map(q => q.text);
+    }
+    // Restore options — hide conversion scores for conversion_table type
+    const hideScore = (qi._calcType === 'conversion_table');
+    const optLabel = (o) => hideScore ? o.text : o.text + (o.score !== undefined && o.score !== '' && o.score !== null ? ' (' + o.score + ')' : '');
+    const allSame = new Set(data.questions.map(q => JSON.stringify((q.options||[]).map(o=>o.text)))).size === 1;
+    if(allSame && data.questions[0] && data.questions[0].options && data.questions[0].options.length) {
+      qi.options = data.questions[0].options.map(optLabel);
+      delete qi.optionsPerQuestion;
+    } else {
+      qi.optionsPerQuestion = data.questions.map(q => (q.options||[]).map(optLabel));
+      delete qi.options;
+    }
+    // Restore raw option scores for computeScore
+    qi._optionScores = data.questions.map(q => (q.options||[]).map(o => o.score));
   }
 }
 
