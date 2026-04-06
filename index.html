@@ -709,8 +709,6 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="code">Tri : Code A→Z</option>
           <option value="j1_desc">Tri : Début récent</option>
           <option value="j1_asc">Tri : Début ancien</option>
-          <option value="created_desc">Tri : Création récente</option>
-          <option value="created_asc">Tri : Création ancienne</option>
           <option value="retard">Tri : En retard d'abord</option>
         </select>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({status:this.value})">
@@ -791,11 +789,11 @@ body.role-saisie .analyse-only { display:none !important; }
             <div class="meta-val" id="pd-dob">—</div>
           </div>
           <div class="ph-meta-item">
-            <div class="meta-label">Début du suivi</div>
+            <div class="meta-label">J1 — 1ère séance</div>
             <div class="meta-val" id="pd-j1">—</div>
           </div>
           <div class="ph-meta-item">
-            <div class="meta-label">Fin du suivi estimée</div>
+            <div class="meta-label">Fin de cure estimée</div>
             <div class="meta-val" id="pd-end">—</div>
           </div>
           <div class="ph-meta-item" style="border-right:none">
@@ -1342,7 +1340,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div id="sched-area" style="display:none">
             <div class="divider"></div>
             <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Questionnaires générés automatiquement</div>
-            <div class="sched-phase"><div class="sched-phase-title">Début du suivi</div><div class="sched-tags" id="sched-auto"></div></div>
+            <div class="sched-phase"><div class="sched-phase-title">J1</div><div class="sched-tags" id="sched-auto"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires</div><div class="sched-tags" id="sched-hetero"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Chaque vendredi en cure</div><div class="sched-tags" id="sched-weekly"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Mensuel × 6 mois consolidation</div><div class="sched-tags" id="sched-monthly"></div></div>
@@ -1415,8 +1413,8 @@ body.role-saisie .analyse-only { display:none !important; }
           Code : <strong class="mono" id="c-code">—</strong><br>
           <span id="c-details">
             Protocole(s) : <strong id="c-prots">—</strong><br>
-            Début du suivi : <strong id="c-j1">—</strong><br>
-            Fin du suivi : <strong id="c-end">—</strong>
+            J1 : <strong id="c-j1">—</strong><br>
+            Fin de cure : <strong id="c-end">—</strong>
           </span>
           <span id="c-postcure-details" style="display:none">
             Mode : <strong>Consolidation directe</strong><br>
@@ -2210,7 +2208,7 @@ function genSchedule(p) {
   Object.entries(byEnd).forEach(([endDate, names]) => {
     const qs = getProtoQs(names);
     const label = Object.keys(byEnd).length > 1
-      ? 'Fin du suivi — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
+      ? 'Fin de cure — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
       : 'Bilan de fin de suivi';
     sched.push({date:endDate, questionnaires:[...qs.endCure], hetero:[...qs.heteroEnd], done:[], type:'end', label});
   });
@@ -2227,7 +2225,8 @@ function genSchedule(p) {
   }
 
   // Sort chronologically, dedupe same-date same-type
-  sched.sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  function _slotSortKey(s){return s.date+(s.type==='parcours_end'?'z':'a');}
+  sched.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
   return sched;
 }
 
@@ -2356,8 +2355,6 @@ function renderPatientList(filter={}) {
   const hasOverdue = (p) => (p.schedule||[]).some(s => s.date < tod && (s.questionnaires||[]).some(q => !(s.done||[]).includes(q) && !(s.ignored||[]).includes(q)));
   if(sort==='j1_desc') pts.sort((a,b)=>(b.j1Date||'').localeCompare(a.j1Date||''));
   else if(sort==='j1_asc') pts.sort((a,b)=>(a.j1Date||'').localeCompare(b.j1Date||''));
-  else if(sort==='created_desc') pts.sort((a,b)=>{ const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt||0); const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt||0); return tb-ta; });
-  else if(sort==='created_asc') pts.sort((a,b)=>{ const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt||0); const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt||0); return ta-tb; });
   else if(sort==='retard') pts.sort((a,b)=>(hasOverdue(b)?1:0)-(hasOverdue(a)?1:0));
   else pts.sort((a,b)=>(a.code||'').localeCompare(b.code||'','fr'));
   list.innerHTML=pts.length===0?'<div class="empty"><p>Aucun patient trouvé</p></div>':pts.map(patRowHTML).join('');
@@ -3098,7 +3095,7 @@ function renderQuestion() {
     const steps = cfg ? cfg.steps - 1 : 10;
     const labelMin = cfg ? cfg.labelMin : String(min);
     const labelMax = cfg ? cfg.labelMax : String(max);
-    const curVal = currentQ.answers[idx] !== undefined ? currentQ.answers[idx] : min;
+    const curVal = currentQ.answers[idx] !== undefined ? currentQ.answers[idx] : Math.round((min+max)/2);
     optEl.innerHTML =
       '<div style="padding:20px 0">' +
       '<div style="font-size:28px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:16px" id="slider-val-display">' + curVal + '</div>' +
@@ -4053,7 +4050,8 @@ function checkQRToken() {
       return true;
     }
     pqState = {patientId:data.patientId, qName:data.qName, date:data.date||new Date().toISOString().split('T')[0], answers:[], idx:0, token};
-    showPatientQScreen();
+    // Charger la config Excel (questionnaires xlsx comme 15D) avant d'afficher
+    loadExcelConfig().then(function(){ showPatientQScreen(); }).catch(function(){ showPatientQScreen(); });
     return true;
   } catch(e) { return false; }
 }
@@ -4247,7 +4245,7 @@ function renderPQQuestion() {
     const steps = cfg ? cfg.steps - 1 : 10;
     const labelMin = cfg ? cfg.labelMin : String(min);
     const labelMax = cfg ? cfg.labelMax : String(max);
-    const curVal = pqState.answers[idx] !== undefined ? pqState.answers[idx] : min;
+    const curVal = pqState.answers[idx] !== undefined ? pqState.answers[idx] : Math.round((min+max)/2);
     optEl.innerHTML =
       '<div style="padding:24px 0">' +
       '<div style="font-size:48px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:20px" id="pq-slider-val">' + curVal + '</div>' +
@@ -4509,14 +4507,16 @@ async function loadCohorte() {
   if(fromDate) pts = pts.filter(p=>p.j1Date>=fromDate);
   if(toDate) pts = pts.filter(p=>p.j1Date<=toDate);
 
-  // Intervention selector : valeurs normalisées uniquement (3 options fixes)
+  // Populate intervention selector dynamically from filtered patients
   const iSel = document.getElementById('coh-intervention');
   if(iSel) {
+    const subtypes = new Set();
+    pts.forEach(p => (p.parcours||[]).forEach(parc => {
+      if(parc.subtype) Object.values(parc.subtype).forEach(v => { if(v) subtypes.add(v); });
+    }));
     const current = iSel.value;
     iSel.innerHTML = '<option value="all">Toutes</option>'
-      + '<option value="nouveau"'+(current==='nouveau'?' selected':'')+'>Nouveau traitement</option>'
-      + '<option value="add-on"'+(current==='add-on'?' selected':'')+'>Add-on</option>'
-      + '<option value="switch"'+(current==='switch'?' selected':'')+'>Switch</option>';
+      + [...subtypes].sort().map(s => '<option value="'+s+'"'+(s===current?' selected':'')+'>'+s+'</option>').join('');
   }
 
   // Extract scores per patient
@@ -5792,14 +5792,16 @@ let _chartGeneration = 0; // incremented on each renderScoreCharts call to cance
 function renderScoreCharts(byQ) {
   const el = document.getElementById('scores-charts');
   if(!el) return;
-  // Destroy existing charts
+  // Destroy existing charts synchronously before anything else
   Object.values(patientCharts).forEach(c => { try { c.destroy(); } catch(e) {} });
   patientCharts = {};
-  // Increment generation — stale rAF callbacks from previous patient will be ignored
+  // Increment generation — stale rAF callbacks from previous calls will be ignored
   const myGeneration = ++_chartGeneration;
+  // Clear DOM immediately so stale charts never flash
+  el.innerHTML = '';
 
   const qsWithMultiple = Object.entries(byQ).filter(([q, scores]) => scores.length >= 1);
-  if(!qsWithMultiple.length) { el.innerHTML = ''; return; }
+  if(!qsWithMultiple.length) return;
 
   el.innerHTML = '<div class="g2" id="pat-charts-grid"></div>';
   const grid = document.getElementById('pat-charts-grid');
@@ -5830,7 +5832,7 @@ function renderScoreCharts(byQ) {
     requestAnimationFrame(() => {
       if(myGeneration !== _chartGeneration) return; // patient changed, abort
       const canvas = document.getElementById(canvasId);
-      if(!canvas) return;
+      if(!canvas || !canvas.isConnected) return; // DOM cleared, abort
       patientCharts[q] = new Chart(canvas, {
         type: 'line',
         data: {
@@ -6385,7 +6387,7 @@ async function moveQToToday(patientId, qName, fromDate) {
     schedule.push({date:today, questionnaires:[qName], hetero:[], done:[], type:'moved', label:'Questionnaire avancé'});
   }
   // Sort schedule by date
-  schedule.sort((a,b) => a.date.localeCompare(b.date));
+  schedule.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
   await patRef.update({schedule});
   NS.currentPatient.schedule = schedule;
   renderTimeline();
@@ -7051,7 +7053,8 @@ async function confirmAddParcours() {
       existing.questionnaires = [...existing.questionnaires, ...newQs];
     }
   });
-  mergedSchedule.sort((a,b)=>a.date<b.date?-1:1);
+  if(!window._slotSortKey) window._slotSortKey=function(s){return s.date+(s.type==='parcours_end'?'z':'a');};
+  mergedSchedule.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
 
   // Store parcours in patient.parcours array
   const existingParcours = p.parcours || [];
@@ -7187,7 +7190,7 @@ async function confirmAddProtocol() {
       mergedSchedule.push({...ns});
     }
   });
-  mergedSchedule.sort((a,b) => a.date<b.date?-1:a.date>b.date?1:0);
+  mergedSchedule.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
 
   // Update endDate to latest
   const newEndDate = newProtos.reduce((m,pr)=>pr.endDate>m?pr.endDate:m,'');
@@ -7415,7 +7418,7 @@ async function saveConsolidation() {
     });
     iteration++;
   }
-  schedule.sort((a,b) => a.date.localeCompare(b.date));
+  schedule.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
 
   await db.doc('patients/'+p.id).update({
     schedule,
@@ -7492,7 +7495,7 @@ async function addSingleQuestionnaire() {
       label
     });
   }
-  schedule.sort((a,b) => a.date.localeCompare(b.date));
+  schedule.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
 
   await db.doc('patients/'+p.id).update({schedule});
   logAccess('add_single_q', p.code + ' · ' + qName + ' · ' + date);
