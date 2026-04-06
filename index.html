@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-HHhMM</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.05-13h14</span>
       </div>
     </div>
   </div>
@@ -709,6 +709,8 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="code">Tri : Code A→Z</option>
           <option value="j1_desc">Tri : Début récent</option>
           <option value="j1_asc">Tri : Début ancien</option>
+          <option value="created_desc">Tri : Création récente</option>
+          <option value="created_asc">Tri : Création ancienne</option>
           <option value="retard">Tri : En retard d'abord</option>
         </select>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({status:this.value})">
@@ -789,11 +791,11 @@ body.role-saisie .analyse-only { display:none !important; }
             <div class="meta-val" id="pd-dob">—</div>
           </div>
           <div class="ph-meta-item">
-            <div class="meta-label">J1 — 1ère séance</div>
+            <div class="meta-label">Début du suivi</div>
             <div class="meta-val" id="pd-j1">—</div>
           </div>
           <div class="ph-meta-item">
-            <div class="meta-label">Fin de cure estimée</div>
+            <div class="meta-label">Fin du suivi estimée</div>
             <div class="meta-val" id="pd-end">—</div>
           </div>
           <div class="ph-meta-item" style="border-right:none">
@@ -832,7 +834,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <div id="tc-notes" class="tab-content">
         <div class="card" style="margin-bottom:12px">
           <div class="fg" style="margin-bottom:8px"><label>Nouvelle note</label><textarea id="note-input" rows="3" placeholder="Observation clinique, événement notable…" autocomplete="off"></textarea></div>
-          <button class="btn btn-primary btn-sm" onclick="btnLoading(this,saveNote())">Enregistrer la note</button>
+          <button class="btn btn-primary btn-sm" onclick="saveNote()">Enregistrer la note</button>
         </div>
         <div id="notes-list"></div>
       </div>
@@ -1340,7 +1342,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div id="sched-area" style="display:none">
             <div class="divider"></div>
             <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Questionnaires générés automatiquement</div>
-            <div class="sched-phase"><div class="sched-phase-title">J1</div><div class="sched-tags" id="sched-auto"></div></div>
+            <div class="sched-phase"><div class="sched-phase-title">Début du suivi</div><div class="sched-tags" id="sched-auto"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Hétéro-questionnaires</div><div class="sched-tags" id="sched-hetero"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Chaque vendredi en cure</div><div class="sched-tags" id="sched-weekly"></div></div>
             <div class="sched-phase"><div class="sched-phase-title">Mensuel × 6 mois consolidation</div><div class="sched-tags" id="sched-monthly"></div></div>
@@ -1413,8 +1415,8 @@ body.role-saisie .analyse-only { display:none !important; }
           Code : <strong class="mono" id="c-code">—</strong><br>
           <span id="c-details">
             Protocole(s) : <strong id="c-prots">—</strong><br>
-            J1 : <strong id="c-j1">—</strong><br>
-            Fin de cure : <strong id="c-end">—</strong>
+            Début du suivi : <strong id="c-j1">—</strong><br>
+            Fin du suivi : <strong id="c-end">—</strong>
           </span>
           <span id="c-postcure-details" style="display:none">
             Mode : <strong>Consolidation directe</strong><br>
@@ -1512,7 +1514,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="cabinet-check" value="NeuroStim Étoile"> NeuroStim Étoile</label>
       <label style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px"><input type="checkbox" class="cabinet-check" value="NeuroStim Luxembourg"> NeuroStim Luxembourg</label>
     </div>
-    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('m-add-user')">Annuler</button><button class="btn btn-primary" onclick="btnLoading(this,createUser())">Créer le compte</button></div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeModal('m-add-user')">Annuler</button><button class="btn btn-primary" onclick="createUser()">Créer le compte</button></div>
   </div>
 </div>
 
@@ -1730,7 +1732,7 @@ body.role-saisie .analyse-only { display:none !important; }
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-add-pem')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,savePEM())">Enregistrer</button>
+      <button class="btn btn-primary" onclick="savePEM()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -1751,7 +1753,7 @@ body.role-saisie .analyse-only { display:none !important; }
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-add-single-q')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,addSingleQuestionnaire())">Ajouter au calendrier</button>
+      <button class="btn btn-primary" onclick="addSingleQuestionnaire()">Ajouter au calendrier</button>
     </div>
   </div>
 </div>
@@ -2208,7 +2210,7 @@ function genSchedule(p) {
   Object.entries(byEnd).forEach(([endDate, names]) => {
     const qs = getProtoQs(names);
     const label = Object.keys(byEnd).length > 1
-      ? 'Fin de cure — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
+      ? 'Fin du suivi — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
       : 'Bilan de fin de suivi';
     sched.push({date:endDate, questionnaires:[...qs.endCure], hetero:[...qs.heteroEnd], done:[], type:'end', label});
   });
@@ -2280,8 +2282,6 @@ function showApp() {
   cabSel.innerHTML='';
   const cabs=p.role==='admin'?['NeuroStim Bastille','NeuroStim Étoile','NeuroStim Luxembourg']:(p.cabinets||[]);
   cabs.sort().forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; cabSel.appendChild(o); });
-  // Restaurer le dernier cabinet choisi (persistance multi-session via Firestore)
-  if(p.lastCabinet && cabs.includes(p.lastCabinet)) cabSel.value=p.lastCabinet;
   // Apply role class to body for CSS-based hiding
   document.body.classList.remove('role-lecture','role-saisie','role-admin');
   document.body.classList.add('role-'+p.role);
@@ -2356,6 +2356,8 @@ function renderPatientList(filter={}) {
   const hasOverdue = (p) => (p.schedule||[]).some(s => s.date < tod && (s.questionnaires||[]).some(q => !(s.done||[]).includes(q) && !(s.ignored||[]).includes(q)));
   if(sort==='j1_desc') pts.sort((a,b)=>(b.j1Date||'').localeCompare(a.j1Date||''));
   else if(sort==='j1_asc') pts.sort((a,b)=>(a.j1Date||'').localeCompare(b.j1Date||''));
+  else if(sort==='created_desc') pts.sort((a,b)=>{ const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt||0); const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt||0); return tb-ta; });
+  else if(sort==='created_asc') pts.sort((a,b)=>{ const ta=a.createdAt?.toMillis?a.createdAt.toMillis():(a.createdAt||0); const tb=b.createdAt?.toMillis?b.createdAt.toMillis():(b.createdAt||0); return ta-tb; });
   else if(sort==='retard') pts.sort((a,b)=>(hasOverdue(b)?1:0)-(hasOverdue(a)?1:0));
   else pts.sort((a,b)=>(a.code||'').localeCompare(b.code||'','fr'));
   list.innerHTML=pts.length===0?'<div class="empty"><p>Aucun patient trouvé</p></div>':pts.map(patRowHTML).join('');
@@ -2403,19 +2405,16 @@ function loadDashboard() {
       else if(s.date>tod&&s.date<=addDays(tod,7)) upcomingItems.push(item);
     });
   });
-  const totalActive=pts.filter(p=>p.status==='cure'||(p.status!=='termine'&&(p.parcours||[]).some(parc=>parc.status==='actif'))).length;
   document.getElementById('stat-today').textContent=todayItems.length;
   document.getElementById('stat-overdue').textContent=overdueItems.length;
   document.getElementById('stat-upcoming').textContent=upcomingItems.length;
-  document.getElementById('stat-total').textContent=totalActive;
+  document.getElementById('stat-total').textContent=pts.filter(p=>p.status==='cure'||(p.status!=='termine'&&(p.parcours||[]).some(parc=>parc.status==='actif'))).length;
   const badge=document.getElementById('nav-badge');
   const urgent=overdueItems.length+todayItems.length;
   badge.textContent=urgent; badge.style.display=urgent>0?'inline':'none';
   renderTodayList(todayItems,overdueItems);
   renderWeekView();
-
 }
-
 
 function renderTodayList(todayItems,overdueItems) {
   const el=document.getElementById('today-list'); if(!el) return;
@@ -2594,9 +2593,9 @@ function renderTimeline() {
     return !!NS.timelineShowAll;
   });
   const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
-
-  // ── Inner function: render a single slot ──
-  function slotHTML(s) {
+  _schedule.forEach(s=>{
+    // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
+    // But do NOT re-merge for interrupted patients — their schedule was already purged
     let slotQs = s.questionnaires||[];
     if(!isInterrupted) {
       if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
@@ -2610,9 +2609,10 @@ function renderTimeline() {
     const allDone=rem.length===0&&qs.length>0;
     const grpCls=allDone?'done':isPast?'overdue':isToday?'today-group':'upcoming';
     const icon=allDone?'✓':isPast?'⚠':isToday?'●':'○';
+    // Parcours slots get a purple accent
     const isParcours = s.type==='parcours'||s.type==='parcours_suivi'||s.type==='parcours_end';
     const grpStyle = isParcours ? ' style="border-left:3px solid var(--purple)"' : '';
-    let out='<div class="tl-group '+grpCls+'"'+grpStyle+'>'
+    html+='<div class="tl-group '+grpCls+'"'+grpStyle+'>'
       +'<div class="tl-group-header"><span class="tl-icon">'+icon+'</span>'
       +(isParcours?'<span style="font-size:10px;background:var(--purple-bg);color:var(--purple);border-radius:3px;padding:1px 5px;margin-right:4px">Parcours</span>':'')
       +'<span class="tl-label">'+s.label+'</span>'
@@ -2631,15 +2631,14 @@ function renderTimeline() {
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(\''+q+'\',\''+s.date+'\')">'
-              +((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel?(typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel:resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
-             +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(\''+q+'\',\''+s.date+'\')">📋 Voir les réponses</div>':'')
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
+             +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
           +(!isDone&&NS.userProfile&&NS.userProfile.role!=='lecture'?'<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
-              +((isToday||isPast)?'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')"> '+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>':'')
-              +((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">📅 Répondre maintenant</button>':'')
-              +'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">✕ Ignorer</button>'
+              +((isToday||isPast)?'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>':'')
+              +((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Avancer à aujourd\'hui">📅 Répondre maintenant</button>':'')
+              +'<button class="btn btn-xs btn-ghost write-only" style="color:var(--text3);font-size:10px" onclick="ignoreQuestionnaire(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Ignorer">✕ Ignorer</button>'
               +'</div>':'')
           +'</div>';
       }).join('')
@@ -2648,43 +2647,7 @@ function renderTimeline() {
         +((isToday||isPast)?'<button class="btn btn-xs btn-ghost write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">📋 Remplir</button>':'')
         +'</div>').join('')
       +'</div></div>';
-    return out;
-  }
-
-  // ── Collapse by month when schedule > 10 visible slots ──
-  if(_schedule.length > 10) {
-    const byMonth={}, monthOrder=[];
-    _schedule.forEach(s=>{
-      const ym=s.date.substring(0,7);
-      if(!byMonth[ym]){byMonth[ym]=[];monthOrder.push(ym);}
-      byMonth[ym].push(s);
-    });
-    function mIsDone(slots){return slots.every(s=>{const qs=s.questionnaires||[],d=s.done||[];return s.date<tod&&qs.length>0&&qs.every(q=>d.includes(q));});}
-    function mLabel(ym){const pts=ym.split('-');return ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][parseInt(pts[1],10)-1]+' '+pts[0];}
-    if(!NS.tlCollapsed) NS.tlCollapsed={};
-    monthOrder.forEach(ym=>{
-      const slots=byMonth[ym];
-      const done=mIsDone(slots);
-      if(NS.tlCollapsed[ym]===undefined) NS.tlCollapsed[ym]=done;
-      const collapsed=NS.tlCollapsed[ym];
-      const doneN=slots.filter(s=>{const qs=s.questionnaires||[],d=s.done||[];return qs.length>0&&qs.every(q=>d.includes(q));}).length;
-      const hasOverdue=slots.some(s=>s.date<tod&&(s.questionnaires||[]).some(q=>!(s.done||[]).includes(q)));
-      const dot=done?'var(--green)':hasOverdue?'var(--red)':'var(--accent)';
-      const statusTxt=(done?'✓ ':'')+doneN+'/'+slots.length+' complété'+(doneN>1?'s':'');
-      html+='<div style="margin-bottom:8px">'
-        +'<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;user-select:none" onclick="if(!NS.tlCollapsed)NS.tlCollapsed={};NS.tlCollapsed[\''+ym+'\']= !NS.tlCollapsed[\''+ym+'\'];renderTimeline()">'
-        +'<span style="width:9px;height:9px;border-radius:50%;background:'+dot+';flex-shrink:0"></span>'
-        +'<span style="font-size:13px;font-weight:600;flex:1">'+mLabel(ym)+'</span>'
-        +'<span style="font-size:11px;color:var(--text3)">'+statusTxt+'</span>'
-        +'<span style="font-size:13px;color:var(--text3);margin-left:6px">'+(collapsed?'▶':'▼')+'</span>'
-        +'</div>'
-        +(collapsed?'':'<div style="padding-top:4px">'+slots.map(slotHTML).join('')+'</div>')
-        +'</div>';
-    });
-  } else {
-    _schedule.forEach(s=>{ html+=slotHTML(s); });
-  }
-
+  });
   if(_hiddenCount > 0 && !NS.timelineShowAll) {
     html += '<div style="text-align:center;padding:12px">'
       + '<button class="btn btn-ghost btn-sm" style="color:var(--text3);font-size:12px" onclick="NS.timelineShowAll=true;renderTimeline()">'
@@ -3135,7 +3098,7 @@ function renderQuestion() {
     const steps = cfg ? cfg.steps - 1 : 10;
     const labelMin = cfg ? cfg.labelMin : String(min);
     const labelMax = cfg ? cfg.labelMax : String(max);
-    const curVal = currentQ.answers[idx] !== undefined ? currentQ.answers[idx] : Math.round((min+max)/2);
+    const curVal = currentQ.answers[idx] !== undefined ? currentQ.answers[idx] : min;
     optEl.innerHTML =
       '<div style="padding:20px 0">' +
       '<div style="font-size:28px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:16px" id="slider-val-display">' + curVal + '</div>' +
@@ -4284,7 +4247,7 @@ function renderPQQuestion() {
     const steps = cfg ? cfg.steps - 1 : 10;
     const labelMin = cfg ? cfg.labelMin : String(min);
     const labelMax = cfg ? cfg.labelMax : String(max);
-    const curVal = pqState.answers[idx] !== undefined ? pqState.answers[idx] : Math.round((min+max)/2);
+    const curVal = pqState.answers[idx] !== undefined ? pqState.answers[idx] : min;
     optEl.innerHTML =
       '<div style="padding:24px 0">' +
       '<div style="font-size:48px;font-weight:700;text-align:center;color:var(--accent);margin-bottom:20px" id="pq-slider-val">' + curVal + '</div>' +
@@ -4546,16 +4509,14 @@ async function loadCohorte() {
   if(fromDate) pts = pts.filter(p=>p.j1Date>=fromDate);
   if(toDate) pts = pts.filter(p=>p.j1Date<=toDate);
 
-  // Populate intervention selector dynamically from filtered patients
+  // Intervention selector : valeurs normalisées uniquement (3 options fixes)
   const iSel = document.getElementById('coh-intervention');
   if(iSel) {
-    const subtypes = new Set();
-    pts.forEach(p => (p.parcours||[]).forEach(parc => {
-      if(parc.subtype) Object.values(parc.subtype).forEach(v => { if(v) subtypes.add(v); });
-    }));
     const current = iSel.value;
     iSel.innerHTML = '<option value="all">Toutes</option>'
-      + [...subtypes].sort().map(s => '<option value="'+s+'"'+(s===current?' selected':'')+'>'+s+'</option>').join('');
+      + '<option value="nouveau"'+(current==='nouveau'?' selected':'')+'>Nouveau traitement</option>'
+      + '<option value="add-on"'+(current==='add-on'?' selected':'')+'>Add-on</option>'
+      + '<option value="switch"'+(current==='switch'?' selected':'')+'>Switch</option>';
   }
 
   // Extract scores per patient
@@ -5187,8 +5148,6 @@ async function loadCabinetsList() {
     const names = cabinets.map(function(c){return c.name;});
     const userCabs = NS.userProfile.role==='admin' ? names : (NS.userProfile.cabinets||[]);
     userCabs.forEach(function(c){ const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===current) o.selected=true; cabSel.appendChild(o); });
-    // Restaurer lastCabinet si le select n'a pas encore de valeur cohérente
-    if(!current && NS.userProfile.lastCabinet && userCabs.includes(NS.userProfile.lastCabinet)) cabSel.value=NS.userProfile.lastCabinet;
   }
 }
 async function saveCabinets(list) {
@@ -5757,21 +5716,6 @@ function computeScore(qKey, answers) {
 // ════════════════════════════════════════════════
 // ERROR HANDLING
 // ════════════════════════════════════════════════
-// ── Spinner inline sur bouton ──
-// Usage : btnLoading(btnElement, asyncFn())
-function btnLoading(btn, promise) {
-  if(!btn) return promise;
-  const orig = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px">'
-    + '<span style="width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>'
-    + '<span>En cours…</span></span>';
-  return Promise.resolve(promise).finally(()=>{
-    btn.disabled = false;
-    btn.innerHTML = orig;
-  });
-}
-
 function showError(msg, duration) {
   const banner = document.getElementById('error-banner');
   const msgEl = document.getElementById('error-banner-msg');
@@ -8616,10 +8560,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
   const cabSel=document.getElementById('cabinet-sel');
-  if(cabSel) cabSel.addEventListener('change',function(){
-    loadPatients();
-    if(NS.user) db.doc('users/'+NS.user.uid).update({lastCabinet: cabSel.value}).catch(()=>{});
-  });
+  if(cabSel) cabSel.addEventListener('change',loadPatients);
   const pwd=document.getElementById('login-pwd');
   if(pwd) pwd.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
   // Attach login button click handler explicitly
@@ -8683,7 +8624,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-patient')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,saveEditPatient())">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveEditPatient()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8699,7 +8640,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-adjust-dates')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,saveAdjustDates())">Recalculer le calendrier</button>
+      <button class="btn btn-primary" onclick="saveAdjustDates()">Recalculer le calendrier</button>
     </div>
   </div>
 </div>
@@ -8715,7 +8656,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-note')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,saveEditNote())">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveEditNote()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8837,7 +8778,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-consolidation')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,saveConsolidation())">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveConsolidation()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -8870,7 +8811,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-user')">Annuler</button>
-      <button class="btn btn-primary" onclick="btnLoading(this,saveEditUser())">Enregistrer</button>
+      <button class="btn btn-primary" onclick="saveEditUser()">Enregistrer</button>
     </div>
   </div>
 </div>
