@@ -2224,9 +2224,15 @@ function genSchedule(p) {
     }
   }
 
-  // Sort chronologically, dedupe same-date same-type
-  function _slotSortKey(s){return s.date+(s.type==='parcours_end'?'z':'a');}
-  sched.sort((a,b)=>{const ka=_slotSortKey(a),kb=_slotSortKey(b);return ka<kb?-1:ka>kb?1:0;});
+  // Sort chronologically with type-aware ordering for same-date slots
+  const _schedTypeOrder = {'consent':0,'j1':1,'weekly':2,'parcours':3,'parcours_suivi':4,'monthly':5,'end':6,'parcours_end':7};
+  sched.sort((a,b) => {
+    if(a.date < b.date) return -1;
+    if(a.date > b.date) return 1;
+    const oa = _schedTypeOrder[a.type] !== undefined ? _schedTypeOrder[a.type] : 4;
+    const ob = _schedTypeOrder[b.type] !== undefined ? _schedTypeOrder[b.type] : 4;
+    return oa - ob;
+  });
   return sched;
 }
 
@@ -2390,7 +2396,7 @@ function loadDashboard() {
     // Hide future slots beyond 7 days unless timelineShowAll
     return !!NS.timelineShowAll;
   });
-  const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
+  const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
   _schedule.forEach(s=>{
       const done=s.done||[], ignored=s.ignored||[], rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
       if(rem.length===0) return;
@@ -2476,7 +2482,7 @@ function renderWeekView() {
     // Hide future slots beyond 7 days unless timelineShowAll
     return !!NS.timelineShowAll;
   });
-  const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
+  const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
   _schedule.forEach(s=>{
         if(s.date===day) {
           const rem=(s.questionnaires||[]).filter(q=>!(s.done||[]).includes(q));
@@ -2581,7 +2587,16 @@ function renderTimeline() {
   const isInterrupted = !!p.interruptDate;
   const _tod = todayStr();
   const _cutoff = (function(){ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
-  const _schedule = (p.schedule||[]).filter(s => {
+  // Re-trier au rendu pour corriger les patients deja sauvegardes avec un mauvais ordre
+  const _tlTypeOrder = {'consent':0,'j1':1,'weekly':2,'parcours':3,'parcours_suivi':4,'monthly':5,'end':6,'parcours_end':7};
+  const _sortedSchedule = (p.schedule||[]).slice().sort((a,b) => {
+    if(a.date < b.date) return -1;
+    if(a.date > b.date) return 1;
+    const oa = _tlTypeOrder[a.type] !== undefined ? _tlTypeOrder[a.type] : 4;
+    const ob = _tlTypeOrder[b.type] !== undefined ? _tlTypeOrder[b.type] : 4;
+    return oa - ob;
+  });
+  const _schedule = _sortedSchedule.filter(s => {
     // Always show: past slots, today, slots with completions, slots within 7 days
     if(s.date <= _tod) return true;
     if((s.done||[]).length > 0) return true;
@@ -2589,7 +2604,7 @@ function renderTimeline() {
     // Hide future slots beyond 7 days unless timelineShowAll
     return !!NS.timelineShowAll;
   });
-  const _hiddenCount = (p.schedule||[]).filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
+  const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
   _schedule.forEach(s=>{
     // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
     // But do NOT re-merge for interrupted patients — their schedule was already purged
@@ -7136,6 +7151,14 @@ function genParcoursSlotsSlots(parc) {
       }
       iter++;
     }
+  });
+
+  // Trier chronologiquement : parcours_end toujours apres les slots intermediaires a meme date
+  const _pTypeOrder = {'parcours':0,'parcours_suivi':1,'parcours_end':2};
+  slots.sort((a,b) => {
+    if(a.date < b.date) return -1;
+    if(a.date > b.date) return 1;
+    return (_pTypeOrder[a.type]||1) - (_pTypeOrder[b.type]||1);
   });
 
   return slots;
