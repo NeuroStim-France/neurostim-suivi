@@ -2380,14 +2380,15 @@ function patRowHTML(p) {
   const prots=normalizeProtocols(p).map(pr=>(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'⛔':'')).join(', ');
   return '<div class="patient-row" onclick="openPatient(\''+p.id+'\')">'
     +'<div class="pat-av">'+ini+'</div>'
-    +'<div class="pat-left"><div class="pat-code">'+(p.code||'—')+'</div>'
+    +'<div class="pat-left"><div class="pat-code" style="display:flex;align-items:baseline;gap:10px">'+(p.code||'—')
+    +(p.createdAt||p.createdBy ? '<span style="font-size:10px;color:var(--text3);font-weight:400;white-space:nowrap">Créé le '
+    +(p.createdAt ? fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
+    +(p.createdBy ? ' par '+(p.createdBy.includes('@')?p.createdBy.split('@')[0]:p.createdBy) : '')
+    +'</span>' : '')
+    +'</div>'
     +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
     +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span>'
     +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span>'
-    +(p.createdAt||p.createdBy ? '<span style="font-size:10px;color:var(--text3);font-weight:400">'
-    +(p.createdAt ? fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
-    +(p.createdBy ? ' · '+(p.createdBy.includes('@')?p.createdBy.split('@')[0]:p.createdBy) : '')
-    +'</span>' : '')
     +'</div></div>'
     +'<div class="pat-right">'+sb+'</div></div>';
 }
