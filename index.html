@@ -2033,12 +2033,41 @@ const QUESTIONNAIRES = {
     questions: [], options: [],
     maxScore: 1, scoreLabel: 'score qualité de vie',
     _calcType: 'conversion_table',
+    higherIsBetter: true,
+    // Scores dimensions (0-1) par dimension × niveau de réponse (1-5)
+    // Utilisés pour le graphique radar — source : table officielle 15D
+    _dimScores: [
+      [1,0.7129,0.4729,0.2526,0.078],   // 1. Mobilité
+      [1,0.784,0.4901,0.3137,0.1089],   // 2. Vue
+      [1,0.7497,0.4611,0.2353,0.1003],  // 3. Ouïe
+      [1,0.6976,0.4771,0.2581,0.0879],  // 4. Respiration
+      [1,0.7615,0.5124,0.3015,0.1115],  // 5. Sommeil
+      [1,0.6462,0.4267,0.1984,0.071],   // 6. Repas
+      [1,0.7033,0.4322,0.2471,0.1298],  // 7. Parole
+      [1,0.6845,0.3958,0.1764,0.0558],  // 8. Toilettes
+      [1,0.721,0.4133,0.2182,0.0785],   // 9. Activités habituelles
+      [1,0.6434,0.375,0.1956,0.0489],   // 10. Facultés mentales
+      [1,0.7024,0.396,0.2083,0.0617],   // 11. Gêne/symptômes
+      [1,0.7651,0.5148,0.3053,0.1576],  // 12. Humeur/dépression
+      [1,0.7251,0.4786,0.2633,0.1255],  // 13. Anxiété
+      [1,0.7713,0.5152,0.2957,0.1253],  // 14. Vitalité
+      [1,0.7095,0.4424,0.2486,0.1318],  // 15. Activité sexuelle
+    ],
+    _dimLabels: ['Mobilité','Vue','Ouïe','Respiration','Sommeil','Repas','Parole','Toilettes','Activités','Facultés mentales','Gêne/symptômes','Humeur','Anxiété','Vitalité','Sexualité'],
     interpret: function(s) {
       if(s >= 0.85) return {label: 'Très bonne QdV', color: 'green'};
       if(s >= 0.70) return {label: 'Bonne QdV', color: 'green'};
       if(s >= 0.55) return {label: 'QdV modérée', color: 'amber'};
       if(s >= 0.40) return {label: 'QdV altérée', color: 'orange'};
       return {label: 'QdV très altérée', color: 'red'};
+    },
+    // Interprétation du delta selon seuils officiels 15D
+    interpretDelta: function(delta) {
+      if(delta > 0.035)  return {label: 'Beaucoup mieux', color: 'green'};
+      if(delta >= 0.015) return {label: 'Légèrement mieux', color: 'green'};
+      if(delta > -0.015) return {label: 'À peu près pareil', color: 'gray'};
+      if(delta >= -0.035) return {label: 'Légèrement moins bien', color: 'amber'};
+      return {label: 'Beaucoup moins bien', color: 'red'};
     }
   },
 
@@ -5852,6 +5881,8 @@ function renderScoreCharts(byQ) {
     const interp = qi.interpret ? qi.interpret(last) : {label:'', color:'gray'};
     const higherIsBetter = !!(qi && qi.higherIsBetter);
     const chartColor = (delta < 0 && !higherIsBetter) || (delta > 0 && higherIsBetter) ? '#1a6b3c' : (delta !== 0) ? '#8b1f1f' : '#1a4d8f';
+    // Pour le 15D : utiliser interpretDelta avec les vrais seuils cliniques
+    const deltaInterp = (qi.interpretDelta && delta !== null) ? qi.interpretDelta(delta) : null;
 
     const canvasId = 'chart-pat-'+q.replace(/[^a-zA-Z0-9]/g,'');
     const card = document.createElement('div');
@@ -5860,7 +5891,7 @@ function renderScoreCharts(byQ) {
       +'<div style="font-size:13px;font-weight:600">'+q+'</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span class="badge b-'+interp.color+'" style="font-size:10px">'+interp.label+'</span>'
-      +'<span style="font-size:12px;font-weight:700;color:'+((delta<0&&!higherIsBetter)||(delta>0&&higherIsBetter)?'var(--green)':delta!==0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2))+'</span>'
+      +(deltaInterp ? '<span class="badge b-'+deltaInterp.color+'" style="font-size:10px">'+deltaInterp.label+'</span>' : '<span style="font-size:12px;font-weight:700;color:'+((delta<0&&!higherIsBetter)||(delta>0&&higherIsBetter)?'var(--green)':delta!==0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2))+'</span>')
       +'</div></div>'
       +'<div style="position:relative;height:130px"><canvas id="'+canvasId+'"></canvas></div>';
     grid.appendChild(card);
@@ -5891,12 +5922,22 @@ function renderScoreCharts(byQ) {
           layout: { padding: { top: 16, left: 4, right: 4 } },
           plugins: { legend: { display: false } },
           scales: {
-            y: {
-              beginAtZero: false,
-              min: Math.max(0, Math.min(...data.filter(v=>v!==null)) - 1),
-              max: Math.max(...data.filter(v=>v!==null)) + Math.max(2, Math.ceil(Math.max(...data.filter(v=>v!==null))*0.15)),
-              grid: { color: '#e6e2db' }, ticks: { font: { size: 10 } }
-            },
+            y: (() => {
+              const validData = data.filter(v=>v!==null);
+              const dMin = Math.min(...validData);
+              const dMax = Math.max(...validData);
+              // Scores décimaux (0-1) : 15D, EQ-5D — axe fixe 0-1
+              if(dMax <= 1 && dMin >= 0) {
+                return { min: 0, max: 1, grid: { color: '#e6e2db' }, ticks: { font: { size: 10 }, callback: v => v.toFixed(2) } };
+              }
+              // Scores entiers : marge dynamique
+              return {
+                beginAtZero: false,
+                min: Math.max(0, dMin - 1),
+                max: dMax + Math.max(2, Math.ceil(dMax * 0.15)),
+                grid: { color: '#e6e2db' }, ticks: { font: { size: 10 } }
+              };
+            })(),
             x: {
               grid: { display: false },
               ticks: {
@@ -5911,6 +5952,142 @@ function renderScoreCharts(byQ) {
           elements: { point: { radius: data.length === 1 ? 6 : 4 }, line: { tension: data.length === 1 ? 0 : .3 } }
         }
       });
+    });
+  });
+
+  // ── Radar 15D : affiché si des réponses 15D existent ──────────────────
+  render15DRadar(myGeneration, myPatientId);
+}
+
+function render15DRadar(myGeneration, myPatientId) {
+  const el = document.getElementById('scores-charts');
+  if(!el) return;
+  const p = NS.currentPatient;
+  if(!p) return;
+  const qi = QUESTIONNAIRES['15D'];
+  if(!qi || !qi._dimScores || !qi._dimLabels) return;
+
+  // Récupérer toutes les réponses 15D triées par date
+  const resp15D = Object.values(p.responses||{})
+    .filter(r => r.questionnaire==='15D' && Array.isArray(r.answers) && r.answers.length>=15)
+    .sort((a,b) => a.date.localeCompare(b.date));
+  if(!resp15D.length) return;
+
+  // Calculer les scores dimensions pour J1 et dernière passation
+  function dimScores(answers) {
+    return answers.slice(0,15).map((a, i) => {
+      const row = qi._dimScores[i];
+      if(!row) return 0;
+      const idx = Math.max(0, Math.min(4, Math.round(a)));
+      return row[idx];
+    });
+  }
+
+  const first = resp15D[0];
+  const last  = resp15D[resp15D.length-1];
+  const scoresFirst = dimScores(first.answers);
+  const scoresLast  = dimScores(last.answers);
+  const isSame = first.date === last.date;
+
+  const labels = qi._dimLabels;
+
+  // Créer la carte radar
+  const radarId = 'chart-15d-radar';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = 'grid-column:1/-1;';
+  card.innerHTML =
+    '<div class="sec-header" style="margin-bottom:10px">'
+    +'<div style="font-size:13px;font-weight:600">15D — Profil par dimension</div>'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+    +(isSame
+      ? '<span style="font-size:11px;color:var(--text3)">'+fmtDate(first.date)+'</span>'
+      : '<span style="display:flex;align-items:center;gap:4px;font-size:11px">'
+        +'<span style="width:10px;height:3px;background:#2a6fc4;display:inline-block;border-radius:2px"></span> J1 ('+fmtDate(first.date)+')'
+        +'<span style="width:10px;height:3px;background:#1a7a4a;display:inline-block;border-radius:2px;margin-left:8px"></span> Dernière ('+fmtDate(last.date)+')'
+        +'</span>'
+    )
+    +'</div></div>'
+    +'<div style="position:relative;height:320px"><canvas id="'+radarId+'"></canvas></div>'
+    +'<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:6px">'
+    +'Score 0–1 par dimension — 1 = meilleure qualité de vie'
+    +'</div>';
+
+  let radarGrid = document.getElementById('pat-charts-grid');
+  if(!radarGrid) {
+    const elSC = document.getElementById('scores-charts');
+    if(!elSC) return;
+    if(!elSC.querySelector('#pat-charts-grid')) {
+      const newGrid = document.createElement('div');
+      newGrid.className = 'g2';
+      newGrid.id = 'pat-charts-grid';
+      elSC.appendChild(newGrid);
+    }
+    radarGrid = document.getElementById('pat-charts-grid');
+  }
+  if(!radarGrid) return;
+  radarGrid.insertBefore(card, radarGrid.firstChild);
+
+  requestAnimationFrame(() => {
+    if(myGeneration !== _chartGeneration) return;
+    const currentId = NS.currentPatient ? NS.currentPatient.id : null;
+    if(myPatientId !== currentId) return;
+    const canvas = document.getElementById(radarId);
+    if(!canvas || !canvas.isConnected) return;
+
+    const datasets = [];
+    if(!isSame) {
+      datasets.push({
+        label: 'J1 ('+fmtDate(first.date)+')',
+        data: scoresFirst,
+        borderColor: '#2a6fc4',
+        backgroundColor: 'rgba(42,111,196,0.08)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#2a6fc4',
+      });
+    }
+    datasets.push({
+      label: isSame ? fmtDate(last.date) : 'Dernière ('+fmtDate(last.date)+')',
+      data: scoresLast,
+      borderColor: '#1a7a4a',
+      backgroundColor: 'rgba(26,122,74,0.10)',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: '#1a7a4a',
+    });
+
+    patientCharts['15D_radar'] = new Chart(canvas, {
+      type: 'radar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: !isSame,
+            position: 'bottom',
+            labels: { font: { size: 10 }, boxWidth: 16, padding: 12 }
+          }
+        },
+        scales: {
+          r: {
+            min: 0, max: 1,
+            ticks: {
+              stepSize: 0.25,
+              font: { size: 9 },
+              backdropColor: 'transparent',
+              color: '#999',
+            },
+            pointLabels: {
+              font: { size: 10 },
+              color: '#444',
+            },
+            grid: { color: '#e0e8f4' },
+            angleLines: { color: '#d0d8e4' },
+          }
+        }
+      }
     });
   });
 }
