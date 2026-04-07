@@ -2160,6 +2160,14 @@ function fmtDob(d) {
   if(parts.length === 3) return parts[2]+'/'+parts[1]+'/'+parts[0];
   return d;
 }
+function fmtCode(code) {
+  // Affichage visuel uniquement : MAR-LAU-19770315 → MAR-LAU-15.03.1977
+  // La donnée stockée reste inchangée (AAAAMMJJ)
+  if(!code) return code;
+  var m = code.match(/^([A-Z]{3}-[A-Z]{3}-)(\d{4})(\d{2})(\d{2})$/);
+  if(m) return m[1]+m[4]+'.'+m[3]+'.'+m[2];
+  return code;
+}
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function addDays(ds,n) { const d=new Date(ds); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
 function dedupe(a) { return [...new Set(a)]; }
@@ -2409,7 +2417,7 @@ function patRowHTML(p) {
   const prots=normalizeProtocols(p).map(pr=>(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'⛔':'')).join(', ');
   return '<div class="patient-row" onclick="openPatient(\''+p.id+'\')">'
     +'<div class="pat-av">'+ini+'</div>'
-    +'<div class="pat-left"><div class="pat-code" style="display:flex;align-items:baseline;gap:10px">'+(p.code||'—')
+    +'<div class="pat-left"><div class="pat-code" style="display:flex;align-items:baseline;gap:10px">'+(fmtCode(p.code)||'—')
     +(p.createdAt||p.createdBy ? '<span style="font-size:10px;color:var(--text3);font-weight:400;white-space:nowrap">Créé le '
     +(p.createdAt ? fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
     +(p.createdBy ? ' par '+(p.createdBy.includes('@')?p.createdBy.split('@')[0]:p.createdBy) : '')
@@ -2487,7 +2495,7 @@ function dashItemHTML(item,type) {
   let html='<div class="dash-item '+(isUrgent?'overdue':'today-item')+'" onclick="openPatient(this.dataset.id)" data-id="'+patId+'">';
   html+='<div class="di-av" style="'+(isUrgent?'background:var(--red-bg);color:var(--red)':'')+'">'+(ini)+'</div>';
   html+='<div class="di-body">';
-  html+='<div class="di-name">'+p.code+'</div>';
+  html+='<div class="di-name">'+fmtCode(p.code)+'</div>';
   html+='<div class="di-qs">'+item.remaining.join(' · ')+'</div>';
   html+='<div class="di-label">'+item.label+' · '+fmtDate(item.date)+'</div>';
   html+='</div>';
@@ -2563,7 +2571,7 @@ function renderPatientDetail() {
   const p=NS.currentPatient;
   // Topbar breadcrumb
   const codeEl=document.getElementById('pd-code');
-  if(codeEl) codeEl.textContent=p.code;
+  if(codeEl) codeEl.textContent=fmtCode(p.code);
   // Avatar
   const avEl=document.getElementById('pd-av');
   if(avEl) {
@@ -2572,7 +2580,7 @@ function renderPatientDetail() {
   }
   // Name + ID
   const code2El=document.getElementById('pd-code2');
-  if(code2El) code2El.textContent=p.code||'—';
+  if(code2El) code2El.textContent=fmtCode(p.code)||'—';
   const idEl=document.getElementById('pd-id');
   if(idEl) idEl.textContent=p.patientId||'—';
   // Status badge
@@ -3734,7 +3742,7 @@ function genCodePreview() {
   const n=document.getElementById('p-nom').value;
   const d=document.getElementById('p-dob').value;
   const el=document.getElementById('code-prev');
-  if(p&&n&&d){el.textContent=genCode(p,n,d);el.style.opacity='1';}
+  if(p&&n&&d){el.textContent=fmtCode(genCode(p,n,d));el.style.opacity='1';}
   else{el.textContent='XXX-XXX-AAAAMMJJ';el.style.opacity='.4';}
 }
 
@@ -5405,7 +5413,7 @@ async function renderFavorisList() {
     return '<div class="patient-row" data-id="'+p.id+'" onclick="openPatient(this.dataset.id)">'
       +'<div class="pat-av" style="background:var(--amber-bg);color:var(--amber)">'+ini+'</div>'
       +'<div class="pat-left">'
-      +'<div class="pat-code" style="display:flex;align-items:center;gap:6px">'+p.code+' <span style="color:var(--amber)">★</span></div>'
+      +'<div class="pat-code" style="display:flex;align-items:center;gap:6px">'+fmtCode(p.code)+' <span style="color:var(--amber)">★</span></div>'
       +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
       +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span><span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span>'
     +((p.extraCabinets&&p.extraCabinets.length)?p.extraCabinets.map(c=>'<span class="badge b-purple fs11">+'+c+'</span>').join(''):'')
@@ -6115,7 +6123,7 @@ function printPatient() {
   // Update print header
   const printCode = document.getElementById('print-code');
   const printDate = document.getElementById('print-date');
-  if(printCode) printCode.textContent = p.code + ' — ' + p.patientId;
+  if(printCode) printCode.textContent = fmtCode(p.code) + ' — ' + p.patientId;
   if(printDate) printDate.textContent = 'Imprimé le ' + new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
   // Switch to scores tab for a complete view
   const suivi = document.querySelector('#page-patient-detail .tab');
@@ -6354,7 +6362,7 @@ async function globalSearch(query) {
           + 'data-id="'+p.id+'" onclick="selectGlobalResult(this.dataset.id)">'
           + '<div style="width:32px;height:32px;border-radius:8px;background:var(--accent-bg);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:monospace;flex-shrink:0">'+codeInitials(p.code)+'</div>'
           + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:13px;font-weight:700;font-family:monospace">'+p.code+'</div>'
+          + '<div style="font-size:13px;font-weight:700;font-family:monospace">'+fmtCode(p.code)+'</div>'
           + '<div style="font-size:11px;color:var(--text3)">'+p.cabinet+' · '+prots+'</div>'
           + '</div>'
           + '<div style="font-size:11px;font-weight:500;color:'+statusColor+'">'+p.status+'</div>'
@@ -6891,7 +6899,7 @@ async function loadArchives() {
       return '<div class="patient-row">'
         +'<div class="pat-av" style="background:var(--surface2);color:var(--text3)">'+ini+'</div>'
         +'<div class="pat-left">'
-        +'<div class="pat-code">'+p.code+'</div>'
+        +'<div class="pat-code">'+fmtCode(p.code)+'</div>'
         +'<div class="pat-id">'+(p.patientId||'---')+'</div>'
         +'<div class="pat-tags"><span class="badge b-gray fs11">'+prots+'</span>'
         +'<span class="badge b-gray fs11">'+(p.cabinet||'---')+'</span>'
@@ -7924,7 +7932,7 @@ function renderTodayList(todayItems, overdueItems) {
         const header = document.createElement('div');
         header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);cursor:pointer';
         header.innerHTML = '<div class="di-av" style="width:32px;height:32px;font-size:11px">'+ini+'</div>'
-          + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+p.code+'</div>'
+          + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+fmtCode(p.code)+'</div>'
           + '<div style="font-size:11px;color:var(--text3)">'+allQs.length+' questionnaire'+(allQs.length>1?'s':'')+' · '+group.items[0].label+'</div></div>'
           + '<span style="font-size:11px;color:var(--text3)">▼</span>';
         const qsDiv = document.createElement('div');
@@ -7974,7 +7982,7 @@ function renderTodayList(todayItems, overdueItems) {
       header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-bg);cursor:pointer';
       const subtitle = group.items.map(function(i){ return fmtDate(i.date)+' — '+i.remaining.join(', '); }).join(' · ');
       header.innerHTML = '<div class="di-av" style="width:32px;height:32px;font-size:11px;background:var(--red-bg);color:var(--red)">'+ini+'</div>'
-        + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--red)">'+p.code+'</div>'
+        + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--red)">'+fmtCode(p.code)+'</div>'
         + '<div style="font-size:11px;color:var(--red)">'+subtitle+'</div></div>'
         + '<span style="font-size:11px;color:var(--red)">▼</span>';
       const qsDiv = document.createElement('div');
