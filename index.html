@@ -2732,8 +2732,8 @@ function renderNotes() {
     const isLecture = n.role === 'lecture';
     const isAdmin = n.role === 'admin';
     const isOwn = n.authorEmail === myEmail;
-    // Admin/saisie can edit all; lecteurs can only edit their own
-    const canEdit = myRole !== 'lecture' || isOwn;
+    // Admin peut tout modifier; les autres uniquement leurs propres notes
+    const canEdit = myRole === 'admin' || isOwn;
     // Color: lecture = purple, admin = blue accent, saisie = neutral
     const itemCls = isLecture ? 'note-item note-lecture' : isAdmin ? 'note-item note-admin' : 'note-item';
     const metaCls = isLecture ? 'note-meta note-lecture-meta' : isAdmin ? 'note-meta note-admin-meta' : 'note-meta';
@@ -2770,8 +2770,9 @@ async function saveEditNote() {
   const p = NS.currentPatient;
   const notes = [...(p.notes||[])];
   const note = notes[idx];
-  // Permission check: lecteurs can only edit their own notes
-  if(NS.userProfile.role === 'lecture' && note.authorEmail !== NS.userProfile.email) {
+  // Seul l'admin peut modifier les notes des autres
+  const canEditNote = NS.userProfile.role === 'admin' || note.authorEmail === NS.userProfile.email;
+  if(!canEditNote) {
     alert('Vous ne pouvez modifier que vos propres notes.'); return;
   }
   notes[idx] = {...note, text, modifiedDate: todayStr(), modifiedBy: NS.userProfile.displayName||NS.userProfile.email};
@@ -2786,8 +2787,9 @@ async function deleteNote(idx) {
   const p = NS.currentPatient;
   const notes = [...(p.notes||[])];
   const note = notes[idx];
-  // Permission check
-  if(NS.userProfile.role === 'lecture' && note.authorEmail !== NS.userProfile.email) {
+  // Seul l'admin peut supprimer les notes des autres
+  const canDeleteNote = NS.userProfile.role === 'admin' || note.authorEmail === NS.userProfile.email;
+  if(!canDeleteNote) {
     alert('Vous ne pouvez supprimer que vos propres notes.'); return;
   }
   notes.splice(idx, 1);
