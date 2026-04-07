@@ -378,7 +378,7 @@ body.role-saisie .analyse-only { display:none !important; }
 /* IMPROVED PATIENT DETAIL */
 .pat-header-v2 { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); margin-bottom:14px; overflow:hidden; }
 .pat-header-v2 .ph-top { padding:18px 20px; display:flex; gap:14px; align-items:flex-start; border-bottom:1px solid var(--border); }
-.pat-header-v2 .ph-meta { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+.pat-header-v2 .ph-meta { display:grid; grid-template-columns:repeat(5,1fr); gap:0; }
 .pat-header-v2 .ph-meta-item { padding:10px 16px; border-right:1px solid var(--border); }
 .pat-header-v2 .ph-meta-item:last-child { border-right:none; }
 .pat-h-av-v2 { width:48px; height:48px; border-radius:12px; background:var(--accent-bg); color:var(--accent); font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
@@ -1815,7 +1815,7 @@ const QUESTIONNAIRES = {
     interpret:(s)=>s<=7?{label:"Pas d'insomnie",color:"green"}:s<=14?{label:"Insomnie légère",color:"green"}:s<=21?{label:"Insomnie modérée",color:"amber"}:{label:"Insomnie sévère",color:"red"}
   },
   'EQ-5D-5L': {
-    name:'EQ-5D-5L', fullName:'EuroQol-5 Dimensions',
+    name:'EQ-5D-5L', fullName:'EuroQol-5 Dimensions', higherIsBetter:true,
     type:'auto', domain:'Qualité de vie',
     instructions:'Pour chaque rubrique, veuillez cocher UNE case, celle qui décrit le mieux votre santé AUJOURD’HUI.',
     optionsPerQuestion:[['Je n’ai aucun problème pour me déplacer à pied (5)','J’ai des problèmes légers pour me déplacer à pied (4)','J’ai des problèmes modérés pour me déplacer à pied (3)','J’ai des problèmes sévères pour me déplacer à pied (2)','Je suis incapable de me déplacer à pied (1)'],['Je n’ai aucun problème pour me laver ou m’habiller tout(e) seul(e) (5)','J’ai des problèmes légers pour me laver ou m’habiller tout(e) seul(e) (4)','J’ai des problèmes modérés pour me laver ou m’habiller tout(e) seul(e) (3)','J’ai des problèmes sévères pour me laver ou m’habiller tout(e) seul(e) (2)','Je suis incapable de me laver ou de m’habiller tout(e) seul(e) (1)'],['Je n’ai aucun problème pour accomplir mes activités courantes (5)','J’ai des problèmes légers pour accomplir mes activités courantes (4)','J’ai des problèmes modérés pour accomplir mes activités courantes (3)','J’ai des problèmes sévères pour accomplir mes activités courantes (2)','Je suis incapable d’accomplir mes activités courantes (1)'],['Je n’ai ni douleur ni inconfort (5)','J’ai des douleurs ou un inconfort léger(ères) (4)','J’ai des douleurs ou un inconfort modéré(es) (3)','J’ai des douleurs ou un inconfort sévère(s) (2)','J’ai des douleurs ou un inconfort extrême(s) (1)'],['Je ne suis ni anxieux(se) ni déprimé(e) (5)','Je suis légèrement anxieux(se) ou déprimé(e) (4)','Je suis modérément anxieux(se) ou déprimé(e) (3)','Je suis sévèrement anxieux(se) ou déprimé(e) (2)','Je suis extrêmement anxieux(se) ou déprimé(e) (1)']],
@@ -2383,10 +2383,11 @@ function patRowHTML(p) {
     +'<div class="pat-left"><div class="pat-code">'+(p.code||'—')+'</div>'
     +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
     +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span>'
-    +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span></div>'
-    +'<div style="font-size:10px;color:var(--text3);margin-top:2px">'
-    +(p.createdAt ? 'Créé le '+fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
-    +(p.createdBy ? ' · par '+p.createdBy : '')
+    +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span>'
+    +(p.createdAt||p.createdBy ? '<span style="font-size:10px;color:var(--text3);font-weight:400">'
+    +(p.createdAt ? fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
+    +(p.createdBy ? ' · '+(p.createdBy.includes('@')?p.createdBy.split('@')[0]:p.createdBy) : '')
+    +'</span>' : '')
     +'</div></div>'
     +'<div class="pat-right">'+sb+'</div></div>';
 }
@@ -2561,7 +2562,8 @@ function renderPatientDetail() {
   const createdEl=document.getElementById('pd-created');
   if(createdEl) {
     const createdDate = p.createdAt ? (typeof p.createdAt==='string' ? p.createdAt : (p.createdAt.toDate ? p.createdAt.toDate().toISOString().split('T')[0] : null)) : null;
-    createdEl.textContent = (createdDate ? fmtDate(createdDate) : '—') + (p.createdBy ? ' · ' + p.createdBy : '');
+    const createdByDisplay = p.createdBy ? (p.createdBy.includes('@') ? p.createdBy.split('@')[0] : p.createdBy) : null;
+    createdEl.textContent = (createdDate ? fmtDate(createdDate) : '—') + (createdByDisplay ? ' · ' + createdByDisplay : '');
   }
   const j1El=document.getElementById('pd-j1');
   if(j1El) j1El.textContent=fmtDate(p.j1Date);
