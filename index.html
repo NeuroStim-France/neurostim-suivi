@@ -4115,7 +4115,7 @@ function checkQRToken() {
       document.getElementById('pq-body').innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">⏰</div><div style="font-size:20px;font-weight:600;margin-bottom:8px">Lien expiré</div><div style="color:var(--text2)">Ce lien n est plus valide. Veuillez demander un nouveau QR code au soignant.</div></div>';
       return true;
     }
-    pqState = {patientId:data.patientId, qName:data.qName, date:data.date||new Date().toISOString().split('T')[0], answers:[], idx:0, token};
+    pqState = {patientId:data.patientId, qName:data.qName, date:data.date||new Date().toISOString().split('T')[0], answers:[], idx:0, token, knownDone:[]};
     loadExcelConfig().then(function(){ showPatientQScreen(); }).catch(function(){ showPatientQScreen(); });
     return true;
   } catch(e) { return false; }
@@ -4263,11 +4263,14 @@ async function pqConsentSubmit() {
     const patData = patSnap.data();
     const responses = {...(patData.responses||{})};
     responses[key] = resp;
+    if(!pqState.knownDone) pqState.knownDone = [];
+    if(!pqState.knownDone.includes(pqState.qName)) pqState.knownDone.push(pqState.qName);
     let remainingQs = [];
     const schedule = (patData.schedule||[]).map(s => {
       if(s.date === pqState.date) {
         const done = [...(s.done||[])];
-        if(!done.includes(pqState.qName)) done.push(pqState.qName);
+        // Fusionner avec knownDone pour éviter race condition cache Firestore
+        pqState.knownDone.forEach(q=>{ if(!done.includes(q)) done.push(q); });
         remainingQs = (s.questionnaires||[]).filter(q => !done.includes(q) && !(s.ignored||[]).includes(q));
         return {...s, done};
       }
@@ -4407,11 +4410,15 @@ async function pqFinish() {
     const responses = {...(patData.responses||{})};
     responses[key] = resp;
     // Mark done and find remaining questionnaires for this date
+    // On utilise knownDone (accumulé localement) pour éviter les race conditions Firestore
+    if(!pqState.knownDone) pqState.knownDone = [];
+    if(!pqState.knownDone.includes(pqState.qName)) pqState.knownDone.push(pqState.qName);
     let remainingQs = [];
     const schedule = (patData.schedule||[]).map(s=>{
       if(s.date===pqState.date){
         const done=[...(s.done||[])];
-        if(!done.includes(pqState.qName)) done.push(pqState.qName);
+        // Fusionner avec knownDone pour éviter race condition cache Firestore
+        pqState.knownDone.forEach(q=>{ if(!done.includes(q)) done.push(q); });
         // Find remaining (not done, not ignored)
         remainingQs = (s.questionnaires||[]).filter(q=>!done.includes(q)&&!(s.ignored||[]).includes(q));
         return {...s,done};
