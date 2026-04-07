@@ -5328,18 +5328,13 @@ async function loadFavorites() {
 function updateFavBadge() {
   const badge = document.getElementById('fav-badge');
   if(!badge) return;
-  // Only count favorites that still exist as patients
+  // Afficher le badge avec les favoris visibles dans le cabinet courant
+  // NE JAMAIS supprimer des favoris ici : un patient peut être dans un autre
+  // cabinet ou pas encore chargé sans avoir été supprimé
   const validIds = new Set((NS.patients||[]).map(function(p){return p.id;}));
-  const validFavs = (NS.favorites||[]).filter(function(id){return validIds.has(id);});
-  // If stale IDs found, clean them up silently
-  if(validFavs.length !== (NS.favorites||[]).length) {
-    NS.favorites = validFavs;
-    if(NS.user) {
-      db.doc('users/'+NS.user.uid+'/prefs/favorites').set({list: validFavs}).catch(function(){});
-    }
-  }
-  badge.textContent = validFavs.length;
-  badge.style.display = validFavs.length > 0 ? 'inline' : 'none';
+  const visibleFavs = (NS.favorites||[]).filter(function(id){return validIds.has(id);});
+  badge.textContent = visibleFavs.length;
+  badge.style.display = visibleFavs.length > 0 ? 'inline' : 'none';
 }
 
 async function toggleFavorite() {
