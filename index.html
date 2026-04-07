@@ -798,11 +798,11 @@ body.role-saisie .analyse-only { display:none !important; }
             <div class="meta-label">Fin du suivi estimée</div>
             <div class="meta-val" id="pd-end">—</div>
           </div>
-          <div class="ph-meta-item" style="border-right:none">
+          <div class="ph-meta-item">
             <div class="meta-label">Cabinet</div>
             <div class="meta-val" id="pd-cabinet">—</div>
           </div>
-          <div class="meta-block">
+          <div class="ph-meta-item" style="border-right:none">
             <div class="meta-label">Créé le · par</div>
             <div class="meta-val" id="pd-created">—</div>
           </div>
@@ -3678,7 +3678,7 @@ async function createPatient() {
       notes:[], responses:{},
       schedule,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy:NS.userProfile.email
+      createdBy:NS.userProfile.displayName||NS.userProfile.email
     });
     hideLoading();
     closeModal('m-add-patient');
