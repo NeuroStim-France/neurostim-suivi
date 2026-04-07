@@ -802,6 +802,10 @@ body.role-saisie .analyse-only { display:none !important; }
             <div class="meta-label">Cabinet</div>
             <div class="meta-val" id="pd-cabinet">—</div>
           </div>
+          <div class="meta-block">
+            <div class="meta-label">Créé le · par</div>
+            <div class="meta-val" id="pd-created">—</div>
+          </div>
         </div>
       </div>
       <!-- Last note preview -->
@@ -1820,7 +1824,7 @@ const QUESTIONNAIRES = {
     interpret:(s)=>s<=7?{label:"Bonne qualité de vie",color:"green"}:s<=14?{label:"Qualité altérée",color:"amber"}:{label:"Très altérée",color:"red"}
   },
   'Ricci-Gagnon': {
-    name:'Ricci-Gagnon', fullName:'Questionnaire de Ricci & Gagnon',
+    name:'Ricci-Gagnon', fullName:'Questionnaire de Ricci & Gagnon', higherIsBetter:true,
     type:'auto', domain:'Activité physique',
     instructions:'Les questions suivantes vont nous permettre d\'évaluer votre niveau d\'activité physique',
     optionsPerQuestion:[['plus de 5h (1)','4 à 5h (2)','3 à 4h (3)','2 à 3h (4)','Moins de 2h (5)'],['Non (1)','Oui (5)'],['1 à 2 fois par mois (1)','1 fois par semaine (2)','2 fois par semaine (3)','3 fois par semaine (4)','4 fois par semaine (5)'],['Moins de 15 minutes (1)','16 à 30 minutes (2)','31 à 45 minutes (3)','46 à 60 minutes (4)','Plus de 60 minutes (5)'],['1.0 (1)','2.0 (2)','3.0 (3)','4.0 (4)','5.0 (5)'],['Légère (1)','Modérée (2)','Moyenne (3)','Intense (4)','Très intense (5)'],['Moins de 2h (1)','3 à 4h (2)','5 à 6h (3)','7 à 9h (4)','Plus de 10h (5)'],['Moins de 15 minutes (1)','16 à 30 minutes (2)','31 à 45 minutes (3)','46 à 60 minutes (4)','Plus de 60 minutes (5)'],['Moins de 2 (1)','3 à 5 (2)','6 à 10 (3)','11 à 15 (4)','Plus de 16 (5)']],
@@ -2379,7 +2383,11 @@ function patRowHTML(p) {
     +'<div class="pat-left"><div class="pat-code">'+(p.code||'—')+'</div>'
     +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
     +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span>'
-    +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span></div></div>'
+    +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span></div>'
+    +'<div style="font-size:10px;color:var(--text3);margin-top:2px">'
+    +(p.createdAt ? 'Créé le '+fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
+    +(p.createdBy ? ' · par '+p.createdBy : '')
+    +'</div></div>'
     +'<div class="pat-right">'+sb+'</div></div>';
 }
 
@@ -2550,6 +2558,11 @@ function renderPatientDetail() {
   if(cabEl) cabEl.textContent=p.cabinet+(p.extraCabinets&&p.extraCabinets.length?' + '+p.extraCabinets.join(', '):'');
   const dobEl=document.getElementById('pd-dob');
   if(dobEl) dobEl.textContent=fmtDob(p.dob);
+  const createdEl=document.getElementById('pd-created');
+  if(createdEl) {
+    const createdDate = p.createdAt ? (typeof p.createdAt==='string' ? p.createdAt : (p.createdAt.toDate ? p.createdAt.toDate().toISOString().split('T')[0] : null)) : null;
+    createdEl.textContent = (createdDate ? fmtDate(createdDate) : '—') + (p.createdBy ? ' · ' + p.createdBy : '');
+  }
   const j1El=document.getElementById('pd-j1');
   if(j1El) j1El.textContent=fmtDate(p.j1Date);
   const endEl=document.getElementById('pd-end');
@@ -2862,13 +2875,15 @@ function renderScores() {
   Object.entries(byQRaw).forEach(([q,dateMap])=>{
     byQ[q] = Object.values(dateMap).sort((a,b)=>a.date.localeCompare(b.date));
   });
-  if(!Object.keys(byQ).length) { el.innerHTML='<div class="empty"><p>Aucune donnée de score</p></div>'; return; }
+  if(!Object.keys(byQ).length) { el.innerHTML='<div class="empty"><p>Aucune donnée de score</p></div>'; renderScoreCharts({}); return; }
   let html='';
   Object.entries(byQ).forEach(([q,scores])=>{
     const qi=QUESTIONNAIRES[q]; if(!qi) return;
     scores.sort((a,b)=>a.date.localeCompare(b.date));
     const last=scores[scores.length-1]?.score, first=scores[0]?.score;
     const delta=scores.length>1?Math.round((last-first)*100)/100:null;
+    const qiH = QUESTIONNAIRES[q];
+    const hib = !!(qiH && qiH.higherIsBetter);
     const interp=qi.interpret?qi.interpret(last):{label:'',color:'gray'};
     html+='<div class="score-card"><div class="score-card-header"><div class="score-card-name">'+q+'</div><span class="badge b-'+interp.color+'">'+interp.label+'</span></div>'
       +'<div class="score-card-vals">'
@@ -2882,7 +2897,7 @@ function renderScores() {
           +(q!=='PEM'?'<div style="font-size:9px;color:var(--text3);margin-top:1px">détail →</div>':'')
           +'</div>';
       }).join('')
-      +(delta!==null?'<div class="score-delta '+(delta<0?'good':delta>0?'bad':'')+'">'+((delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2)))+'</div>':'')
+      +(delta!==null?'<div class="score-delta '+((delta<0&&!hib)||(delta>0&&hib)?'good':(delta!==0)?'bad':'')+'">'+((delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2)))+'</div>':'')
       +'</div></div>';
   });
   el.innerHTML=html;
@@ -5813,6 +5828,8 @@ function renderScoreCharts(byQ) {
   patientCharts = {};
   // Increment generation — stale rAF callbacks from previous calls will be ignored
   const myGeneration = ++_chartGeneration;
+  // Anchor to current patient ID — double protection against stale callbacks
+  const myPatientId = NS.currentPatient ? NS.currentPatient.id : null;
   // Clear DOM immediately so stale charts never flash
   el.innerHTML = '';
 
@@ -5830,7 +5847,8 @@ function renderScoreCharts(byQ) {
     const first = data[0], last = data[data.length-1];
     const delta = last - first;
     const interp = qi.interpret ? qi.interpret(last) : {label:'', color:'gray'};
-    const chartColor = delta < 0 ? '#1a6b3c' : delta > 0 ? '#8b1f1f' : '#1a4d8f';
+    const higherIsBetter = !!(qi && qi.higherIsBetter);
+    const chartColor = (delta < 0 && !higherIsBetter) || (delta > 0 && higherIsBetter) ? '#1a6b3c' : (delta !== 0) ? '#8b1f1f' : '#1a4d8f';
 
     const canvasId = 'chart-pat-'+q.replace(/[^a-zA-Z0-9]/g,'');
     const card = document.createElement('div');
@@ -5839,14 +5857,16 @@ function renderScoreCharts(byQ) {
       +'<div style="font-size:13px;font-weight:600">'+q+'</div>'
       +'<div style="display:flex;align-items:center;gap:6px">'
       +'<span class="badge b-'+interp.color+'" style="font-size:10px">'+interp.label+'</span>'
-      +'<span style="font-size:12px;font-weight:700;color:'+(delta<0?'var(--green)':delta>0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2))+'</span>'
+      +'<span style="font-size:12px;font-weight:700;color:'+((delta<0&&!higherIsBetter)||(delta>0&&higherIsBetter)?'var(--green)':delta!==0?'var(--red)':'var(--text3)')+'">'+( delta>0?'+':'')+(Number.isInteger(delta)?delta:delta.toFixed(2))+'</span>'
       +'</div></div>'
       +'<div style="position:relative;height:130px"><canvas id="'+canvasId+'"></canvas></div>';
     grid.appendChild(card);
 
     // Render chart after DOM update — skip if patient changed (stale callback)
     requestAnimationFrame(() => {
-      if(myGeneration !== _chartGeneration) return; // patient changed, abort
+      if(myGeneration !== _chartGeneration) return; // generation changed, abort
+      const currentId = NS.currentPatient ? NS.currentPatient.id : null;
+      if(myPatientId !== currentId) return; // patient changed, abort
       const canvas = document.getElementById(canvasId);
       if(!canvas || !canvas.isConnected) return; // DOM cleared, abort
       patientCharts[q] = new Chart(canvas, {
