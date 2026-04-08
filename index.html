@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-11h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h00</span>
       </div>
     </div>
   </div>
@@ -2462,18 +2462,7 @@ function loadDashboard() {
   pts.forEach(p=>{
     // Only show active cure patients in today/overdue/upcoming — not interrupted/terminated/postcure
     const activeCure = p.status === 'cure' || !p.status;
-    const _tod = todayStr();
-  const _cutoff = (function(){ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
-  const _schedule = (p.schedule||[]).filter(s => {
-    // Always show: past slots, today, slots with completions, slots within 7 days
-    if(s.date <= _tod) return true;
-    if((s.done||[]).length > 0) return true;
-    if(s.date <= _cutoff) return true;
-    // Hide future slots beyond 7 days unless timelineShowAll
-    return !!NS.timelineShowAll;
-  });
-  const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
-  _schedule.forEach(s=>{
+    (p.schedule||[]).forEach(s=>{
       const done=s.done||[], ignored=s.ignored||[], rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
       if(rem.length===0) return;
       // For non-active-cure patients, still show monthly post-cure questionnaires
@@ -2548,18 +2537,7 @@ function renderWeekView() {
   days.forEach(day=>{
     const d=new Date(day), isToday=day===todayStr(), items=[];
     NS.patients.forEach(p=>{
-      const _tod = todayStr();
-  const _cutoff = (function(){ const d=new Date(); d.setDate(d.getDate()+7); return d.toISOString().split('T')[0]; })();
-  const _schedule = (p.schedule||[]).filter(s => {
-    // Always show: past slots, today, slots with completions, slots within 7 days
-    if(s.date <= _tod) return true;
-    if((s.done||[]).length > 0) return true;
-    if(s.date <= _cutoff) return true;
-    // Hide future slots beyond 7 days unless timelineShowAll
-    return !!NS.timelineShowAll;
-  });
-  const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
-  _schedule.forEach(s=>{
+      (p.schedule||[]).forEach(s=>{
         if(s.date===day) {
           const rem=(s.questionnaires||[]).filter(q=>!(s.done||[]).includes(q));
           if(rem.length>0) items.push({...s,patient:p,remaining:rem});
