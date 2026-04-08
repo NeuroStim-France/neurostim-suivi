@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-17h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-18h00</span>
       </div>
     </div>
   </div>
@@ -4682,12 +4682,22 @@ async function loadCohorte() {
       + '<option value="switch"'+(current==='switch'?' selected':'')+'>Switch</option>';
   }
 
-  // Extract scores per patient
+  // Extract scores per patient — with proper J1 identification
   const patientScores = [];
-  pts.forEach(p=>{
-    const resp = p.responses||{};
-    const scores = Object.values(resp).filter(r=>r.questionnaire===qName).sort((a,b)=>a.date.localeCompare(b.date));
-    if(scores.length>0) patientScores.push({code:p.code, id:p.id, scores});
+  pts.forEach(p => {
+    const resp = p.responses || {};
+    const allScores = Object.values(resp)
+      .filter(r => r.questionnaire === qName && r.score !== undefined && r.score !== null && r.score !== 99)
+      .sort((a,b) => a.date.localeCompare(b.date));
+    if(!allScores.length) return;
+    // J1 score = response keyed to j1Date, not just first chronological score
+    const j1Score = p.j1Date ? ((resp[p.j1Date + '_' + qName]?.score) ?? null) : null;
+    const lastScore = allScores[allScores.length - 1].score;
+    // Delta only if J1 exists AND there is at least one later score
+    const hasJ1 = j1Score !== null;
+    const lastIsJ1 = hasJ1 && allScores.length === 1 && allScores[0].date === p.j1Date;
+    const delta = (hasJ1 && !lastIsJ1) ? Math.round((lastScore - j1Score) * 100) / 100 : null;
+    patientScores.push({code: p.code, id: p.id, scores: allScores, j1Score, lastScore, delta});
   });
 
   document.getElementById('coh-n').textContent = patientScores.length;
@@ -4700,14 +4710,14 @@ async function loadCohorte() {
     return;
   }
 
-  // Mean J1 score
-  const j1Scores = patientScores.map(ps=>ps.scores[0]?.score).filter(s=>s!==undefined);
-  const meanJ1 = j1Scores.length ? (j1Scores.reduce((a,b)=>a+b,0)/j1Scores.length).toFixed(1) : '—';
+  // Mean J1 score — only patients with a real J1 score
+  const j1Vals = patientScores.map(ps => ps.j1Score).filter(s => s !== null);
+  const meanJ1 = j1Vals.length ? (j1Vals.reduce((a,b) => a+b, 0) / j1Vals.length).toFixed(1) : '—';
   document.getElementById('coh-mean-j1').textContent = meanJ1;
 
   // Mean last score
-  const lastScores = patientScores.map(ps=>ps.scores[ps.scores.length-1]?.score).filter(s=>s!==undefined);
-  const meanLast = lastScores.length ? (lastScores.reduce((a,b)=>a+b,0)/lastScores.length).toFixed(1) : '—';
+  const lastVals = patientScores.map(ps => ps.lastScore).filter(s => s !== null && s !== undefined);
+  const meanLast = lastVals.length ? (lastVals.reduce((a,b) => a+b, 0) / lastVals.length).toFixed(1) : '—';
   const meanLastEl = document.getElementById('coh-mean-last');
   if(meanLastEl) meanLastEl.textContent = meanLast;
 
@@ -4727,6 +4737,7 @@ async function loadCohorte() {
 
   // Table
   const qi = QUESTIONNAIRES[qName];
+  const hib = !!(qi && qi.higherIsBetter);
   document.getElementById('coh-table').innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse">'
     +'<thead><tr style="border-bottom:1px solid var(--border)">'
     +'<th style="text-align:left;padding:6px 4px;color:var(--text3);font-weight:500">Patient</th>'
@@ -4735,15 +4746,23 @@ async function loadCohorte() {
     +'<th style="text-align:center;color:var(--text3);font-weight:500">Δ</th>'
     +'<th style="text-align:center;color:var(--text3);font-weight:500">Statut</th>'
     +'</tr></thead><tbody>'
-    +patientScores.map(ps=>{
-      const first=ps.scores[0]?.score, last=ps.scores[ps.scores.length-1]?.score;
-      const delta=ps.scores.length>1?Math.round((last-first)*100)/100:null;
-      const interp=qi?.interpret?qi.interpret(last):{label:'',color:'gray'};
+    +patientScores.map(ps => {
+      const interp = qi?.interpret ? qi.interpret(ps.lastScore) : {label:'', color:'gray'};
+      const j1Display = ps.j1Score !== null ? ps.j1Score : '<span style="color:var(--text3)">—</span>';
+      const lastDisplay = ps.lastScore !== null && ps.lastScore !== undefined ? ps.lastScore : '<span style="color:var(--text3)">—</span>';
+      let deltaDisplay = '<span style="color:var(--text3)">—</span>';
+      if(ps.delta !== null) {
+        const improved = (ps.delta < 0 && !hib) || (ps.delta > 0 && hib);
+        const worsened = (ps.delta > 0 && !hib) || (ps.delta < 0 && hib);
+        const sign = ps.delta > 0 ? '+' : '';
+        const color = improved ? 'var(--green)' : worsened ? 'var(--red)' : 'var(--text2)';
+        deltaDisplay = '<span style="color:'+color+'">'+(ps.delta===0?'0':sign+ps.delta)+'</span>';
+      }
       return '<tr style="border-bottom:1px solid var(--border)">'
         +'<td style="padding:6px 4px;font-family:monospace;font-weight:600">'+ps.code+'</td>'
-        +'<td style="text-align:center;font-family:monospace">'+first+'</td>'
-        +'<td style="text-align:center;font-family:monospace;color:var(--'+interp.color+')">'+last+'</td>'
-        +'<td style="text-align:center;font-family:monospace;color:var(--)">'+( delta!==null?(delta<0?'<span style="color:var(--green)">'+delta+'</span>':delta>0?'<span style="color:var(--red)">+'+delta+'</span>':'0'):'—')+'</td>'
+        +'<td style="text-align:center;font-family:monospace">'+j1Display+'</td>'
+        +'<td style="text-align:center;font-family:monospace;color:var(--'+interp.color+')">'+lastDisplay+'</td>'
+        +'<td style="text-align:center;font-family:monospace">'+deltaDisplay+'</td>'
         +'<td style="text-align:center"><span class="badge b-'+interp.color+'" style="font-size:10px">'+interp.label+'</span></td>'
         +'</tr>';
     }).join('')
