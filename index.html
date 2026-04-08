@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-14h20</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-14h40</span>
       </div>
     </div>
   </div>
@@ -2722,8 +2722,8 @@ function renderNotes() {
   if(notes.length===0){el.innerHTML='<div class="empty"><p>Aucune note</p></div>';return;}
   const myEmail = NS.userProfile?.email;
   const myRole = NS.userProfile?.role || 'saisie';
-  el.innerHTML=[...notes].map((n,i)=>{
-    const realIdx=notes.length-1-i;
+  el.innerHTML=[...notes].map((n,i)=>({n,i})).reverse().map(({n,i})=>{
+    const realIdx=i;
     const isLecture = n.role === 'lecture';
     const isAdmin = n.role === 'admin';
     const isOwn = n.authorEmail === myEmail;
@@ -2749,7 +2749,7 @@ function renderNotes() {
       +'</div>'
       +'<div class="note-body">'+n.text+'</div>'
       +'</div>';
-  }).reverse().join('');
+  }).join('');
 }
 
 function openEditNote(idx) {
