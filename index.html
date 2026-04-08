@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h20</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h45</span>
       </div>
     </div>
   </div>
@@ -1355,28 +1355,8 @@ body.role-saisie .analyse-only { display:none !important; }
 
         <!-- Consolidation directe area -->
         <div id="postcure-startdate-area" style="display:none">
+          <div class="info-box" style="margin-bottom:12px">La configuration détaillée (questionnaires, durée, fréquence) sera demandée à l'étape suivante.</div>
           <div class="fg"><label>Date de début *</label><input type="date" id="p-postcure-start"></div>
-          <div class="g2" style="margin-bottom:14px">
-            <div class="fg"><label>Durée (mois)</label><input type="number" id="p-postcure-months" min="1" max="36" value="6" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px"></div>
-            <div class="fg"><label>Fréquence</label>
-              <select id="p-postcure-freq" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
-                <option value="1">1×/mois</option>
-                <option value="2">2×/mois</option>
-                <option value="3">3×/mois</option>
-              </select>
-            </div>
-          </div>
-          <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Questionnaires mensuels</div>
-          <div id="ps2-cons-qs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-          <div style="display:flex;gap:6px;margin-bottom:14px">
-            <select id="ps2-cons-q-sel" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></select>
-            <button class="btn btn-secondary btn-sm" onclick="ps2ConsAddQ()">+ Ajouter</button>
-          </div>
-          <div id="ps2-consolidation-proto">
-            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Protocole rTMS associé <span style="font-weight:400;text-transform:none">(optionnel)</span></div>
-            <div id="proto-list-area-cons"></div>
-            <button class="btn btn-secondary btn-sm" onclick="addProtocolEntry()" style="margin-bottom:14px;width:100%">+ Ajouter un protocole</button>
-          </div>
         </div>
 
         <!-- Parcours area (reuses parcours modal logic inline) -->
@@ -3308,7 +3288,7 @@ async function qFinish() {
 }
 
 function openAddPatient() {
-  newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure', parcoursState:null, parcoursConfig:null, consQs:['PHQ-9','GAD-7']};
+  newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure', parcoursState:null, parcoursConfig:null};
   ['p-prenom','p-nom','p-dob'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const cp=document.getElementById('code-prev'); if(cp){cp.textContent='XXX-XXX-AAAAMMJJ';cp.style.opacity='.4';}
   const sa=document.getElementById('sched-area'); if(sa) sa.style.display='none';
@@ -3354,11 +3334,7 @@ function renderPatSummary() {
   } else if(newPat.mode === 'postcure') {
     document.getElementById('c-details').style.display='none';
     document.getElementById('c-postcure-details').style.display='';
-    const months = document.getElementById('p-postcure-months')?.value || 6;
-    const freq = document.getElementById('p-postcure-freq')?.value || 1;
-    const qs = (newPat.consQs||[]).join(', ') || '—';
-    const protoTxt = valid.length ? valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ') : 'Aucun';
-    document.getElementById('c-prots2').innerHTML = 'Questionnaires : <strong>'+qs+'</strong><br>Durée : <strong>'+months+' mois</strong> · Fréquence : <strong>'+freq+'×/mois</strong><br>Protocole rTMS : '+protoTxt;
+    document.getElementById('c-prots2').textContent = '—';
     document.getElementById('c-postcure-start').textContent = fmtDate(document.getElementById('p-postcure-start')?.value);
   } else {
     document.getElementById('c-details').style.display='';
@@ -3571,7 +3547,6 @@ function setPatientMode(mode) {
   // Reset protocols when switching mode to avoid carryover between modes
   if(prevMode !== mode) {
     newPat.protocols = [{name:'', startDate:'', endDate:''}];
-    newPat.consQs = ['PHQ-9','GAD-7'];
   }
   document.getElementById('mode-cure-btn').className = 'btn btn-sm ' + (mode==='cure' ? 'btn-primary' : 'btn-secondary');
   document.getElementById('mode-postcure-btn').className = 'btn btn-sm ' + (mode==='postcure' ? 'btn-primary' : 'btn-secondary');
@@ -3585,61 +3560,12 @@ function setPatientMode(mode) {
   if(consArea) consArea.style.display = mode==='postcure' ? 'block' : 'none';
   if(parcArea) parcArea.style.display = mode==='parcours' ? 'block' : 'none';
   if(mode === 'cure') { renderProtocolList(); updateSchedPreview(); }
-  if(mode === 'postcure') { ps2ConsInit(); }
   if(mode === 'parcours') { ps2RenderContextes(); ps2RenderBaseQs(); ps2RenderAddQSelector(); }
 }
 
 function addProtocolEntry() {
   newPat.protocols.push({name:'', startDate:'', endDate:''});
-  if(newPat.mode === 'postcure') renderConsoProtocolList();
-  else renderProtocolList();
-}
-
-function removeConsoProtocolEntry(idx) {
-  if(newPat.protocols.length <= 1) { newPat.protocols[0] = {name:'', startDate:'', endDate:''}; }
-  else { newPat.protocols.splice(idx, 1); }
-  renderConsoProtocolList();
-}
-
-// ── PS2 Consolidation questionnaires ──
-function ps2ConsRenderQs() {
-  const el = document.getElementById('ps2-cons-qs'); if(!el) return;
-  const qs = newPat.consQs || [];
-  if(!qs.length) { el.innerHTML = '<span style="font-size:12px;color:var(--text3)">Aucun — sélectionnez au moins un questionnaire</span>'; return; }
-  el.innerHTML = qs.map((q,i) =>
-    '<span class="stag stag-common" style="cursor:pointer" onclick="ps2ConsRemoveQ('+i+')" title="Retirer">'+q+' ✕</span>'
-  ).join('');
-}
-function ps2ConsAddQ() {
-  const sel = document.getElementById('ps2-cons-q-sel'); if(!sel||!sel.value) return;
-  if(!newPat.consQs) newPat.consQs = [];
-  if(!newPat.consQs.includes(sel.value)) { newPat.consQs.push(sel.value); ps2ConsRenderQs(); }
-  sel.value = '';
-}
-function ps2ConsRemoveQ(i) {
-  if(!newPat.consQs) return;
-  newPat.consQs.splice(i,1); ps2ConsRenderQs();
-}
-function ps2ConsInit() {
-  // Default questionnaires for consolidation
-  if(!newPat.consQs || !newPat.consQs.length) newPat.consQs = ['PHQ-9','GAD-7'];
-  buildQSelectOptions('ps2-cons-q-sel', false);
-  ps2ConsRenderQs();
-  renderConsoProtocolList();
-}
-
-function renderConsoProtocolList() {
-  const area = document.getElementById('proto-list-area-cons');
-  if(!area) return;
-  let html = '';
-  newPat.protocols.forEach((pr, i) => {
-    const opts = PROTO_OPTIONS.map(o => '<option value="'+o.value+'"'+(pr.name===o.value?' selected':'')+'>'+o.label+'</option>').join('');
-    html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px">';
-    if(newPat.protocols.length > 1) html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:600;color:var(--text2)">Protocole '+(i+1)+'</span><button class="btn btn-ghost btn-sm" style="color:var(--red);font-size:11px" onclick="removeConsoProtocolEntry('+i+')">✕ Retirer</button></div>';
-    html += '<div class="fg" style="margin-bottom:0"><label style="font-size:11px">Protocole rTMS associé (optionnel)</label><select onchange="newPat.protocols['+i+'].name=this.value" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-xs);font-family:inherit;font-size:13px;background:var(--surface)">'+opts+'</select></div>';
-    html += '</div>';
-  });
-  area.innerHTML = html;
+  renderProtocolList();
 }
 
 function removeProtocolEntry(idx) {
@@ -3728,13 +3654,8 @@ async function createPatient() {
     let schedule, status, j1Date, endDate, parcours = [];
     if(newPat.mode === 'postcure') {
       const startDate = document.getElementById('p-postcure-start')?.value || todayStr();
-      const months = parseInt(document.getElementById('p-postcure-months')?.value) || 6;
-      const freq = parseInt(document.getElementById('p-postcure-freq')?.value) || 1;
-      const customQs = newPat.consQs && newPat.consQs.length ? [...newPat.consQs] : null;
-      // Use startDate for any associated protocol
-      if(validProtos.length) validProtos.forEach(p => p.startDate = startDate);
-      else validProtos.push({name:'', startDate, endDate:''});
-      schedule = genSchedulePostcureOnly({protocols: validProtos, months, freq, customQs});
+      // Minimal schedule placeholder — openConsolidation() will reconfigure it right after
+      schedule = genSchedulePostcureOnly({protocols: [{name:'', startDate, endDate:''}]});
       status = 'postcure';
       j1Date = startDate;
       endDate = startDate;
@@ -3792,6 +3713,12 @@ async function createPatient() {
     hideLoading();
     closeModal('m-add-patient');
     logAccess('create_patient', code);
+    if(newPat.mode === 'postcure') {
+      // Open the consolidation config modal immediately after creation
+      await new Promise(r => setTimeout(r, 800));
+      const fresh = NS.patients.find(p=>p.code===code);
+      if(fresh) { NS.currentPatient = fresh; setTimeout(()=>openConsolidation(), 400); }
+    }
   } catch(err) {
     hideLoading();
     showError('Erreur lors de la création : '+err.message, 5000);
@@ -6602,7 +6529,6 @@ function validatePatientStep2() {
   if(newPat.mode === 'postcure') {
     const start = document.getElementById('p-postcure-start')?.value;
     if(!start) { showError('Veuillez indiquer la date de début du suivi de consolidation.', 3000); return false; }
-    if(!newPat.consQs || !newPat.consQs.length) { showError('Veuillez sélectionner au moins un questionnaire mensuel.', 3000); return false; }
     return true;
   }
 
