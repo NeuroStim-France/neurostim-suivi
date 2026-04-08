@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h20</span>
       </div>
     </div>
   </div>
@@ -3792,12 +3792,6 @@ async function createPatient() {
     hideLoading();
     closeModal('m-add-patient');
     logAccess('create_patient', code);
-    if(newPat.mode === 'postcure') {
-      // Open post-cure config immediately after creation
-      await new Promise(r => setTimeout(r, 800));
-      const fresh = NS.patients.find(p=>p.code===code);
-      if(fresh) { NS.currentPatient = fresh; setTimeout(()=>openConsolidation(), 400); }
-    }
   } catch(err) {
     hideLoading();
     showError('Erreur lors de la création : '+err.message, 5000);
