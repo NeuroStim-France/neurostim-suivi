@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-13h15</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-14h00</span>
       </div>
     </div>
   </div>
@@ -7589,16 +7589,45 @@ async function confirmInterruptCure() {
 // ════════════════════════════════════════════════
 function openConsolidation() {
   const p = NS.currentPatient; if(!p) return;
-  const qs = getProtoQs(normalizeProtocols(p));
-  consQuestionnaires = [...new Set([...qs.monthly])];
-  if(!consQuestionnaires.length) consQuestionnaires = ['PHQ-9','GAD-7'];
+  const isReconfig = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
+
+  // Populate questionnaires — use existing config if reconfiguring, else derive from protocols
+  if(isReconfig && p.consolidation.questionnaires?.length) {
+    consQuestionnaires = [...p.consolidation.questionnaires];
+  } else {
+    const qs = getProtoQs(normalizeProtocols(p).map ? normalizeProtocols(p) : []);
+    consQuestionnaires = [...new Set([...qs.monthly])];
+    if(!consQuestionnaires.length) consQuestionnaires = ['PHQ-9','GAD-7'];
+  }
   renderConsQs();
-  document.getElementById('cons-months').value = p.consolidation?.months||6;
-  document.getElementById('cons-freq').value = p.consolidation?.freq||1;
-  // Default start date = endDate or today
+
+  // Duration & frequency — use existing config if reconfiguring
+  document.getElementById('cons-months').value = p.consolidation?.months || 6;
+  document.getElementById('cons-freq').value = p.consolidation?.freq || 1;
+
+  // Start date — only relevant for new config
   const startEl = document.getElementById('cons-start-date');
-  if(startEl) startEl.value = p.endDate || p.interruptDate || todayStr();
-  buildQSelectOptions('cons-add-q', false); // auto only for consolidation
+  if(startEl) startEl.value = p.consolidation?.startDate || p.endDate || p.interruptDate || todayStr();
+
+  // Reconfig UI
+  const reconfigArea = document.getElementById('cons-reconfig-area');
+  const infoBox = document.getElementById('cons-info-box');
+  const startDateFg = startEl?.closest('.fg');
+  if(isReconfig) {
+    reconfigArea.style.display = '';
+    // Default reconfig-from = today
+    const fromEl = document.getElementById('cons-reconfig-from');
+    if(fromEl) fromEl.value = todayStr();
+    // Hide the start date field (no longer relevant when reconfiguring)
+    if(startDateFg) startDateFg.style.display = 'none';
+    if(infoBox) infoBox.textContent = 'Modifier le suivi de consolidation à partir d\'une date. Les séances passées et déjà effectuées sont conservées.';
+  } else {
+    reconfigArea.style.display = 'none';
+    if(startDateFg) startDateFg.style.display = '';
+    if(infoBox) infoBox.textContent = 'Configurer le suivi de consolidation/maintien. Les questionnaires et la fréquence sont configurables.';
+  }
+
+  buildQSelectOptions('cons-add-q', false);
   openModal('m-consolidation');
 }
 
@@ -7606,35 +7635,71 @@ async function saveConsolidation() {
   const p = NS.currentPatient; if(!p) return;
   const months = parseFloat(document.getElementById('cons-months').value);
   const freq = parseFloat(document.getElementById('cons-freq').value);
-  const startDate = document.getElementById('cons-start-date')?.value || p.endDate || todayStr();
+  const isReconfig = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
 
-  // Remove old monthly items from schedule
-  let schedule = (p.schedule||[]).filter(s => s.type !== 'monthly');
+  // Determine the generation start date
+  let genFrom;
+  if(isReconfig) {
+    genFrom = document.getElementById('cons-reconfig-from')?.value;
+    if(!genFrom) { showError('Veuillez indiquer une date d\'application.', 3000); return; }
+  } else {
+    genFrom = document.getElementById('cons-start-date')?.value || p.endDate || todayStr();
+  }
 
-  // Generate new post-cure schedule from start date
-  let currentDate = new Date(startDate);
-  const endPostcure = new Date(startDate);
+  // Build new schedule:
+  // - If reconfig: keep all slots before genFrom, and all slots that are done/partially done
+  // - If new: remove all existing monthly slots
+  let schedule;
+  if(isReconfig) {
+    // Keep slots that are either: before genFrom, or have at least one done questionnaire
+    schedule = (p.schedule||[]).filter(s => {
+      if(s.type !== 'monthly') return true; // always keep non-monthly slots
+      if(s.date < genFrom) return true;     // keep past slots
+      if((s.done||[]).length > 0) return true; // keep partially/fully done slots
+      return false; // remove future undone monthly slots from genFrom onwards
+    });
+  } else {
+    schedule = (p.schedule||[]).filter(s => s.type !== 'monthly');
+  }
+
+  // Generate new monthly slots from genFrom
+  const startDate = isReconfig ? p.consolidation.startDate || genFrom : genFrom;
+  let currentDate = new Date(genFrom);
+  const endPostcure = new Date(genFrom);
   endPostcure.setMonth(endPostcure.getMonth() + months);
+
+  // Calculate iteration offset for label (how many periods before genFrom)
+  let iterOffset = 0;
+  if(isReconfig && p.consolidation?.startDate) {
+    const origStart = new Date(p.consolidation.startDate);
+    const msPerPeriod = freq < 1
+      ? Math.round(freq * 4 * 7) * 24 * 3600 * 1000
+      : freq * 30.44 * 24 * 3600 * 1000;
+    iterOffset = Math.round((new Date(genFrom) - origStart) / msPerPeriod);
+  }
 
   let iteration = 1;
   while(currentDate <= endPostcure) {
-    // Advance by frequency
     if(freq < 1) {
-      // Weekly or biweekly
       currentDate.setDate(currentDate.getDate() + Math.round(freq * 4 * 7));
     } else {
       currentDate.setMonth(currentDate.getMonth() + freq);
     }
     if(currentDate > endPostcure) break;
 
+    const slotDate = currentDate.toISOString().split('T')[0];
+    // Skip if a done slot already exists on this date
+    if(schedule.some(s => s.date === slotDate && s.type === 'monthly')) { iteration++; continue; }
+
+    const labelN = iterOffset + iteration;
     const label = freq < 1
-      ? 'Consolidation S+' + Math.round(iteration * freq * 4)
+      ? 'Consolidation S+' + Math.round(labelN * freq * 4)
       : freq === 1
-        ? 'Consolidation M+' + (iteration * freq)
-        : 'Consolidation M+' + Math.round(iteration * freq);
+        ? 'Consolidation M+' + labelN
+        : 'Consolidation M+' + Math.round(labelN * freq);
 
     schedule.push({
-      date: currentDate.toISOString().split('T')[0],
+      date: slotDate,
       questionnaires: [...consQuestionnaires],
       hetero: [], done: [], type: 'monthly',
       label
@@ -7643,12 +7708,18 @@ async function saveConsolidation() {
   }
   schedule.sort((a,b) => a.date.localeCompare(b.date));
 
+  const logMsg = isReconfig
+    ? 'Reconfiguration consolidation à partir du ' + genFrom + ' · ' + freq + '×/mois · ' + months + ' mois'
+    : 'Configuration consolidation · ' + freq + '×/mois · ' + months + ' mois';
+
   await db.doc('patients/'+p.id).update({
     schedule,
     status: 'postcure',
-    consolidation: {months, freq, questionnaires: consQuestionnaires, startDate}
+    consolidation: {months, freq, questionnaires: consQuestionnaires, startDate,
+      ...(isReconfig ? {reconfiguredAt: todayStr(), reconfiguredFrom: genFrom} : {})
+    }
   });
-  logAccess('set_consolidation', p.code);
+  logAccess('set_consolidation', p.code + ' · ' + logMsg);
   closeModal('m-consolidation');
   const fresh = await db.doc('patients/'+p.id).get();
   NS.currentPatient = {id: p.id, ...fresh.data()};
@@ -9059,9 +9130,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="modal fade">
     <div class="mh"><div class="mh-title">Consolidation / Maintien</div><button class="close-btn" onclick="closeModal('m-consolidation')">✕</button></div>
     <div class="mb">
-      <div class="info-box" style="margin-bottom:14px">Configurer le suivi de consolidation/maintien. Les questionnaires et la fréquence sont configurables.</div>
+      <div class="info-box" style="margin-bottom:14px" id="cons-info-box">Configurer le suivi de consolidation/maintien. Les questionnaires et la fréquence sont configurables.</div>
       <div class="fg"><label>Date de début</label>
         <input type="date" id="cons-start-date">
+      </div>
+      <!-- Shown only when reconfiguring an existing consolidation -->
+      <div id="cons-reconfig-area" style="display:none">
+        <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--amber)">
+          ⚠ Une consolidation est déjà en cours. Les séances futures non effectuées seront remplacées à partir de la date ci-dessous. Les séances passées et déjà faites sont conservées.
+        </div>
+        <div class="fg"><label>Appliquer à partir du</label>
+          <input type="date" id="cons-reconfig-from">
+        </div>
       </div>
       <div class="fg"><label>Durée du suivi</label>
         <select id="cons-months">
