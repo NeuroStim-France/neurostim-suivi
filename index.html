@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-15h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-16h30</span>
       </div>
     </div>
   </div>
@@ -1567,6 +1567,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">⛔ Interrompre</div><button class="close-btn" onclick="closeModal('m-interrupt-cure')">✕</button></div>
     <div class="mb">
+      <input type="hidden" id="interrupt-patient-id">
       <div class="warn-box" style="margin-bottom:14px">
         Les questionnaires non complétés après la date d'interruption seront supprimés du calendrier.
       </div>
@@ -1605,8 +1606,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal fade" style="max-width:640px">
     <div class="mh"><div class="mh-title">🗺️ Nouveau parcours</div><button class="close-btn" onclick="closeModal('m-add-parcours')">✕</button></div>
     <div class="mb" style="max-height:75vh;overflow-y:auto">
-
-      <!-- Contexte clinique -->
+      <input type="hidden" id="parcours-patient-id">
       <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif — multi-sélection)</span></div>
       <div class="ctx-dropdown" id="modal-ctx-dropdown" style="margin-bottom:14px">
         <button type="button" class="ctx-dropdown-btn" onclick="toggleCtxDropdown('modal-ctx-dropdown')">
@@ -1687,6 +1687,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mh"><div class="mh-title">➕ Ajouter un protocole</div><button class="close-btn" onclick="closeModal('m-add-protocol')">✕</button></div>
     <div class="mb">
       <div class="info-box" style="margin-bottom:14px;font-size:12px">Les questionnaires déjà présents dans le calendrier ne seront pas dupliqués.</div>
+      <input type="hidden" id="add-proto-patient-id">
       <div class="fg"><label>Protocole *</label>
         <select id="add-proto-name" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
           <option value="">-- Choisir --</option>
@@ -1719,6 +1720,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mh"><div class="mh-title">⚡ Saisir le PEM</div><button class="close-btn" onclick="closeModal('m-add-pem')">✕</button></div>
     <div class="mb">
       <p class="text-muted" style="margin-bottom:16px">Potentiel Évoqué Moteur — valeur en % de la puissance maximale de la machine.</p>
+      <input type="hidden" id="pem-patient-id">
       <div class="fg">
         <label>Date de la mesure</label>
         <input type="date" id="pem-date" class="fg input" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
@@ -2758,6 +2760,7 @@ function renderNotes() {
 
 function openEditNote(idx) {
   document.getElementById('edit-note-idx').value = idx;
+  document.getElementById('edit-note-patient-id').value = NS.currentPatient?.id || '';
   document.getElementById('edit-note-text').value = (NS.currentPatient.notes||[])[idx]?.text || '';
   openModal('m-edit-note');
 }
@@ -2766,36 +2769,44 @@ async function saveEditNote() {
   const idx = parseInt(document.getElementById('edit-note-idx').value);
   const text = document.getElementById('edit-note-text').value.trim();
   if(!text) return;
-  const p = NS.currentPatient;
-  const notes = [...(p.notes||[])];
+  const lockedId = document.getElementById('edit-note-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const notes = [...(patSnap.data().notes||[])];
   const note = notes[idx];
-  // Seul l'admin peut modifier les notes des autres
+  if(!note) return;
   const canEditNote = NS.userProfile.role === 'admin' || note.authorEmail === NS.userProfile.email;
-  if(!canEditNote) {
-    alert('Vous ne pouvez modifier que vos propres notes.'); return;
-  }
+  if(!canEditNote) { alert('Vous ne pouvez modifier que vos propres notes.'); return; }
   notes[idx] = {...note, text, modifiedDate: todayStr(), modifiedBy: NS.userProfile.displayName||NS.userProfile.email};
-  await db.doc('patients/'+p.id).update({notes});
-  NS.currentPatient.notes = notes;
+  await patRef.update({notes});
   closeModal('m-edit-note');
-  renderNotes();
+  if(NS.currentPatient?.id === lockedId) {
+    NS.currentPatient.notes = notes;
+    renderNotes();
+  }
 }
 
 async function deleteNote(idx) {
   if(!confirm('Supprimer cette note ?')) return;
-  const p = NS.currentPatient;
-  const notes = [...(p.notes||[])];
+  const lockedId = NS.currentPatient?.id;
+  if(!lockedId) return;
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const notes = [...(patSnap.data().notes||[])];
   const note = notes[idx];
-  // Seul l'admin peut supprimer les notes des autres
+  if(!note) return;
   const canDeleteNote = NS.userProfile.role === 'admin' || note.authorEmail === NS.userProfile.email;
-  if(!canDeleteNote) {
-    alert('Vous ne pouvez supprimer que vos propres notes.'); return;
-  }
+  if(!canDeleteNote) { alert('Vous ne pouvez supprimer que vos propres notes.'); return; }
   notes.splice(idx, 1);
-  await db.doc('patients/'+p.id).update({notes});
-  NS.currentPatient.notes = notes;
-  renderNotes();
-  renderLastNote();
+  await patRef.update({notes});
+  if(NS.currentPatient?.id === lockedId) {
+    NS.currentPatient.notes = notes;
+    renderNotes();
+    renderLastNote();
+  }
 }
 
 // ── Contexte clinique dropdown-checkbox ──
@@ -2880,16 +2891,22 @@ document.addEventListener('click', function(e) {
 });
 
 async function saveNote() {
-  const p=NS.currentPatient, text=document.getElementById('note-input').value.trim();
+  const p = NS.currentPatient; if(!p) return;
+  const text = document.getElementById('note-input').value.trim();
   if(!text) return;
-  const role = NS.userProfile.role || 'saisie'; // 'admin', 'saisie', or 'lecture'
-  const note={text, date:todayStr(), author:NS.userProfile.displayName||NS.userProfile.email, authorEmail:NS.userProfile.email, role};
-  const notes=[...(p.notes||[]),note];
-  await db.doc('patients/'+p.id).update({notes});
-  NS.currentPatient.notes=notes;
-  document.getElementById('note-input').value='';
-  renderNotes();
-  renderLastNote();
+  const role = NS.userProfile.role || 'saisie';
+  const note = {text, date:todayStr(), author:NS.userProfile.displayName||NS.userProfile.email, authorEmail:NS.userProfile.email, role};
+  // Read fresh from Firestore to avoid overwriting concurrent changes
+  const patRef = db.doc('patients/'+p.id);
+  const patSnap = await patRef.get();
+  const notes = [...((patSnap.exists ? patSnap.data().notes : null) || []), note];
+  await patRef.update({notes});
+  if(NS.currentPatient?.id === p.id) {
+    NS.currentPatient.notes = notes;
+    document.getElementById('note-input').value='';
+    renderNotes();
+    renderLastNote();
+  }
 }
 
 function renderScores() {
@@ -4042,16 +4059,23 @@ function toggleFullscreen() {
 // ── ADJUST CURE DATES ──
 function openAdjustDates() {
   const p = NS.currentPatient; if(!p) return;
+  document.getElementById('adj-patient-id').value = p.id;
   document.getElementById('adj-j1').value = p.j1Date || '';
   document.getElementById('adj-end').value = p.endDate || '';
   openModal('m-adjust-dates');
 }
 
 async function saveAdjustDates() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('adj-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const j1Date = document.getElementById('adj-j1').value;
   const endDate = document.getElementById('adj-end').value;
   if(!j1Date || !endDate) { alert('Veuillez remplir les deux dates.'); return; }
+
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const p = {id: lockedId, ...patSnap.data()};
   // Generate new schedule
   const adjProtos = normalizeProtocols(p).map(pr => ({...pr, startDate:j1Date, endDate}));
   const newSchedule = genSchedule({protocols: adjProtos});
@@ -6996,6 +7020,8 @@ const FREQ_OPTIONS = [
 ];
 
 function openAddParcours() {
+  const p = NS.currentPatient; if(!p) return;
+  document.getElementById('parcours-patient-id').value = p.id;
   // Reset state
   parcoursState = {contextes:[], type:'', subtype:{}, startDate:todayStr(),
     duration:6, baseQs:[], specificQs:[], addedQs:[], freqMap:{}};
@@ -7226,13 +7252,20 @@ function renderParcoursFreqList() {
 }
 
 async function confirmAddParcours() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('parcours-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const type = document.getElementById('parcours-type').value;
   const startDate = document.getElementById('parcours-start').value;
   const duration = parseInt(document.getElementById('parcours-duration').value) || 0;
 
   if(!type) { alert('Veuillez choisir un type de parcours.'); return; }
   if(!startDate) { alert('Veuillez indiquer une date de démarrage.'); return; }
+
+  // Read fresh from Firestore
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const p = {id: lockedId, ...patSnap.data()};
 
   // Build questionnaire list with frequencies
   const allQs = [];
@@ -7374,6 +7407,7 @@ function genParcoursSlotsSlots(parc) {
 
 function openAddProtocolToPatient() {
   const p = NS.currentPatient; if(!p) return;
+  document.getElementById('add-proto-patient-id').value = p.id;
   document.getElementById('add-proto-name').value = '';
   document.getElementById('add-proto-j1').value = todayStr();
   document.getElementById('add-proto-end').value = '';
@@ -7381,13 +7415,20 @@ function openAddProtocolToPatient() {
 }
 
 async function confirmAddProtocol() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('add-proto-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const name = document.getElementById('add-proto-name').value;
   const j1 = document.getElementById('add-proto-j1').value;
   const end = document.getElementById('add-proto-end').value;
   if(!name) { alert('Veuillez choisir un protocole.'); return; }
   if(!j1 || !end) { alert('Veuillez remplir les deux dates.'); return; }
   if(new Date(end) <= new Date(j1)) { alert('La fin de suivi doit être après le J1.'); return; }
+
+  // Read fresh from Firestore
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const p = {id: lockedId, ...patSnap.data()};
 
   // Normalize existing protocols
   const existingProtos = normalizeProtocols(p);
@@ -7446,6 +7487,7 @@ async function confirmAddProtocol() {
 
 function openInterruptCure() {
   const p = NS.currentPatient; if(!p) return;
+  document.getElementById('interrupt-patient-id').value = p.id;
   const protos = normalizeProtocols(p);
   const dateEl = document.getElementById('interrupt-date');
   if(dateEl) dateEl.value = todayStr();
@@ -7470,7 +7512,8 @@ function openInterruptCure() {
 }
 
 async function confirmInterruptCure() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('interrupt-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const interruptDate = document.getElementById('interrupt-date')?.value;
   const reason = document.getElementById('interrupt-reason')?.value || '';
   const doPostcure = document.getElementById('interrupt-postcure')?.value === 'yes';
@@ -7480,6 +7523,12 @@ async function confirmInterruptCure() {
   const rtmsProtoName = isRtmsSel ? whichProto.replace('rtms_', '') : null;
 
   if(!interruptDate) { alert('Veuillez indiquer la date d\'interruption.'); return; }
+
+  // Read fresh from Firestore
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const p = {id: lockedId, ...patSnap.data()};
 
   const isPostcureInterrupt = whichProto === 'postcure';
   let updateData = {};
@@ -7597,6 +7646,7 @@ async function confirmInterruptCure() {
 // ════════════════════════════════════════════════
 function openConsolidation() {
   const p = NS.currentPatient; if(!p) return;
+  document.getElementById('cons-patient-id').value = p.id;
   const isReconfig = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
 
   // Populate questionnaires — use existing config if reconfiguring, else derive from protocols
@@ -7640,9 +7690,17 @@ function openConsolidation() {
 }
 
 async function saveConsolidation() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('cons-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const months = parseFloat(document.getElementById('cons-months').value);
   const freq = parseFloat(document.getElementById('cons-freq').value);
+
+  // Read fresh from Firestore
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const p = {id: lockedId, ...patSnap.data()};
+
   const isReconfig = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
 
   // Determine the generation start date
@@ -7875,26 +7933,35 @@ function openAddPEM() {
   const p = NS.currentPatient; if(!p) return;
   document.getElementById('pem-date').value = todayStr();
   document.getElementById('pem-value').value = '';
+  document.getElementById('pem-patient-id').value = p.id;
   openModal('m-add-pem');
 }
 
 async function savePEM() {
-  const p = NS.currentPatient; if(!p) return;
+  const lockedId = document.getElementById('pem-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const date = document.getElementById('pem-date').value;
   const val = parseInt(document.getElementById('pem-value').value);
   if(!date) { showError('Veuillez saisir une date.', 3000); return; }
   if(isNaN(val) || val < 1 || val > 100) { showError('La valeur PEM doit être entre 1 et 100.', 3000); return; }
 
-  const key = date + '_PEM';
-  const responses = { ...(p.responses || {}) };
-  responses[key] = { questionnaire: 'PEM', date, score: val, completedAt: new Date().toISOString() };
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) { showError('Patient introuvable.', 3000); return; }
+  const patData = patSnap.data();
 
-  await db.doc('patients/' + p.id).update({ responses });
-  NS.currentPatient.responses = responses;
+  const key = date + '_PEM';
+  const responses = {...(patData.responses||{})};
+  responses[key] = {questionnaire:'PEM', date, score:val, completedAt:new Date().toISOString()};
+
+  await patRef.update({responses});
+  logAccess('add_pem', patData.code + ' ' + date + ' ' + val + '%');
   closeModal('m-add-pem');
-  renderScores();
   showError('PEM enregistré : ' + val + '%', 2000);
-  logAccess('add_pem', p.code + ' ' + date + ' ' + val + '%');
+  if(NS.currentPatient?.id === lockedId) {
+    NS.currentPatient.responses = responses;
+    renderScores();
+  }
 }
 
 
@@ -9041,6 +9108,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Ajuster les dates de suivi</div><button class="close-btn" onclick="closeModal('m-adjust-dates')">✕</button></div>
     <div class="mb">
       <div class="warn-box" style="margin-bottom:14px">Le calendrier sera recalculé à partir des nouvelles dates. Les questionnaires déjà complétés sont conservés.</div>
+      <input type="hidden" id="adj-patient-id">
       <div class="fg"><label>Date de début (1ère séance)</label><input type="date" id="adj-j1"></div>
       <div class="fg"><label>Date fin de suivi estimée</label><input type="date" id="adj-end"></div>
     </div>
@@ -9057,6 +9125,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Modifier la note</div><button class="close-btn" onclick="closeModal('m-edit-note')">✕</button></div>
     <div class="mb">
       <input type="hidden" id="edit-note-idx">
+      <input type="hidden" id="edit-note-patient-id">
       <div class="fg"><label>Note</label><textarea id="edit-note-text" rows="5" autocomplete="off"></textarea></div>
       <div class="info-box" style="font-size:11px">L'horodatage original est conservé. La date de modification sera ajoutée.</div>
     </div>
@@ -9152,6 +9221,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div class="mh"><div class="mh-title">Consolidation / Maintien</div><button class="close-btn" onclick="closeModal('m-consolidation')">✕</button></div>
     <div class="mb">
       <div class="info-box" style="margin-bottom:14px" id="cons-info-box">Configurer le suivi de consolidation/maintien. Les questionnaires et la fréquence sont configurables.</div>
+      <input type="hidden" id="cons-patient-id">
       <div class="fg"><label>Date de début</label>
         <input type="date" id="cons-start-date">
       </div>
