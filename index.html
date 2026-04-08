@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-14h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-14h20</span>
       </div>
     </div>
   </div>
@@ -2612,8 +2612,12 @@ function renderPatientDetail() {
     });
     protsEl.innerHTML = [...rtmsBadges, ...parcoursBadges].join('') || '<span style="font-size:12px;color:var(--text3)">Aucun suivi actif</span>';
   }
-  const firstTab=document.querySelector('#page-patient-detail .tab');
-  switchTab('suivi',firstTab);
+  // Update consolidation dropdown label based on existing config
+  const consDropBtn = document.querySelector('#add-dropdown-menu .dropdown-item[onclick*="openConsolidation"]');
+  if(consDropBtn) {
+    const hasExistingCons = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
+    consDropBtn.textContent = hasExistingCons ? '📆 Modifier la consolidation' : '📆 Consolidation / Maintien';
+  }
   renderTimeline(); renderNotes(); renderScores();
   renderLastNote();
 }
