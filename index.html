@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-15h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-15h30</span>
       </div>
     </div>
   </div>
@@ -1744,6 +1744,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mh"><div class="mh-title">➕ Ajouter un questionnaire unique</div><button class="close-btn" onclick="closeModal('m-add-single-q')">✕</button></div>
     <div class="mb">
       <p class="text-muted" style="margin-bottom:14px">Ajouter un questionnaire ponctuel au calendrier du patient, à une date choisie.</p>
+      <input type="hidden" id="single-q-patient-id">
       <div class="fg"><label>Questionnaire</label>
         <select id="single-q-name">
           <option value="">-- Sélectionner --</option>
@@ -7759,11 +7760,16 @@ function openAddSingleQ() {
   buildQSelectOptions('single-q-name', true); // include hetero
   const nameEl = document.getElementById('single-q-name');
   if(nameEl) nameEl.value = '';
+  // Lock the patient ID at the moment the modal is opened
+  const hiddenEl = document.getElementById('single-q-patient-id');
+  if(hiddenEl) hiddenEl.value = NS.currentPatient?.id || '';
   openModal('m-add-single-q');
 }
 
 async function addSingleQuestionnaire() {
-  const p = NS.currentPatient; if(!p) return;
+  // Use the patient ID locked at modal open — not NS.currentPatient which may have changed
+  const lockedId = document.getElementById('single-q-patient-id')?.value || NS.currentPatient?.id;
+  if(!lockedId) return;
   const qName = document.getElementById('single-q-name')?.value;
   const date = document.getElementById('single-q-date')?.value;
   const label = document.getElementById('single-q-label')?.value || 'Questionnaire ponctuel';
@@ -7774,11 +7780,16 @@ async function addSingleQuestionnaire() {
   const qi = QUESTIONNAIRES[qName];
   const isHetero = qi?.type === 'hetero';
 
-  const schedule = [...(p.schedule||[])];
+  // Always read fresh schedule from Firestore — never trust NS.currentPatient.schedule
+  const patRef = db.doc('patients/'+lockedId);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) { showError('Patient introuvable.', 3000); return; }
+  const patData = patSnap.data();
+
+  const schedule = [...(patData.schedule||[])];
   // Check if already exists for this date
   const existing = schedule.find(s => s.date === date && s.type === 'ponctuel');
   if(existing) {
-    // Add to existing ponctuel slot for this date
     if(isHetero) {
       if(!existing.hetero) existing.hetero = [];
       if(!existing.hetero.includes(qName)) existing.hetero.push(qName);
@@ -7798,13 +7809,16 @@ async function addSingleQuestionnaire() {
   }
   schedule.sort((a,b) => a.date.localeCompare(b.date));
 
-  await db.doc('patients/'+p.id).update({schedule});
-  logAccess('add_single_q', p.code + ' · ' + qName + ' · ' + date);
+  await patRef.update({schedule});
+  logAccess('add_single_q', patData.code + ' · ' + qName + ' · ' + date);
   closeModal('m-add-single-q');
 
-  const fresh = await db.doc('patients/'+p.id).get();
-  NS.currentPatient = {id: p.id, ...fresh.data()};
-  renderTimeline();
+  // Only update NS.currentPatient if still on the same patient
+  if(NS.currentPatient?.id === lockedId) {
+    const fresh = await patRef.get();
+    NS.currentPatient = {id: lockedId, ...fresh.data()};
+    renderTimeline();
+  }
 }
 
 
