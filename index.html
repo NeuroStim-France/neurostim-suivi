@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-16h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-17h30</span>
       </div>
     </div>
   </div>
@@ -3945,6 +3945,43 @@ async function openEditPatient(id) {
         +'</label>';
     }).join('');
   }
+  // Show/hide sections based on patient type
+  const activeParcours = (p.parcours||[]).filter(parc => parc.status !== 'interrompu');
+  const hasRtms = normalizeProtocols(p).length > 0;
+  const isParcourOnly = activeParcours.length > 0 && !hasRtms;
+  const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈'};
+  const PARCOURS_LABELS = {medicament:'Médicament',cpap:'CPAP/OAM',psychotherapie:'Psychothérapie',remediation:'Remédiation',groupe:'Thérapie groupe',monitoring:'Monitoring'};
+
+  const parcoursSection = document.getElementById('edit-parcours-section');
+  const protocolsSection = document.getElementById('edit-protocols-section');
+  if(parcoursSection) parcoursSection.style.display = activeParcours.length ? '' : 'none';
+  if(protocolsSection) protocolsSection.style.display = isParcourOnly ? 'none' : '';
+
+  // Populate parcours list
+  const parcoursList = document.getElementById('edit-parcours-list');
+  if(parcoursList && activeParcours.length) {
+    parcoursList.innerHTML = activeParcours.map(parc => {
+      const icon = PARCOURS_ICONS[parc.type] || '🗺️';
+      const label = PARCOURS_LABELS[parc.type] || parc.type;
+      const contextes = (parc.contextes||[]).map(code => {
+        const ctx = PARCOURS_CONFIG.contextes.find(c=>c.code===code);
+        return ctx ? ctx.label : code;
+      }).filter(Boolean).join(' · ');
+      return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
+        + '<div>'
+        + '<div style="font-size:13px;font-weight:600">' + icon + ' ' + label + '</div>'
+        + (contextes ? '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + contextes + '</div>' : '')
+        + '<div style="font-size:11px;color:var(--text3)">Début : ' + fmtDate(parc.startDate) + (parc.endDate ? ' · Fin : ' + fmtDate(parc.endDate) : ' · Durée indéfinie') + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:5px;flex-shrink:0">'
+        + '<div class="fg" style="margin:0"><input type="date" value="' + (parc.endDate||'') + '" title="Modifier la date de fin" style="padding:5px 8px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:12px" onchange="editParcoursEndDate(\'' + parc.id + '\',this.value)"></div>'
+        + '</div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
   openModal('m-edit-patient');
 }
 
@@ -3956,53 +3993,79 @@ function toggleEditProtocol(val, el) {
   hidden.value = JSON.stringify(prots);
 }
 
+// Track parcours end date edits in modal
+const _editParcoursChanges = {};
+function editParcoursEndDate(parcoursId, newEndDate) {
+  _editParcoursChanges[parcoursId] = newEndDate;
+}
+
 async function saveEditPatient() {
   const id = document.getElementById('edit-pat-id').value;
-  const j1Date = document.getElementById('edit-j1').value;
-  const endDate = document.getElementById('edit-end').value;
-  const status = document.getElementById('edit-status').value;
   const dob = document.getElementById('edit-dob').value;
-  const rawProts = JSON.parse(document.getElementById('edit-protocols-hidden').value || '[]');
-  // Convert to new format, preserving existing dates if already new format
-  const existingProtos = normalizeProtocols(NS.currentPatient||{});
-  const protocols = rawProts.map(name => {
-    const ex = existingProtos.find(pr=>pr.name===name);
-    return ex || {name, startDate: j1Date, endDate};
-  });
-  if(!j1Date || !endDate) { alert('Veuillez remplir les dates.'); return; }
-  if(!protocols.length) { alert('Veuillez sélectionner au moins un protocole.'); return; }
-  // Regenerate schedule based on new dates/protocols
-  const newSchedule = genSchedule({protocols});
-  // Preserve done status by type+index
-  const patSnap2 = await db.doc('patients/'+id).get();
-  const oldSched = patSnap2.data().schedule || [];
-  ['consent','j1','end'].forEach(type => {
-    const oldItem = oldSched.find(s => s.type === type);
-    const newItem = newSchedule.find(s => s.type === type);
-    if(oldItem && newItem && oldItem.done && oldItem.done.length > 0) newItem.done = [...oldItem.done];
-  });
-  ['weekly','monthly'].forEach(type => {
-    const oldItems = oldSched.filter(s => s.type === type);
-    const newItems = newSchedule.filter(s => s.type === type);
-    oldItems.forEach((oi,idx) => { if(oi.done && oi.done.length > 0 && newItems[idx]) newItems[idx].done = [...oi.done]; });
-  });
-  const newCabinet = document.getElementById('edit-cabinet') ? document.getElementById('edit-cabinet').value : null;
+  const newCabinet = document.getElementById('edit-cabinet')?.value || null;
   const extraCabinets = [];
   document.querySelectorAll('.extra-cabinet-check:checked').forEach(cb => extraCabinets.push(cb.value));
   const newPrenom = document.getElementById('edit-prenom')?.value.trim() || '';
   const newNom = document.getElementById('edit-nom')?.value.trim() || '';
-  const updateData = {j1Date, endDate, status, dob, protocols, schedule: newSchedule};
+
+  // Always read fresh from Firestore
+  const patSnap2 = await db.doc('patients/'+id).get();
+  if(!patSnap2.exists) return;
+  const freshData = patSnap2.data();
+
+  const activeParcours = (freshData.parcours||[]).filter(parc => parc.status !== 'interrompu');
+  const isParcourOnly = activeParcours.length > 0 && normalizeProtocols(freshData).length === 0;
+
+  const updateData = {dob};
   if(newCabinet) updateData.cabinet = newCabinet;
   updateData.extraCabinets = extraCabinets;
   if(newPrenom) updateData.prenom = newPrenom;
   if(newNom) updateData.nom = newNom;
+
+  if(isParcourOnly) {
+    // Parcours-only: apply any end date changes from modal
+    if(Object.keys(_editParcoursChanges).length) {
+      updateData.parcours = (freshData.parcours||[]).map(parc =>
+        _editParcoursChanges[parc.id] !== undefined ? {...parc, endDate: _editParcoursChanges[parc.id]||null} : parc
+      );
+    }
+  } else {
+    const j1Date = document.getElementById('edit-j1').value;
+    const endDate = document.getElementById('edit-end').value;
+    const status = document.getElementById('edit-status').value;
+    const rawProts = JSON.parse(document.getElementById('edit-protocols-hidden').value || '[]');
+    const existingProtos = normalizeProtocols(freshData);
+    const protocols = rawProts.map(name => {
+      const ex = existingProtos.find(pr=>pr.name===name);
+      return ex || {name, startDate: j1Date, endDate};
+    });
+    if(!j1Date || !endDate) { alert('Veuillez remplir les dates.'); return; }
+    if(!protocols.length) { alert('Veuillez sélectionner au moins un protocole.'); return; }
+    const newSchedule = genSchedule({protocols});
+    const oldSched = freshData.schedule || [];
+    ['consent','j1','end'].forEach(type => {
+      const oldItem = oldSched.find(s => s.type === type);
+      const newItem = newSchedule.find(s => s.type === type);
+      if(oldItem && newItem && oldItem.done && oldItem.done.length > 0) newItem.done = [...oldItem.done];
+    });
+    ['weekly','monthly'].forEach(type => {
+      const oldItems = oldSched.filter(s => s.type === type);
+      const newItems = newSchedule.filter(s => s.type === type);
+      oldItems.forEach((oi,idx) => { if(oi.done && oi.done.length > 0 && newItems[idx]) newItems[idx].done = [...oi.done]; });
+    });
+    updateData.j1Date = j1Date;
+    updateData.endDate = endDate;
+    updateData.status = status;
+    updateData.protocols = protocols;
+    updateData.schedule = newSchedule;
+  }
+
   await db.doc('patients/'+id).update(updateData);
-  // Log detailed history entry on the patient document
   const histEntry = {
     action: 'edit_patient',
     user: NS.userProfile?.displayName || NS.userProfile?.email || 'unknown',
     date: new Date().toISOString().split('T')[0],
-    detail: 'Statut: '+status+' · J1: '+j1Date+' · Fin: '+endDate
+    detail: isParcourOnly ? 'Modification parcours' : ('Statut: '+(updateData.status||'')+' · J1: '+(updateData.j1Date||'')+' · Fin: '+(updateData.endDate||''))
   };
   const histSnap = await db.doc('patients/'+id).get();
   const history = histSnap.data().history || [];
@@ -4010,7 +4073,7 @@ async function saveEditPatient() {
   await db.doc('patients/'+id).update({history});
   logAccess('edit_patient', id);
   closeModal('m-edit-patient');
-  // Refresh if on detail page
+  Object.keys(_editParcoursChanges).forEach(k => delete _editParcoursChanges[k]);
   if(NS.currentPatient && NS.currentPatient.id === id) {
     const fresh = await db.doc('patients/'+id).get();
     NS.currentPatient = {id, ...fresh.data()};
@@ -7299,15 +7362,34 @@ async function confirmAddParcours() {
   // Generate schedule slots for this parcours
   const newSlots = genParcoursSlotsSlots(parcoursObj);
 
-  // Merge into existing schedule (no duplicates)
+  // Merge into existing schedule
+  // - For bilan initial (type:'parcours') and bilan final (type:'parcours_end'):
+  //   merge questionnaires into existing slot at same date+type regardless of parcoursId
+  //   (patient has one bilan session even with multiple parcours)
+  // - For suivi slots (type:'parcours_suivi'): dedupe by date+type+parcoursId
   const existingSchedule = p.schedule || [];
   const mergedSchedule = [...existingSchedule];
   newSlots.forEach(ns => {
-    const existing = mergedSchedule.find(s => s.date===ns.date && s.type===ns.type && s.parcoursId===ns.parcoursId);
-    if(!existing) mergedSchedule.push({...ns});
-    else {
-      const newQs = (ns.questionnaires||[]).filter(q=>!existing.questionnaires.includes(q));
-      existing.questionnaires = [...existing.questionnaires, ...newQs];
+    if(ns.type === 'parcours' || ns.type === 'parcours_end') {
+      // Find any existing bilan slot on same date+type (regardless of parcoursId)
+      const existing = mergedSchedule.find(s => s.date === ns.date && s.type === ns.type);
+      if(!existing) {
+        mergedSchedule.push({...ns});
+      } else {
+        // Merge questionnaires — no duplicates
+        const newQs = (ns.questionnaires||[]).filter(q => !existing.questionnaires.includes(q));
+        existing.questionnaires = [...existing.questionnaires, ...newQs];
+        // Keep label generic
+        existing.label = ns.type === 'parcours' ? 'Bilan initial' : 'Bilan final';
+      }
+    } else {
+      // suivi slots: dedupe by date+type+parcoursId
+      const existing = mergedSchedule.find(s => s.date===ns.date && s.type===ns.type && s.parcoursId===ns.parcoursId);
+      if(!existing) mergedSchedule.push({...ns});
+      else {
+        const newQs = (ns.questionnaires||[]).filter(q=>!existing.questionnaires.includes(q));
+        existing.questionnaires = [...existing.questionnaires, ...newQs];
+      }
     }
   });
   mergedSchedule.sort((a,b)=>a.date<b.date?-1:1);
@@ -9063,10 +9145,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="fg"><select id="edit-cabinet" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px"></select></div>
       <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cabinets supplémentaires</div>
       <div id="edit-extra-cabinets" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px"></div>
-      <!-- Statut & dates -->
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cure</div>
-      <div class="g2">
-        <div class="fg"><label>Statut</label>
+      <!-- Section Parcours (shown when patient has parcours) -->
+      <div id="edit-parcours-section" style="display:none">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;margin-top:4px">Parcours actifs</div>
+        <div id="edit-parcours-list" style="margin-bottom:12px"></div>
+      </div>
+      <!-- Section Protocoles rTMS (hidden for pure parcours patients) -->
+      <div id="edit-protocols-section">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Cure</div>
+        <div class="g2">
+          <div class="fg"><label>Statut</label>
           <select id="edit-status">
             <option value="cure">En cours de suivi</option>
             <option value="postcure">Consolidation/maintien</option>
@@ -9093,7 +9181,8 @@ document.addEventListener('DOMContentLoaded',()=>{
         <button class="prot-btn edit-prot-btn" data-prot="add_alc" onclick="toggleEditProtocol('add_alc',this)">Addiction alcool</button>
         <button class="prot-btn edit-prot-btn" data-prot="add_coc" onclick="toggleEditProtocol('add_coc',this)">Addiction cocaïne</button>
         <button class="prot-btn edit-prot-btn" data-prot="add_aut" onclick="toggleEditProtocol('add_aut',this)">Addiction autre</button>
-      </div>
+      </div><!-- end prot-grid -->
+      </div><!-- end edit-protocols-section -->
     </div>
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeModal('m-edit-patient')">Annuler</button>
