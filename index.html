@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-12h45</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-13h15</span>
       </div>
     </div>
   </div>
@@ -3698,7 +3698,7 @@ async function createPatient() {
       endDate = validProtos.reduce((m,p)=>p.endDate>m?p.endDate:m,'');
     }
 
-    await db.collection('patients').add({
+    const patientData = {
       code, patientId, dob, j1Date, endDate, cabinet,
       prenom: prenom,
       nom: nom,
@@ -3709,15 +3709,15 @@ async function createPatient() {
       schedule,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       createdBy:NS.userProfile.displayName||NS.userProfile.email
-    });
+    };
+    const docRef = await db.collection('patients').add(patientData);
     hideLoading();
     closeModal('m-add-patient');
     logAccess('create_patient', code);
     if(newPat.mode === 'postcure') {
-      // Open the consolidation config modal immediately after creation
-      await new Promise(r => setTimeout(r, 800));
-      const fresh = NS.patients.find(p=>p.code===code);
-      if(fresh) { NS.currentPatient = fresh; setTimeout(()=>openConsolidation(), 400); }
+      // Set currentPatient immediately from local data — no need to wait for snapshot
+      NS.currentPatient = {id: docRef.id, ...patientData, createdAt: new Date()};
+      openConsolidation();
     }
   } catch(err) {
     hideLoading();
