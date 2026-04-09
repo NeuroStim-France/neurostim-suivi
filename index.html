@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.08-18h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.09-10h00</span>
       </div>
     </div>
   </div>
@@ -2143,9 +2143,16 @@ const NS = {user:null,userProfile:null,patients:[],currentPatient:null,unsub:nul
 let currentQ = {patientId:null,qName:null,date:null,answers:[],currentIdx:0};
 let newPat = {step:1, protocols:[], mode:'cure'}; // protocols = [{name,startDate,endDate}]
 
+function normalizeStr(s) {
+  // Normalize accented chars to ASCII equivalents, then keep only letters
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'') // strip diacritics
+           .toUpperCase().replace(/[^A-Z]/g,''); // keep only A-Z
+}
 function genCode(p,n,d) {
-  const pp=p.trim().toUpperCase().replace(/[^A-Z]/g,'').substring(0,3).padEnd(3,'X');
-  const nn=n.trim().toUpperCase().replace(/[^A-Z]/g,'').substring(0,3).padEnd(3,'X');
+  // For compound names (e.g. "ES SQALLI"), take first 3 letters of the full normalized name
+  // For short names (e.g. "WU"), pad with X
+  const pp = normalizeStr(p.trim()).substring(0,3).padEnd(3,'X');
+  const nn = normalizeStr(n.trim()).substring(0,3).padEnd(3,'X');
   return pp+'-'+nn+'-'+d.replace(/-/g,'');
 }
 function fmtDate(d) {
