@@ -502,7 +502,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <span class="error-banner-msg" id="error-banner-msg">Une erreur est survenue.</span>
   <button class="error-banner-close" onclick="hideError()">✕</button>
 </div>
-<div id="offline-badge">⚡ Hors ligne — reconnexion en cours…</div>
+<div id="offline-badge">⚡ Hors ligne - reconnexion en cours…</div>
 <div id="loading-overlay">
   <div class="loading-spinner"></div>
   <div class="loading-text" id="loading-text">Chargement…</div>
@@ -612,8 +612,8 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="user-row">
         <div class="user-av" id="sb-user-av">??</div>
         <div style="flex:1">
-          <div class="user-name" id="sb-user-name">—</div>
-          <div class="user-role" id="sb-user-role">—</div>
+          <div class="user-name" id="sb-user-name">-</div>
+          <div class="user-role" id="sb-user-role">-</div>
         </div>
         <button class="logout-btn" onclick="doLogout()">
           <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 3h4v14h-4M9 14l-4-4 4-4M5 10h8"/></svg>
@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.09-10h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.09-10h20</span>
       </div>
     </div>
   </div>
@@ -719,7 +719,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-secondary btn-sm saisie-only" onclick="showPage('archives',document.querySelector('[onclick*=archives]'))" style="white-space:nowrap">📦 Archives</button>
         <select style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none" onchange="renderPatientList({protocol:this.value})">
           <option value="all">Tous les protocoles</option>
-          <option value="add_alc">Addiction — alcool</option><option value="add_coc">Addiction — cocaïne</option><option value="add_aut">Addiction — autre</option>
+          <option value="add_alc">Addiction - alcool</option><option value="add_coc">Addiction - cocaïne</option><option value="add_aut">Addiction - autre</option>
           <option value="cognitif">Trouble cognitif</option><option value="depression">Dépression</option><option value="douleur">Douleur</option>
           <option value="ptsd">Stress post-traumatique</option><option value="toc">TOC</option><option value="anxiete">Trouble anxieux</option>
           <option value="schiz_h">Schizophrénie hallucinatoire</option><option value="schiz_n">Schizophrénie négative</option>
@@ -734,7 +734,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <div class="topbar-title">
           <button class="btn btn-ghost btn-sm" onclick="showPage('patients',document.querySelector('[onclick*=patients]'))" style="color:var(--text2);font-weight:400">← Patients</button>
           <span style="color:var(--text3)">/</span>
-          <span class="mono" id="pd-code">—</span>
+          <span class="mono" id="pd-code">-</span>
         </div>
         <div class="topbar-actions" style="flex-direction:column;align-items:flex-end;gap:5px">
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
@@ -766,45 +766,45 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <!-- Print header (hidden on screen) -->
       <div class="print-header">
-        <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="print-code">—</div>
-        <div class="print-header-title">NeuroStim data manager — Résumé de suivi</div>
-        <div class="print-header-date" id="print-date">—</div>
+        <div style="font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="print-code">-</div>
+        <div class="print-header-title">NeuroStim data manager - Résumé de suivi</div>
+        <div class="print-header-date" id="print-date">-</div>
       </div>
       <div class="pat-header-v2">
         <div class="ph-top">
           <div class="pat-h-av-v2" id="pd-av">??</div>
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <span style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.3px" id="pd-code2">—</span>
+              <span style="font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;letter-spacing:-.3px" id="pd-code2">-</span>
               <span id="pd-status-badge"></span>
             </div>
-            <div style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:3px" id="pd-id">—</div>
+            <div style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:3px" id="pd-id">-</div>
             <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap" id="pd-prots"></div>
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0">
-            <div style="font-size:11px;color:var(--text3);text-align:right" id="pd-cabinet-label">—</div>
+            <div style="font-size:11px;color:var(--text3);text-align:right" id="pd-cabinet-label">-</div>
           </div>
         </div>
         <div class="ph-meta">
           <div class="ph-meta-item">
             <div class="meta-label">Date de naissance</div>
-            <div class="meta-val" id="pd-dob">—</div>
+            <div class="meta-val" id="pd-dob">-</div>
           </div>
           <div class="ph-meta-item">
             <div class="meta-label">Début du suivi</div>
-            <div class="meta-val" id="pd-j1">—</div>
+            <div class="meta-val" id="pd-j1">-</div>
           </div>
           <div class="ph-meta-item">
             <div class="meta-label">Fin du suivi estimée</div>
-            <div class="meta-val" id="pd-end">—</div>
+            <div class="meta-val" id="pd-end">-</div>
           </div>
           <div class="ph-meta-item">
             <div class="meta-label">Cabinet</div>
-            <div class="meta-val" id="pd-cabinet">—</div>
+            <div class="meta-val" id="pd-cabinet">-</div>
           </div>
           <div class="ph-meta-item" style="border-right:none">
             <div class="meta-label">Créé le · par</div>
-            <div class="meta-val" id="pd-created">—</div>
+            <div class="meta-val" id="pd-created">-</div>
           </div>
         </div>
       </div>
@@ -813,9 +813,9 @@ body.role-saisie .analyse-only { display:none !important; }
         <div style="border:1px solid var(--amber-border);background:var(--amber-bg);border-radius:var(--r-sm);padding:12px 14px;cursor:pointer" onclick="switchTab('notes',document.querySelectorAll('#page-patient-detail .tab')[2])">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
             <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.4px">📝 Dernière note clinique</div>
-            <div style="font-size:11px;color:var(--amber)" id="last-note-meta">—</div>
+            <div style="font-size:11px;color:var(--amber)" id="last-note-meta">-</div>
           </div>
-          <div style="font-size:13px;color:var(--text);line-height:1.5" id="last-note-text">—</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.5" id="last-note-text">-</div>
           <div style="font-size:11px;color:var(--amber);margin-top:5px">Voir toutes les notes →</div>
         </div>
       </div>
@@ -880,7 +880,7 @@ body.role-saisie .analyse-only { display:none !important; }
             <div style="width:44px;height:44px;border-radius:12px;background:#f0eef8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📋</div>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Suivi &amp; questionnaires</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Suivi &amp; questionnaires</strong> affiche la timeline complète : bilans initiaux et finaux, séances hebdomadaires, suivis mensuels, et jalons de parcours (en violet). Les séances à venir au-delà de 7 jours sont masquées par défaut — un bouton permet de toutes les afficher. Cliquez sur un score pour voir le détail des réponses.</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Suivi &amp; questionnaires</strong> affiche la timeline complète : bilans initiaux et finaux, séances hebdomadaires, suivis mensuels, et jalons de parcours (en violet). Les séances à venir au-delà de 7 jours sont masquées par défaut - un bouton permet de toutes les afficher. Cliquez sur un score pour voir le détail des réponses.</div>
             </div>
           </div>
 
@@ -888,7 +888,7 @@ body.role-saisie .analyse-only { display:none !important; }
             <div style="width:44px;height:44px;border-radius:12px;background:#fef9e7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📊</div>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Évolution des scores</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Scores</strong> affiche les graphiques d'évolution de chaque questionnaire au fil du temps. Un delta (Δ) indique l'évolution entre le premier et le dernier score. Pour le 15D (qualité de vie), le score est compris entre 0 et 1 — plus il est élevé, meilleure est la qualité de vie.</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Scores</strong> affiche les graphiques d'évolution de chaque questionnaire au fil du temps. Un delta (Δ) indique l'évolution entre le premier et le dernier score. Pour le 15D (qualité de vie), le score est compris entre 0 et 1 - plus il est élevé, meilleure est la qualité de vie.</div>
             </div>
           </div>
 
@@ -896,7 +896,7 @@ body.role-saisie .analyse-only { display:none !important; }
             <div style="width:44px;height:44px;border-radius:12px;background:#f4ecf7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🕜</div>
             <div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Historique complet</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Historique</strong> présente une vue chronologique de l'ensemble du parcours — du consentement initial jusqu'à aujourd'hui — avec tous les jalons, questionnaires et notes cliniques.</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.6">L'onglet <strong>Historique</strong> présente une vue chronologique de l'ensemble du parcours - du consentement initial jusqu'à aujourd'hui - avec tous les jalons, questionnaires et notes cliniques.</div>
             </div>
           </div>
 
@@ -984,9 +984,9 @@ body.role-saisie .analyse-only { display:none !important; }
         </div>
       </div>
       <div class="g3" style="margin-bottom:12px">
-        <div class="stat-card"><div class="stat-label">Patients inclus</div><div class="stat-value" id="coh-n">—</div></div>
-        <div class="stat-card"><div class="stat-label">Score moyen J1</div><div class="stat-value" id="coh-mean-j1">—</div></div>
-        <div class="stat-card"><div class="stat-label">Score moyen dernier</div><div class="stat-value" id="coh-mean-last">—</div></div>
+        <div class="stat-card"><div class="stat-label">Patients inclus</div><div class="stat-value" id="coh-n">-</div></div>
+        <div class="stat-card"><div class="stat-label">Score moyen J1</div><div class="stat-value" id="coh-mean-j1">-</div></div>
+        <div class="stat-card"><div class="stat-label">Score moyen dernier</div><div class="stat-value" id="coh-mean-last">-</div></div>
       </div>
       <div class="g2">
         <div class="card">
@@ -1036,7 +1036,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <span class="text-muted" style="font-size:12px">Patients marqués comme favoris</span>
         </div>
       </div>
-      <div id="favoris-list"><div class="empty"><p>Aucun favori — cliquez sur ★ sur une fiche patient pour l'ajouter</p></div></div>
+      <div id="favoris-list"><div class="empty"><p>Aucun favori - cliquez sur ★ sur une fiche patient pour l'ajouter</p></div></div>
     </div>
 
     <!-- EXPORT -->
@@ -1044,13 +1044,13 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="topbar"><div class="topbar-title">Export données</div></div>
       <div class="g2" style="margin-bottom:12px">
         <div class="card">
-          <div class="sec-title">Export clinique — CSV</div>
+          <div class="sec-title">Export clinique - CSV</div>
           <p class="text-muted" style="margin-bottom:12px;font-size:12px">Export pseudonymisé des scores. Compatible Excel, R et Python.</p>
           <p class="text-muted" style="margin-bottom:14px;font-size:11px">Colonnes : Code · PatientID · Cabinet · Protocoles · J1 · FinCure · Questionnaire · Date · Score · Interprétation</p>
           <button class="btn btn-primary btn-sm" onclick="exportCSV()">⬇ Export CSV clinique</button>
         </div>
         <div class="card">
-          <div class="sec-title">Export recherche — Format structuré</div>
+          <div class="sec-title">Export recherche - Format structuré</div>
           <p class="text-muted" style="margin-bottom:12px;font-size:12px">Export enrichi avec statistiques descriptives, mapping des variables, prêt pour analyse statistique et soumission comité d'éthique.</p>
           <div class="fg" style="margin-bottom:10px">
             <label>Filtrer par protocole</label>
@@ -1105,7 +1105,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div class="set-row">
             <div>
               <div class="set-label">Fichier actuellement chargé</div>
-              <div class="set-desc" id="excel-config-status">Aucun fichier importé — configuration par défaut active</div>
+              <div class="set-desc" id="excel-config-status">Aucun fichier importé - configuration par défaut active</div>
             </div>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -1148,34 +1148,34 @@ body.role-saisie .analyse-only { display:none !important; }
         <div id="legal-cgu">
           <div class="card" style="margin-bottom:12px">
             <div style="font-size:16px;font-weight:700;margin-bottom:4px">Conditions Générales d'Utilisation</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:20px">Version 1.0 — Janvier 2025</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:20px">Version 1.0 - Janvier 2025</div>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 1 — Objet</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 1 - Objet</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               Les présentes CGU définissent les modalités d'utilisation de la plateforme de suivi clinique NeuroStim (ci-après "la Plateforme"), outil de gestion et de suivi des questionnaires patients dans le cadre de protocoles de neurostimulation (rTMS). La Plateforme permet la collecte de données cliniques, le suivi longitudinal des patients, l'amélioration de la qualité des soins et, le cas échéant, l'exploitation de données à des fins de recherche dans un cadre réglementaire approprié (notamment MR-004).
             </p>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 2 — Accès et utilisateurs</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 2 - Accès et utilisateurs</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               L'accès à la Plateforme est strictement limité aux personnes disposant d'un compte créé et validé par l'administrateur. Trois niveaux d'accès sont définis : <strong>Admin</strong> (accès complet à tous les cabinets et à la configuration), <strong>Saisie</strong> (lecture et modification des données patients d'un ou plusieurs cabinets assignés) et <strong>Lecture</strong> (consultation seule). Tout utilisateur s'engage à ne pas partager ses identifiants de connexion.
             </p>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 3 — Utilisation des données patients</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 3 - Utilisation des données patients</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               Les données saisies dans la Plateforme concernent des patients pseudonymisés par un code alphanumérique. Aucune donnée nominative directement identifiante (nom, prénom, adresse) n'est stockée dans la Plateforme. Le tableau de correspondance entre le code patient et l'identité réelle est conservé séparément dans les dossiers médicaux du cabinet, sous la responsabilité du professionnel de santé référent. La Plateforme est utilisée uniquement en cabinet, durant les séances, et non à des fins d'envoi à distance.
             </p>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 4 — Responsabilités</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 4 - Responsabilités</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               La Plateforme est un outil d'aide à la gestion du suivi. Elle ne se substitue en aucun cas au jugement clinique du professionnel de santé. Les scores calculés automatiquement sont fournis à titre indicatif. L'interprétation clinique et les décisions thérapeutiques restent de la responsabilité exclusive du praticien. Le réseau NeuroStim ne saurait être tenu responsable d'une mauvaise utilisation de la Plateforme ou d'une interprétation erronée des données affichées.
             </p>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 5 — Hébergement, confidentialité et sécurité</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 5 - Hébergement, confidentialité et sécurité</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               Les données sont hébergées sur l'infrastructure Firebase (Google Cloud, région europe-west1, Belgique), auprès d'un prestataire respectant les exigences du RGPD avec clauses contractuelles types. Les mesures de sécurité comprennent : chiffrement des données au repos (AES-256) et en transit (TLS), séparation des données identifiantes et cliniques, authentification sécurisée, gestion des habilitations par rôle, journalisation des accès (audit trail). Chaque utilisateur est responsable de la confidentialité de ses identifiants.
             </p>
 
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 6 — Droit applicable</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Article 6 - Droit applicable</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:0;line-height:1.7">
               Les présentes CGU sont soumises au droit français. Tout litige relatif à leur interprétation ou à leur exécution sera soumis aux tribunaux compétents de Paris.
             </p>
@@ -1198,9 +1198,9 @@ body.role-saisie .analyse-only { display:none !important; }
             <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Hébergement</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               La Plateforme est hébergée par :<br>
-              <strong>Google Firebase</strong> — Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA<br>
+              <strong>Google Firebase</strong> - Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA<br>
               Région de stockage des données : <strong>europe-west1 (Belgique)</strong><br>
-              <strong>GitHub Pages</strong> — GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (hébergement de l'interface uniquement, aucune donnée patient)
+              <strong>GitHub Pages</strong> - GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA (hébergement de l'interface uniquement, aucune donnée patient)
             </p>
 
             <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">Propriété intellectuelle</div>
@@ -1219,7 +1219,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <div id="legal-confidentialite" style="display:none">
           <div class="card" style="margin-bottom:12px">
             <div style="font-size:16px;font-weight:700;margin-bottom:4px">Politique de confidentialité</div>
-            <div style="font-size:11px;color:var(--text3);margin-bottom:20px">Conforme au Règlement Général sur la Protection des Données (RGPD — UE 2016/679)</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:20px">Conforme au Règlement Général sur la Protection des Données (RGPD - UE 2016/679)</div>
 
             <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">1. Responsable du traitement</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
@@ -1247,11 +1247,11 @@ body.role-saisie .analyse-only { display:none !important; }
             <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">5. Droits des personnes concernées</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
               Conformément au RGPD, les patients bénéficient des droits suivants, exercés par l'intermédiaire du professionnel de santé référent :<br>
-              • <strong>Droit d'accès</strong> (Art. 15) — consultation des données enregistrées<br>
-              • <strong>Droit de rectification</strong> (Art. 16) — correction des données inexactes<br>
-              • <strong>Droit à l'effacement</strong> (Art. 17) — suppression complète des données<br>
-              • <strong>Droit à la portabilité</strong> (Art. 20) — export des données en format structuré<br>
-              • <strong>Droit d'opposition</strong> (Art. 21) — opposition au traitement<br><br>
+              • <strong>Droit d'accès</strong> (Art. 15) - consultation des données enregistrées<br>
+              • <strong>Droit de rectification</strong> (Art. 16) - correction des données inexactes<br>
+              • <strong>Droit à l'effacement</strong> (Art. 17) - suppression complète des données<br>
+              • <strong>Droit à la portabilité</strong> (Art. 20) - export des données en format structuré<br>
+              • <strong>Droit d'opposition</strong> (Art. 21) - opposition au traitement<br><br>
               Ces droits sont exercés via la section <strong>Paramètres → RGPD</strong> de la Plateforme par les utilisateurs Admin.
             </p>
 
@@ -1262,7 +1262,7 @@ body.role-saisie .analyse-only { display:none !important; }
 
             <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)">7. Sous-traitants</div>
             <p style="font-size:13px;color:var(--text2);margin-bottom:0;line-height:1.7">
-              Google Firebase (Google LLC) — hébergement et authentification, serveurs en europe-west1 (Belgique), certifié ISO 27001 et SOC 2/3. Google LLC est signataire des clauses contractuelles types de la Commission Européenne pour les transferts de données hors UE.
+              Google Firebase (Google LLC) - hébergement et authentification, serveurs en europe-west1 (Belgique), certifié ISO 27001 et SOC 2/3. Google LLC est signataire des clauses contractuelles types de la Commission Européenne pour les transferts de données hors UE.
             </p>
           </div>
 
@@ -1313,7 +1313,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="steps"><div class="step-dot active" id="sd1"></div><div class="step-dot" id="sd2"></div><div class="step-dot" id="sd3"></div></div>
       <!-- Step 1 -->
       <div id="ps1">
-        <div class="step-label">Étape 1 — Identité</div>
+        <div class="step-label">Étape 1 - Identité</div>
         <div class="g2">
           <div class="fg"><label>Prénom *</label><input type="text" id="p-prenom" placeholder="Marie" oninput="genCodePreview()" autocomplete="off"></div>
           <div class="fg"><label>Nom *</label><input type="text" id="p-nom" placeholder="Dupont" oninput="genCodePreview()" autocomplete="off"></div>
@@ -1331,7 +1331,7 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <!-- Step 2 -->
       <div id="ps2" style="display:none">
-        <div class="step-label">Étape 2 — Type de suivi &amp; dates</div>
+        <div class="step-label">Étape 2 - Type de suivi &amp; dates</div>
         <!-- Mode selector -->
         <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
           <button id="mode-cure-btn" class="btn btn-primary btn-sm" onclick="setPatientMode('cure')" style="flex:1;min-width:120px">🧠 Cure rTMS</button>
@@ -1364,7 +1364,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;color:var(--text3)">(multi-sélection)</span></div>
           <div class="ctx-dropdown" id="ps2-ctx-dropdown">
             <button type="button" class="ctx-dropdown-btn" onclick="toggleCtxDropdown('ps2-ctx-dropdown')">
-              <span id="ps2-ctx-label" style="color:var(--text3)">— Sélectionner un ou plusieurs troubles —</span>
+              <span id="ps2-ctx-label" style="color:var(--text3)">- Sélectionner un ou plusieurs troubles -</span>
               <span style="font-size:10px;color:var(--text3)">▾</span>
             </button>
             <div class="ctx-dropdown-menu" id="ps2-ctx-menu"></div>
@@ -1372,7 +1372,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <div class="fg">
             <label>Parcours *</label>
             <select id="ps2-parcours-type" onchange="onPs2ParcoursTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
-              <option value="">— Choisir un parcours —</option>
+              <option value="">- Choisir un parcours -</option>
               <option value="medicament">💊 Intervention médicamenteuse</option>
               <option value="cpap">🛏️ CPAP ou OAM</option>
               <option value="psychotherapie">🗣️ Psychothérapie</option>
@@ -1410,19 +1410,19 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <!-- Step 3 -->
       <div id="ps3" style="display:none">
-        <div class="step-label">Étape 3 — Confirmation</div>
+        <div class="step-label">Étape 3 - Confirmation</div>
         <div class="success-box" style="margin-bottom:14px"><div style="font-weight:600;margin-bottom:3px">✓ Prêt à créer le patient</div>Le calendrier de questionnaires sera généré automatiquement.</div>
         <div style="font-size:13px;line-height:2" id="c-summary">
-          Code : <strong class="mono" id="c-code">—</strong><br>
+          Code : <strong class="mono" id="c-code">-</strong><br>
           <span id="c-details">
-            Protocole(s) : <strong id="c-prots">—</strong><br>
-            Début du suivi : <strong id="c-j1">—</strong><br>
-            Fin du suivi : <strong id="c-end">—</strong>
+            Protocole(s) : <strong id="c-prots">-</strong><br>
+            Début du suivi : <strong id="c-j1">-</strong><br>
+            Fin du suivi : <strong id="c-end">-</strong>
           </span>
           <span id="c-postcure-details" style="display:none">
             Mode : <strong>Consolidation directe</strong><br>
-            Début post-cure : <strong id="c-postcure-start">—</strong><br>
-            Protocole(s) : <strong id="c-prots2">—</strong>
+            Début post-cure : <strong id="c-postcure-start">-</strong><br>
+            Protocole(s) : <strong id="c-prots2">-</strong>
           </span>
         </div>
       </div>
@@ -1441,7 +1441,7 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mh">
       <div>
         <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Questionnaire patient</div>
-        <div class="mh-title" id="q-title">—</div>
+        <div class="mh-title" id="q-title">-</div>
       </div>
       <div style="display:flex;gap:6px;align-items:center">
         <button class="btn btn-secondary btn-sm" onclick="showQRFromQ()" title="QR Code patient" id="qr-from-q-btn">📷 QR Code</button>
@@ -1451,14 +1451,14 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
     </div>
     <div class="tablet-header">
-      <div class="th-title" id="q-title-tablet">—</div>
-      <div class="th-sub" id="q-progress-tablet">—</div>
+      <div class="th-title" id="q-title-tablet">-</div>
+      <div class="th-sub" id="q-progress-tablet">-</div>
     </div>
     <div class="mb">
       <div class="q-progress"><div class="q-progress-bar" id="q-progress-bar" style="width:0%"></div></div>
       <div class="q-progress-text" id="q-progress-text">1 / ?</div>
       <p style="font-size:12px;color:var(--text2);margin-bottom:14px;font-style:italic" id="q-instructions"></p>
-      <div class="q-question" id="q-question">—</div>
+      <div class="q-question" id="q-question">-</div>
       <div id="q-options"></div>
     </div>
     <div class="mf">
@@ -1473,9 +1473,9 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">Résultat</div><button class="close-btn" onclick="closeModal('m-result')">✕</button></div>
     <div class="mb" style="text-align:center;padding:28px 20px">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:6px" id="result-qname">—</div>
-      <div style="font-size:40px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:6px" id="result-score">—</div>
-      <div style="font-size:16px;font-weight:600" id="result-label">—</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px" id="result-qname">-</div>
+      <div style="font-size:40px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:6px" id="result-score">-</div>
+      <div style="font-size:16px;font-weight:600" id="result-label">-</div>
     </div>
     <div class="mf"><button class="btn btn-primary" onclick="closeModal('m-result')">Fermer</button></div>
   </div>
@@ -1486,7 +1486,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">QR Code séance</div><button class="close-btn" onclick="closeModal('m-qr')">✕</button></div>
     <div class="mb" style="text-align:center">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Questionnaire : <strong id="qr-qname">—</strong><br>Valide 5 jours</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Questionnaire : <strong id="qr-qname">-</strong><br>Valide 5 jours</div>
       <img id="qr-img" src="" alt="QR Code" style="width:200px;height:200px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px">
       <div class="fg"><label>Lien direct</label><input type="text" id="qr-link" readonly onclick="this.select()" style="font-size:11px;font-family:monospace"></div>
       <p class="text-muted">Le patient peut scanner ce code depuis son téléphone ou utiliser la tablette.</p>
@@ -1528,7 +1528,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal fade" style="max-width:720px">
     <div class="mh" style="background:var(--accent);border-radius:14px 14px 0 0">
       <div>
-        <div class="mh-title" style="color:#fff">Consentement éclairé — rTMS</div>
+        <div class="mh-title" style="color:#fff">Consentement éclairé - rTMS</div>
         <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px" id="consent-progress">Étape 1 / 3</div>
       </div>
       <button class="btn btn-sm" onclick="showQRFromQ()" title="QR Code patient" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)">📷 QR Code</button>
@@ -1545,7 +1545,7 @@ body.role-saisie .analyse-only { display:none !important; }
         </video>
       </div>
       <button class="btn btn-primary btn-full" id="consent-start-btn" onclick="consentVideoWatched()" style="margin-bottom:14px">
-        ✓ J'ai visionné la vidéo — Continuer vers les questions
+        ✓ J'ai visionné la vidéo - Continuer vers les questions
       </button>
       <!-- Questions step -->
       <div id="consent-questions-area" style="display:none">
@@ -1589,8 +1589,8 @@ body.role-saisie .analyse-only { display:none !important; }
       </div>
       <div class="fg" id="interrupt-postcure-area"><label>Démarrer le suivi post-cure immédiatement ?</label>
         <select id="interrupt-postcure">
-          <option value="yes">Oui — configurer le suivi de consolidation/maintien</option>
-          <option value="no">Non — interrompre sans suivi de consolidation/maintien</option>
+          <option value="yes">Oui - configurer le suivi de consolidation/maintien</option>
+          <option value="no">Non - interrompre sans suivi de consolidation/maintien</option>
         </select>
       </div>
     </div>
@@ -1607,10 +1607,10 @@ body.role-saisie .analyse-only { display:none !important; }
     <div class="mh"><div class="mh-title">🗺️ Nouveau parcours</div><button class="close-btn" onclick="closeModal('m-add-parcours')">✕</button></div>
     <div class="mb" style="max-height:75vh;overflow-y:auto">
       <input type="hidden" id="parcours-patient-id">
-      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif — multi-sélection)</span></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Contexte clinique <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(informatif - multi-sélection)</span></div>
       <div class="ctx-dropdown" id="modal-ctx-dropdown" style="margin-bottom:14px">
         <button type="button" class="ctx-dropdown-btn" onclick="toggleCtxDropdown('modal-ctx-dropdown')">
-          <span id="modal-ctx-label" style="color:var(--text3)">— Sélectionner un ou plusieurs troubles —</span>
+          <span id="modal-ctx-label" style="color:var(--text3)">- Sélectionner un ou plusieurs troubles -</span>
           <span style="font-size:10px;color:var(--text3)">▾</span>
         </button>
         <div class="ctx-dropdown-menu" id="modal-ctx-menu"></div>
@@ -1620,7 +1620,7 @@ body.role-saisie .analyse-only { display:none !important; }
       <div class="fg">
         <label>Parcours <span style="color:var(--red)">*</span></label>
         <select id="parcours-type" onchange="onParcoursTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:14px">
-          <option value="">— Choisir un parcours —</option>
+          <option value="">- Choisir un parcours -</option>
           <option value="medicament">💊 Intervention médicamenteuse</option>
           <option value="cpap">🛏️ CPAP ou OAM</option>
           <option value="psychotherapie">🗣️ Psychothérapie</option>
@@ -1699,9 +1699,9 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="schiz_h">Schizo. hallucinatoire</option>
           <option value="schiz_n">Schizo. négative</option>
           <option value="cognitif">Trouble cognitif</option>
-          <option value="add_alc">Addiction — Alcool</option>
-          <option value="add_coc">Addiction — Cocaïne</option>
-          <option value="add_aut">Addiction — Autre</option>
+          <option value="add_alc">Addiction - Alcool</option>
+          <option value="add_coc">Addiction - Cocaïne</option>
+          <option value="add_aut">Addiction - Autre</option>
         </select>
       </div>
       <div class="fg"><label>Date de début de ce protocole *</label><input type="date" id="add-proto-j1"></div>
@@ -1719,7 +1719,7 @@ body.role-saisie .analyse-only { display:none !important; }
   <div class="modal sm fade">
     <div class="mh"><div class="mh-title">⚡ Saisir le PEM</div><button class="close-btn" onclick="closeModal('m-add-pem')">✕</button></div>
     <div class="mb">
-      <p class="text-muted" style="margin-bottom:16px">Potentiel Évoqué Moteur — valeur en % de la puissance maximale de la machine.</p>
+      <p class="text-muted" style="margin-bottom:16px">Potentiel Évoqué Moteur - valeur en % de la puissance maximale de la machine.</p>
       <input type="hidden" id="pem-patient-id">
       <div class="fg">
         <label>Date de la mesure</label>
@@ -1923,7 +1923,7 @@ const QUESTIONNAIRES = {
     interpret:(s)=>({label:s+" pts",color:"gray"})
   },
   'EVA craving': {
-    name:'EVA craving', fullName:'Échelle Visuelle Analogique — Craving',
+    name:'EVA craving', fullName:'Échelle Visuelle Analogique - Craving',
     type:'auto', domain:'Addiction',
     instructions:'Estimez votre "craving" (envie irrépressible et difficilement contrôlable) par rapport à la substance pour laquelle vous êtes traité. Côté l\'intensité du craving le plus intense que vous avez ressentit sur les 24 dernires heures',
     options:['0 = Pas de craving du tout (0)','1.0 (1)','2.0 (2)','3.0 (3)','4.0 (4)','5.0 (5)','6.0 (6)','7.0 (7)','8.0 (8)','9.0 (9)','10 = Un craving si intense qu\'il était impossible de résister (10)'],
@@ -1942,7 +1942,7 @@ const QUESTIONNAIRES = {
   },
   'Consentement rTMS': {
     name: 'Consentement rTMS',
-    fullName: 'Consentement éclairé — Stimulation Magnétique Transcrânienne répétitive (rTMS)',
+    fullName: 'Consentement éclairé - Stimulation Magnétique Transcrânienne répétitive (rTMS)',
     type: 'consent',
     domain: 'Consentement',
     videoUrl: 'https://neurostimfrance.com/wp-content/uploads/2026/02/questionnaire_consent-rTMS.mp4',
@@ -1979,23 +1979,23 @@ const QUESTIONNAIRES = {
     unit: '%',
     interpret: function(s) {
       if(s === null || s === undefined) return {label:'', color:'gray'};
-      if(s >= 70) return {label: s + '% — Élevé', color: 'green'};
-      if(s >= 40) return {label: s + '% — Modéré', color: 'amber'};
-      return {label: s + '% — Faible', color: 'red'};
+      if(s >= 70) return {label: s + '% - Élevé', color: 'green'};
+      if(s >= 40) return {label: s + '% - Modéré', color: 'amber'};
+      return {label: s + '% - Faible', color: 'red'};
     }
   },
 
   // ── SDS : Échelle d'invalidité de Sheehan ──────────────────────────────
   'SDS': {
-    name: 'SDS', fullName: "SDS / Sheehan — Échelle d'invalidité",
+    name: 'SDS', fullName: "SDS / Sheehan - Échelle d'invalidité",
     type: 'auto', domain: 'Fonctionnement',
     instructions: "Tous les énoncés se rapportent aux 14 derniers jours. Pour chacune des 3 questions suivantes, déplacez le curseur pour indiquer à quel point vos symptômes ont perturbé ce domaine de votre vie.",
     questions: [
-      "TRAVAIL / ÉTUDES — Vos symptômes ont perturbé votre travail / vos études :",
-      "VIE SOCIALE — Vos symptômes ont perturbé votre vie sociale / vos loisirs :",
-      "VIE FAMILIALE / TÂCHES DOMESTIQUES — Vos symptômes ont perturbé votre vie familiale / vos tâches domestiques :",
-      "JOURS D'INACTIVITÉ TOTALE — Combien de jours au cours de la dernière semaine vos symptômes vous ont-ils empêché(e) d'aller à l'école ou au travail, ou rendu(e) incapable d'assumer vos responsabilités quotidiennes ?",
-      "JOURS À EFFICACITÉ RÉDUITE — Combien de jours au cours de la dernière semaine vous êtes-vous senti(e) si affaibli(e) par vos symptômes que, même si vous êtes allé(e) à l'école ou au travail, votre efficacité était réduite ?",
+      "TRAVAIL / ÉTUDES - Vos symptômes ont perturbé votre travail / vos études :",
+      "VIE SOCIALE - Vos symptômes ont perturbé votre vie sociale / vos loisirs :",
+      "VIE FAMILIALE / TÂCHES DOMESTIQUES - Vos symptômes ont perturbé votre vie familiale / vos tâches domestiques :",
+      "JOURS D'INACTIVITÉ TOTALE - Combien de jours au cours de la dernière semaine vos symptômes vous ont-ils empêché(e) d'aller à l'école ou au travail, ou rendu(e) incapable d'assumer vos responsabilités quotidiennes ?",
+      "JOURS À EFFICACITÉ RÉDUITE - Combien de jours au cours de la dernière semaine vous êtes-vous senti(e) si affaibli(e) par vos symptômes que, même si vous êtes allé(e) à l'école ou au travail, votre efficacité était réduite ?",
     ],
     questionTypes: ['slider', 'slider', 'slider', 'slider', 'slider'],
     sliderConfigs: [
@@ -2027,7 +2027,7 @@ const QUESTIONNAIRES = {
 
     // ── 15D : Qualité de vie 15 dimensions (chargé depuis xlsx) ───────────
   '15D': {
-    name: '15D', fullName: "15D — Questionnaire de qualité de vie (15 dimensions)",
+    name: '15D', fullName: "15D - Questionnaire de qualité de vie (15 dimensions)",
     type: 'auto', domain: 'Qualité de vie',
     instructions: "Lisez toutes les possibilités de réponse pour chaque question avant de choisir. Sélectionnez la réponse qui décrit le mieux votre état de santé ACTUEL.",
     questions: [], options: [],
@@ -2035,7 +2035,7 @@ const QUESTIONNAIRES = {
     _calcType: 'conversion_table',
     higherIsBetter: true,
     // Scores dimensions (0-1) par dimension × niveau de réponse (1-5)
-    // Utilisés pour le graphique radar — source : table officielle 15D
+    // Utilisés pour le graphique radar - source : table officielle 15D
     _dimScores: [
       [1,0.7129,0.4729,0.2526,0.078],   // 1. Mobilité
       [1,0.784,0.4901,0.3137,0.1089],   // 2. Vue
@@ -2073,7 +2073,7 @@ const QUESTIONNAIRES = {
 
     // ── DIVA-5-SR : auto-questionnaire TDAH (chargé depuis xlsx) ──────────
   'DIVA-5-SR': {
-    name: 'DIVA-5-SR', fullName: "DIVA-5-SR — Auto-questionnaire TDAH adulte",
+    name: 'DIVA-5-SR', fullName: "DIVA-5-SR - Auto-questionnaire TDAH adulte",
     type: 'auto', domain: 'TDAH',
     instructions: "Ce questionnaire explore votre fonctionnement habituel. Répondez en pensant à votre fonctionnement habituel.",
     questions: [], options: [],
@@ -2089,7 +2089,7 @@ const QUESTIONNAIRES = {
 
     // ── DIVA-5 : hétéro-questionnaire clinicien TDAH (chargé depuis xlsx) ──
   'DIVA-5': {
-    name: 'DIVA-5', fullName: "DIVA-5 — Entretien diagnostic TDAH adulte (clinicien)",
+    name: 'DIVA-5', fullName: "DIVA-5 - Entretien diagnostic TDAH adulte (clinicien)",
     type: 'hetero', domain: 'TDAH',
     instructions: "Pour chaque critère, coter la présence à l'adulte ET dans l'enfance (5-12 ans). Seuil adulte : ≥5/9. Seuil enfance : ≥3/9.",
     questions: [], options: ["Absent (0)", "Présent (1)"],
@@ -2134,9 +2134,9 @@ const PROTOCOLS = {
   'schiz_h':{name:'Schizo. hallucinatoire',auto:['PHQ-9','GAD-7'],hetero:['AHRS'],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
   'schiz_n':{name:'Schizo. négative',auto:['PHQ-9','GAD-7'],hetero:['SANS'],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
   'cognitif':{name:'Trouble cognitif',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
-  'add_alc':{name:'Addiction — Alcool',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
-  'add_coc':{name:'Addiction — Cocaïne',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
-  'add_aut':{name:'Addiction — Autre',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']}
+  'add_alc':{name:'Addiction - Alcool',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
+  'add_coc':{name:'Addiction - Cocaïne',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']},
+  'add_aut':{name:'Addiction - Autre',auto:['PHQ-9','GAD-7'],hetero:[],weekly:['PHQ-9','GAD-7'],monthly:['PHQ-9','GAD-7']}
 };
 
 const NS = {user:null,userProfile:null,patients:[],currentPatient:null,unsub:null};
@@ -2156,12 +2156,12 @@ function genCode(p,n,d) {
   return pp+'-'+nn+'-'+d.replace(/-/g,'');
 }
 function fmtDate(d) {
-  if(!d) return '—';
+  if(!d) return '-';
   if(d && d.toDate) d=d.toDate();
   return new Date(d).toLocaleDateString('fr-FR');
 }
 function fmtDob(d) {
-  if(!d) return '—';
+  if(!d) return '-';
   // Input: "YYYY-MM-DD" → "JJ/MM/AAAA"
   var parts = String(d).split('-');
   if(parts.length === 3) return parts[2]+'/'+parts[1]+'/'+parts[0];
@@ -2184,7 +2184,7 @@ function normalizeProtocols(p) {
   if(!raw.length) return [];
   // Already new format?
   if(typeof raw[0] === 'object') return raw;
-  // Old format: array of strings — use j1Date as startDate, endDate as endDate
+  // Old format: array of strings - use j1Date as startDate, endDate as endDate
   return raw.map(name => ({name, startDate: p.j1Date || todayStr(), endDate: p.endDate || ''}));
 }
 
@@ -2207,7 +2207,7 @@ function getFridays(start,end) {
   return f;
 }
 
-// genSchedule — supports multi-protocol new format
+// genSchedule - supports multi-protocol new format
 // p.protocols = [{name, startDate, endDate}]  OR  legacy string[]
 // p.j1Date / p.endDate used as fallback for legacy
 function genSchedule(p) {
@@ -2229,7 +2229,7 @@ function genSchedule(p) {
   });
   Object.entries(byStart).forEach(([startDate, names]) => {
     const qs = getProtoQs(names);
-    const label = startDate === globalJ1 ? 'J1 — Bilan initial' : 'J1 — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ');
+    const label = startDate === globalJ1 ? 'J1 - Bilan initial' : 'J1 - ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ');
     sched.push({date:startDate, questionnaires:[...qs.auto], hetero:[...qs.hetero], done:[], type:'j1', label});
   });
 
@@ -2258,7 +2258,7 @@ function genSchedule(p) {
   Object.entries(byEnd).forEach(([endDate, names]) => {
     const qs = getProtoQs(names);
     const label = Object.keys(byEnd).length > 1
-      ? 'Fin du suivi — ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
+      ? 'Fin du suivi - ' + names.map(n=>PROTOCOLS[n]?.name||n).join(', ')
       : 'Bilan de fin de suivi';
     sched.push({date:endDate, questionnaires:[...qs.endCure], hetero:[...qs.heteroEnd], done:[], type:'end', label});
   });
@@ -2286,7 +2286,7 @@ function genSchedule(p) {
   return sched;
 }
 
-// genSchedulePostcureOnly — for patients starting directly in post-cure
+// genSchedulePostcureOnly - for patients starting directly in post-cure
 function genSchedulePostcureOnly(p) {
   const protos = normalizeProtocols(p);
   const allNames = protos.map(pr=>pr.name);
@@ -2432,15 +2432,15 @@ function patRowHTML(p) {
   const prots=normalizeProtocols(p).map(pr=>(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'⛔':'')).join(', ');
   return '<div class="patient-row" onclick="openPatient(\''+p.id+'\')">'
     +'<div class="pat-av">'+ini+'</div>'
-    +'<div class="pat-left"><div class="pat-code" style="display:flex;align-items:baseline;gap:10px">'+(fmtCode(p.code)||'—')
+    +'<div class="pat-left"><div class="pat-code" style="display:flex;align-items:baseline;gap:10px">'+(fmtCode(p.code)||'-')
     +(p.createdAt||p.createdBy ? '<span style="font-size:10px;color:var(--text3);font-weight:400;white-space:nowrap">Créé le '
     +(p.createdAt ? fmtDate(typeof p.createdAt==='string'?p.createdAt:(p.createdAt.toDate?p.createdAt.toDate().toISOString().split("T")[0]:String(p.createdAt))) : '')
     +(p.createdBy ? ' par '+(p.createdBy.includes('@')?p.createdBy.split('@')[0]:p.createdBy) : '')
     +'</span>' : '')
     +'</div>'
-    +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
-    +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span>'
-    +'<span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span>'
+    +'<div class="pat-id">'+(p.patientId||'-')+'</div>'
+    +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'-')+'</span>'
+    +'<span class="badge b-gray fs11">'+(p.cabinet||'-')+'</span>'
     +'</div></div>'
     +'<div class="pat-right">'+sb+'</div></div>';
 }
@@ -2450,7 +2450,7 @@ function loadDashboard() {
   const pts=NS.patients, tod=todayStr();
   let todayItems=[],overdueItems=[],upcomingItems=[];
   pts.forEach(p=>{
-    // Only show active cure patients in today/overdue/upcoming — not interrupted/terminated/postcure
+    // Only show active cure patients in today/overdue/upcoming - not interrupted/terminated/postcure
     const activeCure = p.status === 'cure' || !p.status;
     (p.schedule||[]).forEach(s=>{
       const done=s.done||[], ignored=s.ignored||[], rem=(s.questionnaires||[]).filter(q=>!done.includes(q)&&!ignored.includes(q));
@@ -2542,7 +2542,7 @@ function renderWeekView() {
       +items.map(i=>'<div class="wd-item" onclick="openPatient(\''+i.patient.id+'\')">'
         +'<span class="wd-code">'+i.patient.code+'</span>'
         +'<span class="wd-q">'+i.remaining.length+'Q</span></div>').join('')
-      +(items.length===0?'<div class="wd-empty">—</div>':'')
+      +(items.length===0?'<div class="wd-empty">-</div>':'')
       +'</div></div>';
   });
   html+='</div>';
@@ -2576,9 +2576,9 @@ function renderPatientDetail() {
   }
   // Name + ID
   const code2El=document.getElementById('pd-code2');
-  if(code2El) code2El.textContent=fmtCode(p.code)||'—';
+  if(code2El) code2El.textContent=fmtCode(p.code)||'-';
   const idEl=document.getElementById('pd-id');
-  if(idEl) idEl.textContent=p.patientId||'—';
+  if(idEl) idEl.textContent=p.patientId||'-';
   // Status badge
   const sbEl=document.getElementById('pd-status-badge');
   if(sbEl) {
@@ -2597,7 +2597,7 @@ function renderPatientDetail() {
   if(createdEl) {
     const createdDate = p.createdAt ? (typeof p.createdAt==='string' ? p.createdAt : (p.createdAt.toDate ? p.createdAt.toDate().toISOString().split('T')[0] : null)) : null;
     const createdByDisplay = p.createdBy ? (p.createdBy.includes('@') ? p.createdBy.split('@')[0] : p.createdBy) : null;
-    createdEl.textContent = (createdDate ? fmtDate(createdDate) : '—') + (createdByDisplay ? ' · ' + createdByDisplay : '');
+    createdEl.textContent = (createdDate ? fmtDate(createdDate) : '-') + (createdByDisplay ? ' · ' + createdByDisplay : '');
   }
   const j1El=document.getElementById('pd-j1');
   if(j1El) j1El.textContent=fmtDate(p.j1Date);
@@ -2664,7 +2664,7 @@ function renderTimeline() {
   const _hiddenCount = _sortedSchedule.filter(s => s.date > _tod && s.date > _cutoff && !(s.done||[]).length).length;
   _schedule.forEach(s=>{
     // For end/j1 slots, merge saved qs with current protocol qs (preserving manually added ones)
-    // But do NOT re-merge for interrupted patients — their schedule was already purged
+    // But do NOT re-merge for interrupted patients - their schedule was already purged
     let slotQs = s.questionnaires||[];
     if(!isInterrupted) {
       if(s.type==='end') { slotQs = dedupe([...slotQs, ...liveProtoQs.endCure]); s = {...s, hetero: liveProtoQs.heteroEnd}; }
@@ -2696,11 +2696,11 @@ function renderTimeline() {
         return '<div class="tl-item '+(isDone?'done':isPast?'overdue':'pending')+(isHet?' hetero':'')+'">'
           +'<div class="tl-item-name">'+qLabel(q)+'</div>'
           +(ign.includes(q)
-            ?'<div class="tl-item-status" style="font-size:11px;color:var(--text3)">— Ignoré</div>'
+            ?'<div class="tl-item-status" style="font-size:11px;color:var(--text3)">- Ignoré</div>'
             :isDone&&q==='Consentement rTMS'&&resp
             ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
-            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' — '+lbl))+'</div>'
+            ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' - '+lbl))+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
           +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
@@ -2852,7 +2852,7 @@ function buildCtxDropdown(menuId, labelId, selectedCodes, onToggle) {
           const c = PARCOURS_CONFIG.contextes.find(x=>x.code===code);
           return c ? c.label : code;
         }).join(', ')
-      : '— Sélectionner un ou plusieurs troubles —';
+      : '- Sélectionner un ou plusieurs troubles -';
   }
 
   // Store callback on menu element for use in onCtxCheckChange
@@ -2990,14 +2990,14 @@ function openScoreDetail(qName, date) {
     const qType = (qi.questionTypes && qi.questionTypes[i]) || 'radio';
     let ansText, pts;
     if(qType === 'slider') {
-      ansText = ans !== undefined && ans !== null ? String(ans) : '—';
-      pts = ans !== undefined ? ans : '—';
+      ansText = ans !== undefined && ans !== null ? String(ans) : '-';
+      pts = ans !== undefined ? ans : '-';
     } else if(qType === 'multi') {
-      ansText = typeof ans === 'string' ? ans : (Array.isArray(ans) ? ans.join(', ') : '—');
-      pts = '—';
+      ansText = typeof ans === 'string' ? ans : (Array.isArray(ans) ? ans.join(', ') : '-');
+      pts = '-';
     } else {
       const opts = qi.optionsPerQuestion?qi.optionsPerQuestion[i]:(qi.options||[]);
-      ansText = opts[ans]||'—';
+      ansText = opts[ans]||'-';
       pts = typeof ans==='number'?ans:'?';
     }
     detailHTML += '<div class="score-row">'
@@ -3031,7 +3031,7 @@ function openConsentModal(patientId, date) {
   document.getElementById('consent-video').load();
   document.getElementById('consent-questions-area').style.display = 'none';
   document.getElementById('consent-start-btn').style.display = 'inline-flex';
-  document.getElementById('consent-progress').textContent = 'Étape 1 / 3 — Visionnez la vidéo';
+  document.getElementById('consent-progress').textContent = 'Étape 1 / 3 - Visionnez la vidéo';
   const cm = document.getElementById('m-consent');
   if(cm) cm.style.display = 'flex';
   document.body.classList.add('in-questionnaire');
@@ -3047,7 +3047,7 @@ function resetConsentForm() {
 function consentVideoWatched() {
   document.getElementById('consent-questions-area').style.display = 'block';
   document.getElementById('consent-start-btn').style.display = 'none';
-  document.getElementById('consent-progress').textContent = 'Étape 2 / 3 — Questions de compréhension';
+  document.getElementById('consent-progress').textContent = 'Étape 2 / 3 - Questions de compréhension';
   renderConsentQuestions();
 }
 
@@ -3109,7 +3109,7 @@ async function submitConsent() {
     const responses = {...(patSnap.data().responses||{})};
     responses[key] = {questionnaire:'Consentement rTMS', date:currentQ.date, score:99, answers:[...answers,currentQ.finalAnswer], accepted:false, refused:true, completedAt:todayStr()};
     await patRef.update({responses, consentSigned:false});
-    // Show alert overlay — PIN required to exit
+    // Show alert overlay - PIN required to exit
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(139,31,31,0.97);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px';
     overlay.id = 'consent-alert-overlay';
@@ -3173,7 +3173,7 @@ function renderQuestion() {
   const qi=QUESTIONNAIRES[currentQ.qName]; if(!qi) return;
   const idx=currentQ.currentIdx, total=qi.questions.length;
   document.getElementById('q-progress-bar').style.width=((idx/total)*100)+'%';
-  document.getElementById('q-progress-text').textContent=(qi.name||currentQ.qName)+' — '+(idx+1)+' / '+total;
+  document.getElementById('q-progress-text').textContent=(qi.name||currentQ.qName)+' - '+(idx+1)+' / '+total;
   document.getElementById('q-question').textContent=qi.questions[idx];
 
   const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
@@ -3316,7 +3316,7 @@ async function qFinish() {
   // Show lock screen with result (score visible only after PIN unlock)
   enterPatientLock(remainingQs);
   // Also update the lock overlay to show score discreetly for soignant after unlock
-  // (score is NOT shown on the lock screen — only after PIN)
+  // (score is NOT shown on the lock screen - only after PIN)
 }
 
 function openAddPatient() {
@@ -3359,19 +3359,19 @@ function renderPatSummary() {
     document.getElementById('c-postcure-details').style.display='';
     const pc = newPat.parcoursConfig || {};
     const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Groupe',monitoring:'📈 Monitoring'};
-    document.getElementById('c-prots2').textContent = (PARCOURS_LABELS[pc.type]||pc.type||'—') + (pc.contextes&&pc.contextes.length?' · '+pc.contextes.join(', '):'');
+    document.getElementById('c-prots2').textContent = (PARCOURS_LABELS[pc.type]||pc.type||'-') + (pc.contextes&&pc.contextes.length?' · '+pc.contextes.join(', '):'');
     document.getElementById('c-postcure-start').textContent = fmtDate(pc.startDate);
     const durEl = document.getElementById('c-postcure-details');
     if(durEl) durEl.querySelector('strong') && (durEl.innerHTML = durEl.innerHTML.replace('Post-cure directe','Parcours'));
   } else if(newPat.mode === 'postcure') {
     document.getElementById('c-details').style.display='none';
     document.getElementById('c-postcure-details').style.display='';
-    document.getElementById('c-prots2').textContent = '—';
+    document.getElementById('c-prots2').textContent = '-';
     document.getElementById('c-postcure-start').textContent = fmtDate(document.getElementById('p-postcure-start')?.value);
   } else {
     document.getElementById('c-details').style.display='';
     document.getElementById('c-postcure-details').style.display='none';
-    document.getElementById('c-prots').textContent = valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ')||'—';
+    document.getElementById('c-prots').textContent = valid.map(p=>PROTOCOLS[p.name]?.name||p.name).join(', ')||'-';
     const firstStart = valid.reduce((m,p)=>(!m||p.startDate<m)?p.startDate:m,'');
     const lastEnd = valid.reduce((m,p)=>p.endDate>m?p.endDate:m,'');
     document.getElementById('c-j1').textContent = fmtDate(firstStart);
@@ -3380,7 +3380,7 @@ function renderPatSummary() {
 }
 
 function toggleProtocol(val,el) {
-  // Legacy function kept for compatibility — new UI uses protocol entries
+  // Legacy function kept for compatibility - new UI uses protocol entries
   updateSchedPreview();
 }
 
@@ -3395,9 +3395,9 @@ const PROTO_OPTIONS = [
   {value:'schiz_h', label:'Schizo. hallucinatoire'},
   {value:'schiz_n', label:'Schizo. négative'},
   {value:'cognitif', label:'Trouble cognitif'},
-  {value:'add_alc', label:'Addiction — Alcool'},
-  {value:'add_coc', label:'Addiction — Cocaïne'},
-  {value:'add_aut', label:'Addiction — Autre'},
+  {value:'add_alc', label:'Addiction - Alcool'},
+  {value:'add_coc', label:'Addiction - Cocaïne'},
+  {value:'add_aut', label:'Addiction - Autre'},
 ];
 
 // ── PS2 Parcours inline state ──
@@ -3525,7 +3525,7 @@ function onPs2ParcoursTypeChange() {
     const list=document.createElement('div'); list.style.cssText='display:flex;flex-direction:column;gap:6px'; fgDiv2.appendChild(list);
     subEl.appendChild(fgDiv2);
     const ps2MedFields=document.createElement('div'); ps2MedFields.id='ps2-med-fields'; ps2MedFields.style.display='none'; subEl.appendChild(ps2MedFields);
-    [{v:'nouveau', l:'Nouveau traitement',  tip:"Monothérapie — nouvelle molécule"},
+    [{v:'nouveau', l:'Nouveau traitement',  tip:"Monothérapie - nouvelle molécule"},
      {v:'addon',   l:"Stratégie d'Add-on", tip:"Adjonction à un traitement existant"},
      {v:'switch',  l:'Switch',               tip:"Remplacement d'un traitement existant"}
     ].forEach(function(s) {
@@ -3564,10 +3564,10 @@ function onPs2ParcoursTypeChange() {
       cpapList.appendChild(lbl);
     });
   } else if(type==='psychotherapie') {
-    subEl.innerHTML='<div class="fg"><label>Type</label><select id="ps2-psycho-type" onchange="newPat.parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">— Choisir —</option>'+['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Schémas','ICV','Autre'].map(function(v){return'<option>'+v+'</option>';}).join('')+'</select></div>'
-      +'<div class="fg"><label>Rythme</label><select id="ps2-psycho-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
+    subEl.innerHTML='<div class="fg"><label>Type</label><select id="ps2-psycho-type" onchange="newPat.parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">- Choisir -</option>'+['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Schémas','ICV','Autre'].map(function(v){return'<option>'+v+'</option>';}).join('')+'</select></div>'
+      +'<div class="fg"><label>Rythme</label><select id="ps2-psycho-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">-</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
   } else if(type==='remediation'||type==='groupe') {
-    let html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">—</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
+    let html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">-</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
     if(type==='groupe') html+='<div class="fg"><label>Description (optionnel)</label><input type="text" autocomplete="off" placeholder="Ex: Groupe TCC" onchange="newPat.parcoursState.subtype.desc=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
     subEl.innerHTML=html;
   }
@@ -3686,7 +3686,7 @@ async function createPatient() {
     let schedule, status, j1Date, endDate, parcours = [];
     if(newPat.mode === 'postcure') {
       const startDate = document.getElementById('p-postcure-start')?.value || todayStr();
-      // Minimal schedule placeholder — openConsolidation() will reconfigure it right after
+      // Minimal schedule placeholder - openConsolidation() will reconfigure it right after
       schedule = genSchedulePostcureOnly({protocols: [{name:'', startDate, endDate:''}]});
       status = 'postcure';
       j1Date = startDate;
@@ -3747,7 +3747,7 @@ async function createPatient() {
     closeModal('m-add-patient');
     logAccess('create_patient', code);
     if(newPat.mode === 'postcure') {
-      // Set currentPatient immediately from local data — no need to wait for snapshot
+      // Set currentPatient immediately from local data - no need to wait for snapshot
       NS.currentPatient = {id: docRef.id, ...patientData, createdAt: new Date()};
       openConsolidation();
     }
@@ -3814,7 +3814,7 @@ async function loadLogs() {
   const snap=await db.collection('logs').orderBy('timestamp','desc').limit(100).get();
   el.innerHTML=snap.docs.map(d=>{
     const l=d.data();
-    return '<div class="log-row"><span class="log-ts">'+(l.timestamp&&l.timestamp.toDate?l.timestamp.toDate().toLocaleString('fr-FR'):'—')+'</span>'
+    return '<div class="log-row"><span class="log-ts">'+(l.timestamp&&l.timestamp.toDate?l.timestamp.toDate().toLocaleString('fr-FR'):'-')+'</span>'
       +'<span class="log-user">'+l.user+'</span><span class="log-action">'+l.action+'</span><span class="log-target">'+l.target+'</span></div>';
   }).join('');
 }
@@ -4149,7 +4149,7 @@ async function saveAdjustDates() {
   // Generate new schedule
   const adjProtos = normalizeProtocols(p).map(pr => ({...pr, startDate:j1Date, endDate}));
   const newSchedule = genSchedule({protocols: adjProtos});
-  // Preserve done status by TYPE (not date) — so completed items stay completed
+  // Preserve done status by TYPE (not date) - so completed items stay completed
   // regardless of date shifts
   const oldSchedule = p.schedule || [];
   // Build a map of completed questionnaires per type
@@ -4287,7 +4287,7 @@ function renderPQConsentScreen(qi) {
       '</video>' +
     '</div>' +
     '<button class="btn btn-primary" style="width:100%;margin-bottom:14px" id="pq-consent-video-btn" onclick="pqConsentVideoWatched()">' +
-      '✓ J\'ai visionné la vidéo — Continuer vers les questions' +
+      '✓ J\'ai visionné la vidéo - Continuer vers les questions' +
     '</button>' +
     '<div id="pq-consent-questions" style="display:none"></div>' +
     '<button class="btn btn-primary" style="width:100%;margin-top:20px;display:none" id="pq-consent-submit-btn" onclick="pqConsentSubmit()">✓ Valider le consentement</button>';
@@ -4400,7 +4400,7 @@ function renderPQQuestion() {
   const qi = QUESTIONNAIRES[pqState.qName];
   const idx = pqState.idx, total = qi.questions.length;
   document.getElementById('pq-bar').style.width = ((idx/total)*100)+'%';
-  document.getElementById('pq-progress').textContent = (qi.name||pqState.qName)+' — '+(idx+1)+' / '+total;
+  document.getElementById('pq-progress').textContent = (qi.name||pqState.qName)+' - '+(idx+1)+' / '+total;
   document.getElementById('pq-question').textContent = qi.questions[idx];
 
   const qType = (qi.questionTypes && qi.questionTypes[idx]) || 'radio';
@@ -4528,7 +4528,7 @@ async function pqFinish() {
     await patRef.update({responses,schedule});
     pqState.remainingQs = remainingQs;
   } catch(e) { console.error('Save error:', e); pqState.remainingQs = []; }
-  // Show done screen — no score shown to patient
+  // Show done screen - no score shown to patient
   document.getElementById('pq-body').style.display='none';
   const closeBtn = document.getElementById('pq-close-btn');
   if(closeBtn) closeBtn.style.display='block';
@@ -4637,7 +4637,7 @@ function initCohFilters() {
       cSel.appendChild(grp);
     });
   }
-  // Populate interventions (subtypes from existing parcours data — built dynamically)
+  // Populate interventions (subtypes from existing parcours data - built dynamically)
   const iSel = document.getElementById('coh-intervention');
   if(iSel) {
     const subtypes = new Set();
@@ -4689,7 +4689,7 @@ async function loadCohorte() {
       + '<option value="switch"'+(current==='switch'?' selected':'')+'>Switch</option>';
   }
 
-  // Extract scores per patient — with proper J1 identification
+  // Extract scores per patient - with proper J1 identification
   const patientScores = [];
   pts.forEach(p => {
     const resp = p.responses || {};
@@ -4710,21 +4710,21 @@ async function loadCohorte() {
   document.getElementById('coh-n').textContent = patientScores.length;
 
   if(!patientScores.length) {
-    document.getElementById('coh-mean-j1').textContent='—';
-    const mlEl=document.getElementById('coh-mean-last'); if(mlEl) mlEl.textContent='—';
+    document.getElementById('coh-mean-j1').textContent='-';
+    const mlEl=document.getElementById('coh-mean-last'); if(mlEl) mlEl.textContent='-';
     const ceEl=document.getElementById('coh-chart-empty'); if(ceEl) ceEl.style.display='block';
     document.getElementById('coh-table').innerHTML='<div class="empty"><p>Aucune donnée pour ces filtres</p></div>';
     return;
   }
 
-  // Mean J1 score — only patients with a real J1 score
+  // Mean J1 score - only patients with a real J1 score
   const j1Vals = patientScores.map(ps => ps.j1Score).filter(s => s !== null);
-  const meanJ1 = j1Vals.length ? (j1Vals.reduce((a,b) => a+b, 0) / j1Vals.length).toFixed(1) : '—';
+  const meanJ1 = j1Vals.length ? (j1Vals.reduce((a,b) => a+b, 0) / j1Vals.length).toFixed(1) : '-';
   document.getElementById('coh-mean-j1').textContent = meanJ1;
 
   // Mean last score
   const lastVals = patientScores.map(ps => ps.lastScore).filter(s => s !== null && s !== undefined);
-  const meanLast = lastVals.length ? (lastVals.reduce((a,b) => a+b, 0) / lastVals.length).toFixed(1) : '—';
+  const meanLast = lastVals.length ? (lastVals.reduce((a,b) => a+b, 0) / lastVals.length).toFixed(1) : '-';
   const meanLastEl = document.getElementById('coh-mean-last');
   if(meanLastEl) meanLastEl.textContent = meanLast;
 
@@ -4755,9 +4755,9 @@ async function loadCohorte() {
     +'</tr></thead><tbody>'
     +patientScores.map(ps => {
       const interp = qi?.interpret ? qi.interpret(ps.lastScore) : {label:'', color:'gray'};
-      const j1Display = ps.j1Score !== null ? ps.j1Score : '<span style="color:var(--text3)">—</span>';
-      const lastDisplay = ps.lastScore !== null && ps.lastScore !== undefined ? ps.lastScore : '<span style="color:var(--text3)">—</span>';
-      let deltaDisplay = '<span style="color:var(--text3)">—</span>';
+      const j1Display = ps.j1Score !== null ? ps.j1Score : '<span style="color:var(--text3)">-</span>';
+      const lastDisplay = ps.lastScore !== null && ps.lastScore !== undefined ? ps.lastScore : '<span style="color:var(--text3)">-</span>';
+      let deltaDisplay = '<span style="color:var(--text3)">-</span>';
       if(ps.delta !== null) {
         const improved = (ps.delta < 0 && !hib) || (ps.delta > 0 && hib);
         const worsened = (ps.delta > 0 && !hib) || (ps.delta < 0 && hib);
@@ -4870,7 +4870,7 @@ async function uploadExcelConfig(input) {
         uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
         uploadedBy: NS.userProfile?.email||'unknown'
       });
-      statusEl.textContent = 'Fichier importé : '+file.name+' — La configuration sera appliquée au prochain chargement.';
+      statusEl.textContent = 'Fichier importé : '+file.name+' - La configuration sera appliquée au prochain chargement.';
       document.getElementById('excel-preview').style.display='block';
       logAccess('upload_excel', file.name);
     };
@@ -4888,7 +4888,7 @@ async function uploadExcelConfig(input) {
   const msgEl = document.getElementById('excel-preview-msg');
   statusEl.textContent = 'Lecture du fichier en cours...';
 
-  // No size limit — we only store the extracted config, not the raw file
+  // No size limit - we only store the extracted config, not the raw file
 
   try {
     const reader = new FileReader();
@@ -4897,7 +4897,7 @@ async function uploadExcelConfig(input) {
       try {
         statusEl.textContent = 'Analyse du fichier Excel...';
         const bytes = new Uint8Array(e.target.result);
-        // We only parse and extract config — raw file is NOT stored
+        // We only parse and extract config - raw file is NOT stored
         const workbook = XLSX.read(bytes, {type: 'array'});
         applyParcoursConfig(workbook);
         const sheetName = 'Règles envoi des questionnaires';
@@ -5035,7 +5035,7 @@ async function uploadExcelConfig(input) {
           updatedAt: new Date().toISOString()
         };
 
-        // Save ONLY the extracted config (not raw file) — stays well under 1MB
+        // Save ONLY the extracted config (not raw file) - stays well under 1MB
         const leanConfig = {
           protocols: config.protocols,
           questionnaires: config.questionnaires,
@@ -5064,7 +5064,7 @@ async function uploadExcelConfig(input) {
         }
         statusEl.textContent = 'Fichier actif : ' + file.name;
         previewEl.style.display = 'block';
-        msgEl.textContent = 'Import réussi — ' + Object.keys(protocols).length + ' protocoles + ' + qUpdated + ' questionnaires mis à jour.';
+        msgEl.textContent = 'Import réussi - ' + Object.keys(protocols).length + ' protocoles + ' + qUpdated + ' questionnaires mis à jour.';
         renderExcelProtocolsPreview(config);
         logAccess('upload_excel', file.name);
 
@@ -5094,9 +5094,9 @@ function parseExcelConfig(bytes) {
       'schiz_h': { name: 'Schizophrénie hallucinatoire', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon'], hetero: ['AHRS'], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon'], monthly: ['PHQ-9','GAD-7'] },
       'schiz_n': { name: 'Schizophrénie négative', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','SANS'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','SANS'], monthly: ['PHQ-9','GAD-7','SANS'] },
       'cognitif': { name: 'Trouble cognitif', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon'], hetero: ['MOCA'], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon'], monthly: ['PHQ-9','GAD-7'] },
-      'add_alc': { name: 'Addiction — Alcool', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','OCDS'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','OCDS'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving','OCDS'] },
-      'add_coc': { name: 'Addiction — Cocaïne', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','CCQ'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','CCQ'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving','CCQ'] },
-      'add_aut': { name: 'Addiction — Autre', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving'] }
+      'add_alc': { name: 'Addiction - Alcool', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','OCDS'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','OCDS'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving','OCDS'] },
+      'add_coc': { name: 'Addiction - Cocaïne', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','CCQ'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving','CCQ'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving','CCQ'] },
+      'add_aut': { name: 'Addiction - Autre', j1: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving'], hetero: [], weekly: ['PHQ-9','GAD-7'], endCure: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','DSM5','EVA craving'], monthly: ['PHQ-9','GAD-7','DSM5','EVA craving'] }
     },
     questionnaires: ['PHQ-9','GAD-7','ISI','EQ-5D-5L','Ricci-Gagnon','BDI-2','Y-BOCS-SR','PCL-5','STAI-E','STAI-T','QCD','FIQ','DSM5','EVA craving','OCDS','CCQ','SANS','AHRS','MOCA','Maudsley'],
     updatedAt: new Date().toISOString()
@@ -5142,7 +5142,7 @@ async function reloadExcelConfig() {
       const statusEl = document.getElementById('excel-config-status');
       if(statusEl) statusEl.textContent = 'Fichier actif : ' + snap.data().filename + ' (importé par ' + snap.data().uploadedBy + ')';
       document.getElementById('excel-preview').style.display = 'block';
-      document.getElementById('excel-preview-msg').textContent = 'Configuration rechargée — ' + Object.keys(config.protocols).length + ' protocoles actifs.';
+      document.getElementById('excel-preview-msg').textContent = 'Configuration rechargée - ' + Object.keys(config.protocols).length + ' protocoles actifs.';
       renderExcelProtocolsPreview(config);
     } else {
       alert('Aucun fichier Excel importé. Utilisez le bouton "Importer" pour charger votre fichier.');
@@ -5261,7 +5261,7 @@ function applyExcelQuestionnairesFromFirestore(parsedQs) {
     if(!qi.questions || !qi.questions.length) {
       qi.questions = data.questions.map(q => q.text);
     }
-    // Restore options — hide conversion scores for conversion_table type
+    // Restore options - hide conversion scores for conversion_table type
     const hideScore = (qi._calcType === 'conversion_table');
     const optLabel = (o) => hideScore ? o.text : o.text + (o.score !== undefined && o.score !== '' && o.score !== null ? ' (' + o.score + ')' : '');
     const allSame = new Set(data.questions.map(q => JSON.stringify((q.options||[]).map(o=>o.text)))).size === 1;
@@ -5492,7 +5492,7 @@ function updateFavoriteButton(patientId) {
 async function renderFavorisList() {
   const el = document.getElementById('favoris-list'); if(!el) return;
   if(!NS.favorites || !NS.favorites.length) {
-    el.innerHTML = '<div class="empty"><p>Aucun favori — cliquez sur ☆ sur une fiche patient pour ajouter</p></div>';
+    el.innerHTML = '<div class="empty"><p>Aucun favori - cliquez sur ☆ sur une fiche patient pour ajouter</p></div>';
     return;
   }
   el.innerHTML = '<div class="empty"><p>Chargement…</p></div>';
@@ -5523,8 +5523,8 @@ async function renderFavorisList() {
       +'<div class="pat-av" style="background:var(--amber-bg);color:var(--amber)">'+ini+'</div>'
       +'<div class="pat-left">'
       +'<div class="pat-code" style="display:flex;align-items:center;gap:6px">'+fmtCode(p.code)+' <span style="color:var(--amber)">★</span></div>'
-      +'<div class="pat-id">'+(p.patientId||'—')+'</div>'
-      +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'—')+'</span><span class="badge b-gray fs11">'+(p.cabinet||'—')+'</span>'
+      +'<div class="pat-id">'+(p.patientId||'-')+'</div>'
+      +'<div class="pat-tags"><span class="badge b-gray fs11">'+(prots||'-')+'</span><span class="badge b-gray fs11">'+(p.cabinet||'-')+'</span>'
     +((p.extraCabinets&&p.extraCabinets.length)?p.extraCabinets.map(c=>'<span class="badge b-purple fs11">+'+c+'</span>').join(''):'')
     +'</div>'
       +'</div>'
@@ -5745,7 +5745,7 @@ async function rgpdExportPatient() {
 }
 
 // ════════════════════════════════════════════════
-// EXCEL ADVANCED — READ QUESTIONS FROM SHEETS
+// EXCEL ADVANCED - READ QUESTIONS FROM SHEETS
 // ════════════════════════════════════════════════
 function parseExcelQuestionnaires(workbook) {
   // sheetToQ : nom de l'onglet xlsx → clé dans QUESTIONNAIRES
@@ -5859,7 +5859,7 @@ function applyExcelQuestionnaires(parsedQs, typeMap) {
   return updated;
 }
 
-// Central score computation — used by both qFinish and pqFinish
+// Central score computation - used by both qFinish and pqFinish
 function computeScore(qKey, answers) {
   const qi = QUESTIONNAIRES[qKey];
   if(!qi) return 0;
@@ -5932,7 +5932,7 @@ function setupOfflineDetection() {
     if(!badge) return;
     if(!navigator.onLine) {
       badge.classList.add('show');
-      showError('Connexion perdue — vérifiez votre réseau. Les données ne peuvent pas être sauvegardées.', 0);
+      showError('Connexion perdue - vérifiez votre réseau. Les données ne peuvent pas être sauvegardées.', 0);
     } else {
       badge.classList.remove('show');
       hideError();
@@ -5963,7 +5963,7 @@ function updateDashboardDate() {
   if(weekEl) {
     const start = new Date(); start.setDate(start.getDate() - start.getDay() + 1);
     const end = new Date(start); end.setDate(end.getDate() + 6);
-    weekEl.textContent = start.getDate()+'/'+( start.getMonth()+1)+' — '+end.getDate()+'/'+(end.getMonth()+1);
+    weekEl.textContent = start.getDate()+'/'+( start.getMonth()+1)+' - '+end.getDate()+'/'+(end.getMonth()+1);
   }
 }
 
@@ -5979,9 +5979,9 @@ function renderScoreCharts(byQ) {
   // Destroy existing charts synchronously before anything else
   Object.values(patientCharts).forEach(c => { try { c.destroy(); } catch(e) {} });
   patientCharts = {};
-  // Increment generation — stale rAF callbacks from previous calls will be ignored
+  // Increment generation - stale rAF callbacks from previous calls will be ignored
   const myGeneration = ++_chartGeneration;
-  // Anchor to current patient ID — double protection against stale callbacks
+  // Anchor to current patient ID - double protection against stale callbacks
   const myPatientId = NS.currentPatient ? NS.currentPatient.id : null;
   // Clear DOM immediately so stale charts never flash
   el.innerHTML = '';
@@ -6017,7 +6017,7 @@ function renderScoreCharts(byQ) {
       +'<div style="position:relative;height:130px"><canvas id="'+canvasId+'"></canvas></div>';
     grid.appendChild(card);
 
-    // Render chart after DOM update — skip if patient changed (stale callback)
+    // Render chart after DOM update - skip if patient changed (stale callback)
     requestAnimationFrame(() => {
       if(myGeneration !== _chartGeneration) return; // generation changed, abort
       const currentId = NS.currentPatient ? NS.currentPatient.id : null;
@@ -6047,7 +6047,7 @@ function renderScoreCharts(byQ) {
               const validData = data.filter(v=>v!==null);
               const dMin = Math.min(...validData);
               const dMax = Math.max(...validData);
-              // Scores décimaux (0-1) : 15D, EQ-5D — axe fixe 0-1
+              // Scores décimaux (0-1) : 15D, EQ-5D - axe fixe 0-1
               if(dMax <= 1 && dMin >= 0) {
                 return { min: 0, max: 1, grid: { color: '#e6e2db' }, ticks: { font: { size: 10 }, callback: v => v.toFixed(2) } };
               }
@@ -6119,7 +6119,7 @@ function render15DRadar(myGeneration, myPatientId) {
   card.style.cssText = 'grid-column:1/-1;';
   card.innerHTML =
     '<div class="sec-header" style="margin-bottom:10px">'
-    +'<div style="font-size:13px;font-weight:600">15D — Profil par dimension</div>'
+    +'<div style="font-size:13px;font-weight:600">15D - Profil par dimension</div>'
     +'<div style="display:flex;align-items:center;gap:8px">'
     +(isSame
       ? '<span style="font-size:11px;color:var(--text3)">'+fmtDate(first.date)+'</span>'
@@ -6131,7 +6131,7 @@ function render15DRadar(myGeneration, myPatientId) {
     +'</div></div>'
     +'<div style="position:relative;height:320px"><canvas id="'+radarId+'"></canvas></div>'
     +'<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:6px">'
-    +'Score 0–1 par dimension — 1 = meilleure qualité de vie'
+    +'Score 0–1 par dimension - 1 = meilleure qualité de vie'
     +'</div>';
 
   let radarGrid = document.getElementById('pat-charts-grid');
@@ -6232,7 +6232,7 @@ function printPatient() {
   // Update print header
   const printCode = document.getElementById('print-code');
   const printDate = document.getElementById('print-date');
-  if(printCode) printCode.textContent = fmtCode(p.code) + ' — ' + p.patientId;
+  if(printCode) printCode.textContent = fmtCode(p.code) + ' - ' + p.patientId;
   if(printDate) printDate.textContent = 'Imprimé le ' + new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
   // Switch to scores tab for a complete view
   const suivi = document.querySelector('#page-patient-detail .tab');
@@ -6382,7 +6382,7 @@ function renderDescriptiveStats(pts) {
   });
 
   function stats(arr) {
-    if(!arr.length) return {n:0, mean:'—', sd:'—', median:'—', min:'—', max:'—'};
+    if(!arr.length) return {n:0, mean:'-', sd:'-', median:'-', min:'-', max:'-'};
     const n = arr.length;
     const mean = arr.reduce((a,b)=>a+b,0)/n;
     const sd = Math.sqrt(arr.reduce((a,b)=>a+Math.pow(b-mean,2),0)/n);
@@ -6540,7 +6540,7 @@ async function loadPatientHistory() {
         type: 'questionnaire',
         action: 'questionnaire_completed',
         user: 'Patient',
-        detail: resp.questionnaire + ' — score ' + resp.score
+        detail: resp.questionnaire + ' - score ' + resp.score
       });
     });
 
@@ -6702,7 +6702,7 @@ function safeCloseQuestionnaire() {
 }
 
 async function moveQToToday(patientId, qName, fromDate) {
-  if(NS.userProfile?.role === 'lecture') { showError('Accès refusé — compte lecture seule.', 3000); return; }
+  if(NS.userProfile?.role === 'lecture') { showError('Accès refusé - compte lecture seule.', 3000); return; }
   const today = todayStr();
   if(fromDate === today) return;
   if(!confirm('Déplacer "' + qName + '" à aujourd\'hui (' + fmtDate(today) + ') ?')) return;
@@ -6732,7 +6732,7 @@ async function moveQToToday(patientId, qName, fromDate) {
 }
 
 async function ignoreQuestionnaire(patientId, qName, date) {
-  if(NS.userProfile?.role === 'lecture') { showError('Accès refusé — compte lecture seule.', 3000); return; }
+  if(NS.userProfile?.role === 'lecture') { showError('Accès refusé - compte lecture seule.', 3000); return; }
   if(!confirm('Marquer "' + qName + '" du ' + fmtDate(date) + ' comme non applicable ?\nCe questionnaire ne comptera plus comme en retard.')) return;
 
   const patRef = db.doc('patients/' + patientId);
@@ -6856,7 +6856,7 @@ function openChangePassword(isFirstLogin) {
   const cancelBtn = document.getElementById('pwd-cancel-btn');
   const closeBtn = document.getElementById('pwd-close-btn');
   if(isFirstLogin) {
-    if(sub) sub.textContent = 'Première connexion — changement obligatoire';
+    if(sub) sub.textContent = 'Première connexion - changement obligatoire';
     if(warning) warning.style.display = 'block';
     if(cancelBtn) cancelBtn.style.display = 'none';
     if(closeBtn) closeBtn.style.display = 'none';
@@ -6928,7 +6928,7 @@ async function checkSystemStatus() {
       const lastLog = lSnap.docs[0]?.data();
       statsEl.innerHTML = '<div class="set-row"><div class="set-label">Patients total</div><div class="meta-val mono">'+pSnap.size+'</div></div>'
         +'<div class="set-row"><div class="set-label">Utilisateurs</div><div class="meta-val mono">'+uSnap.size+'</div></div>'
-        +'<div class="set-row"><div class="set-label">Derniere activite</div><div class="meta-val" style="font-size:12px">'+(lastLog?.user||'—')+' · '+(lastLog?.action||'—')+'</div></div>';
+        +'<div class="set-row"><div class="set-label">Derniere activite</div><div class="meta-val" style="font-size:12px">'+(lastLog?.user||'-')+' · '+(lastLog?.action||'-')+'</div></div>';
     } catch(e) {
       statsEl.innerHTML = '<div class="empty"><p>Erreur de chargement</p></div>';
     }
@@ -6941,7 +6941,7 @@ async function checkSystemStatus() {
       activityEl.innerHTML = snap.docs.map(d => {
         const l=d.data();
         return '<div class="log-row">'
-          +'<span class="log-ts">'+(l.timestamp?.toDate?l.timestamp.toDate().toLocaleString('fr-FR'):'—')+'</span>'
+          +'<span class="log-ts">'+(l.timestamp?.toDate?l.timestamp.toDate().toLocaleString('fr-FR'):'-')+'</span>'
           +'<span class="log-user">'+l.user+'</span>'
           +'<span class="log-action">'+l.action+'</span>'
           +'<span class="log-target">'+l.target+'</span>'
@@ -7200,7 +7200,7 @@ function onParcoursTypeChange() {
   } else if(type === 'psychotherapie') {
     html = '<div class="fg"><label>Type de psychothérapie</label>'
       +'<select id="psycho-type" onchange="parcoursState.subtype.psychoType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
-      +'<option value="">— Choisir —</option>'
+      +'<option value="">- Choisir -</option>'
       +['TCC','ACT','TIP','Psychodynamique','Systémique','DBT','EMDR','Thérapie des schémas','Intégration du cycle de vie','Autre']
       .map(v => '<option value="'+v+'">'+v+'</option>').join('')
       +'</select></div>'
@@ -7221,7 +7221,7 @@ function onParcoursTypeChange() {
 function renderRythmField(prefix) {
   return '<div class="fg"><label>Rythme des séances</label>'
     +'<select id="'+prefix+'-rythme" onchange="parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
-    +'<option value="">— Choisir —</option>'
+    +'<option value="">- Choisir -</option>'
     +[['1/semaine','Une fois par semaine'],['1/2semaines','Tous les 15 jours'],
       ['1/mois','Tous les mois'],['autre','Autre']]
     .map(([v,l]) => '<option value="'+v+'">'+l+'</option>').join('')
@@ -7337,7 +7337,7 @@ function parcoursRemoveQ(idx) {
 }
 
 function renderParcoursFreqList() {
-  // Frequency list is now inline in each pill — this function kept for compatibility
+  // Frequency list is now inline in each pill - this function kept for compatibility
 }
 
 async function confirmAddParcours() {
@@ -7402,7 +7402,7 @@ async function confirmAddParcours() {
       if(!existing) {
         mergedSchedule.push({...ns});
       } else {
-        // Merge questionnaires — no duplicates
+        // Merge questionnaires - no duplicates
         const newQs = (ns.questionnaires||[]).filter(q => !existing.questionnaires.includes(q));
         existing.questionnaires = [...existing.questionnaires, ...newQs];
         // Keep label generic
@@ -7462,8 +7462,8 @@ function genParcoursSlotsSlots(parc) {
       .filter(n => !(byFreq['ponctuel_debut_fin'] || []).includes(n)) // dedupe
   ];
   if(bilanQs.length) {
-    slots.push({date:startDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours', parcoursId, label:'Bilan initial — Parcours'});
-    if(endDate) slots.push({date:endDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours_end', parcoursId, label:'Bilan final — Parcours'});
+    slots.push({date:startDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours', parcoursId, label:'Bilan initial - Parcours'});
+    if(endDate) slots.push({date:endDate, questionnaires:[...bilanQs], hetero:[], done:[], type:'parcours_end', parcoursId, label:'Bilan final - Parcours'});
   }
 
   const freqToMonths = {
@@ -7491,7 +7491,7 @@ function genParcoursSlotsSlots(parc) {
       if(end && current > end) break;
       if(!end && iter > 24) break; // safety limit for indefinite parcours
       const dateStr = current.toISOString().split('T')[0];
-      const label = 'Parcours — ' + (months < 1 ? 'S+'+Math.round(months*4*iter) : 'M+'+Math.round(months*iter));
+      const label = 'Parcours - ' + (months < 1 ? 'S+'+Math.round(months*4*iter) : 'M+'+Math.round(months*iter));
       const existing = slots.find(s => s.date===dateStr && s.parcoursId===parcoursId && s.type==='parcours_suivi');
       if(existing) {
         qs.forEach(q => { if(!existing.questionnaires.includes(q)) existing.questionnaires.push(q); });
@@ -7546,7 +7546,7 @@ async function confirmAddProtocol() {
   }
   const newProtos = [...existingProtos, {name, startDate: j1, endDate: end}];
 
-  // Get existing schedule — preserve done responses, add only new slots
+  // Get existing schedule - preserve done responses, add only new slots
   const existingSchedule = p.schedule || [];
   const newSchedule = genSchedule({protocols: newProtos});
 
@@ -7554,7 +7554,7 @@ async function confirmAddProtocol() {
   // Key for dedup: date + type + (for weekly: date is enough)
   const existingKeys = new Set(existingSchedule.map(s => s.date+'|'+s.type));
 
-  // For j1/end/consent: may have different labels — merge questionnaires
+  // For j1/end/consent: may have different labels - merge questionnaires
   const mergedSchedule = [...existingSchedule];
 
   newSchedule.forEach(ns => {
@@ -7757,7 +7757,7 @@ function openConsolidation() {
   document.getElementById('cons-patient-id').value = p.id;
   const isReconfig = !!(p.consolidation && (p.schedule||[]).some(s => s.type === 'monthly'));
 
-  // Populate questionnaires — use existing config if reconfiguring, else derive from protocols
+  // Populate questionnaires - use existing config if reconfiguring, else derive from protocols
   if(isReconfig && p.consolidation.questionnaires?.length) {
     consQuestionnaires = [...p.consolidation.questionnaires];
   } else {
@@ -7767,11 +7767,11 @@ function openConsolidation() {
   }
   renderConsQs();
 
-  // Duration & frequency — use existing config if reconfiguring
+  // Duration & frequency - use existing config if reconfiguring
   document.getElementById('cons-months').value = p.consolidation?.months || 6;
   document.getElementById('cons-freq').value = p.consolidation?.freq || 1;
 
-  // Start date — only relevant for new config
+  // Start date - only relevant for new config
   const startEl = document.getElementById('cons-start-date');
   if(startEl) startEl.value = p.consolidation?.startDate || p.endDate || p.interruptDate || todayStr();
 
@@ -7913,7 +7913,7 @@ function buildQSelectOptions(selId, includeHetero) {
         if(!qi || !qi.questions || !qi.questions.length) return '';
         if(!includeHetero && qi.type === 'hetero') return '';
         const tag = qi.type === 'hetero' ? ' (hétéro)' : '';
-        const domain = qi.domain ? ' — ' + qi.domain : '';
+        const domain = qi.domain ? ' - ' + qi.domain : '';
         return '<option value="' + k + '">' + k + domain + tag + '</option>';
       }).join('');
 }
@@ -7933,7 +7933,7 @@ function openAddSingleQ() {
 }
 
 async function addSingleQuestionnaire() {
-  // Use the patient ID locked at modal open — not NS.currentPatient which may have changed
+  // Use the patient ID locked at modal open - not NS.currentPatient which may have changed
   const lockedId = document.getElementById('single-q-patient-id')?.value || NS.currentPatient?.id;
   if(!lockedId) return;
   const qName = document.getElementById('single-q-name')?.value;
@@ -7946,7 +7946,7 @@ async function addSingleQuestionnaire() {
   const qi = QUESTIONNAIRES[qName];
   const isHetero = qi?.type === 'hetero';
 
-  // Always read fresh schedule from Firestore — never trust NS.currentPatient.schedule
+  // Always read fresh schedule from Firestore - never trust NS.currentPatient.schedule
   const patRef = db.doc('patients/'+lockedId);
   const patSnap = await patRef.get();
   if(!patSnap.exists) { showError('Patient introuvable.', 3000); return; }
@@ -8035,7 +8035,7 @@ function toggleProt(prot, btn) {
 let pinBuffer = '';
 
 // ══════════════════════════════════════════
-// PEM — Potentiel Évoqué Moteur
+// PEM - Potentiel Évoqué Moteur
 // ══════════════════════════════════════════
 function openAddPEM() {
   const p = NS.currentPatient; if(!p) return;
@@ -8135,7 +8135,7 @@ async function checkPin() {
   const stored = await getStoredPin();
   const errEl = document.getElementById('pq-pin-error');
   if(!stored || stored === '') {
-    // No PIN set — exit directly
+    // No PIN set - exit directly
     exitPatientScreen();
     return;
   }
@@ -8154,7 +8154,7 @@ function exitPatientScreen() {
 }
 
 // ════════════════════════════════════════════
-// IMPROVED DASHBOARD — grouped by patient
+// IMPROVED DASHBOARD - grouped by patient
 // ════════════════════════════════════════════
 function renderTodayList(todayItems, overdueItems) {
   const todayEl = document.getElementById('today-list');
@@ -8235,7 +8235,7 @@ function renderTodayList(todayItems, overdueItems) {
       wrapper.style.cssText = 'border:1px solid var(--red-border);border-radius:var(--r-sm);margin-bottom:6px;overflow:hidden';
       const header = document.createElement('div');
       header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--red-bg);cursor:pointer';
-      const subtitle = group.items.map(function(i){ return fmtDate(i.date)+' — '+i.remaining.join(', '); }).join(' · ');
+      const subtitle = group.items.map(function(i){ return fmtDate(i.date)+' - '+i.remaining.join(', '); }).join(' · ');
       header.innerHTML = '<div class="di-av" style="width:32px;height:32px;font-size:11px;background:var(--red-bg);color:var(--red)">'+ini+'</div>'
         + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--red)">'+fmtCode(p.code)+'</div>'
         + '<div style="font-size:11px;color:var(--red)">'+subtitle+'</div></div>'
@@ -8269,7 +8269,7 @@ function togglePatientQs(el, pid) {
 }
 
 // ════════════════════════════════════════════
-// IMPROVED WEEK VIEW — compact
+// IMPROVED WEEK VIEW - compact
 // ════════════════════════════════════════════
 function renderWeekView() {
   const el = document.getElementById('week-view'); if(!el) return;
@@ -8304,7 +8304,7 @@ function renderWeekView() {
       return '<div style="border:1px solid '+(isToday?'var(--accent)':'var(--border)')+';border-radius:var(--r-sm);padding:6px;background:'+(isToday?'var(--accent-bg)':'var(--surface)')+';">'
         + '<div style="font-size:10px;font-weight:600;color:'+(isToday?'var(--accent)':'var(--text3)')+';margin-bottom:4px">'+dayNames[d.getDay()]+' '+d.getDate()+'</div>'
         + (items.length === 0
-          ? '<div style="font-size:10px;color:var(--border2);text-align:center;padding:4px 0">—</div>'
+          ? '<div style="font-size:10px;color:var(--border2);text-align:center;padding:4px 0">-</div>'
           : '<div style="font-size:10px;font-weight:600;color:'+(isToday?'var(--accent)':'var(--text2)')+';margin-bottom:2px">'+items.length+' patient'+(items.length>1?'s':'')+'</div>'
           + items.map(item =>
               '<div style="padding:3px 5px;background:'+(isToday?'var(--accent)':'var(--surface2)')+';color:'+(isToday?'#fff':'var(--text)')+';border-radius:4px;margin-bottom:2px;font-size:10px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" data-id="'+item.patient.id+'" onclick="openPatient(this.dataset.id)">'+item.patient.code+'</div>'
@@ -8317,7 +8317,7 @@ function renderWeekView() {
 }
 
 // ════════════════════════════════════════════
-// HISTORIQUE — GRAPHICAL TIMELINE
+// HISTORIQUE - GRAPHICAL TIMELINE
 // ════════════════════════════════════════════
 
 let consentPinBuffer = '';
@@ -8433,7 +8433,7 @@ function updateLockDots() {
 async function checkLockPin() {
   const stored = await getStoredPin();
   if(!stored || stored === '') {
-    // No PIN configured — unlock directly
+    // No PIN configured - unlock directly
     exitPatientLock();
     return;
   }
@@ -8465,7 +8465,7 @@ function lockStartNextQ() {
 const _origCloseModal = window.closeModal;
 function closeModal(id) {
   if(id === 'm-questionnaire' && document.body.classList.contains('patient-lock')) {
-    // Already in lock — do nothing (croix désactivée)
+    // Already in lock - do nothing (croix désactivée)
     return;
   }
   if(_origCloseModal) _origCloseModal(id);
@@ -8482,7 +8482,7 @@ function openQuitWithPin() {
   const qOpen = document.body.classList.contains('in-questionnaire') || document.body.classList.contains('patient-lock');
 
   if(!consentOpen && !qOpen) {
-    // Not locked — just close normally
+    // Not locked - just close normally
     currentQ = {patientId:null, qName:null, date:null, answers:[], currentIdx:0};
     closeModal('m-questionnaire');
     return;
@@ -8496,7 +8496,7 @@ function openQuitWithPin() {
       if(pin === null) return; // cancelled
       if(pin !== stored) { alert('Code PIN incorrect.'); return; }
     }
-    // PIN OK or no PIN configured — unlock everything
+    // PIN OK or no PIN configured - unlock everything
     document.body.classList.remove('in-questionnaire', 'patient-lock');
     document.body.style.overflow = '';
     currentQ = {patientId:null, qName:null, date:null, answers:[], currentIdx:0};
@@ -8523,7 +8523,7 @@ function openQuitWithPin() {
 
 
 // ════════════════════════════════════════════════
-// HISTORIQUE — rebuilt from scratch
+// HISTORIQUE - rebuilt from scratch
 // ════════════════════════════════════════════════
 async function buildHistory() {
   var el = document.getElementById('hist-content');
@@ -8549,7 +8549,7 @@ async function buildHistory() {
 
   // Milestones
   if(p.consentDate) getDay(p.consentDate).ms.push({icon:'✓', label:'Consentement signé', cls:'green'});
-  if(p.j1Date) getDay(p.j1Date).ms.push({icon:'▶', label:'Début de cure — J1', cls:'blue'});
+  if(p.j1Date) getDay(p.j1Date).ms.push({icon:'▶', label:'Début de cure - J1', cls:'blue'});
   if(p.interruptDate) getDay(p.interruptDate).ms.push({icon:'⛔', label:'Interruption', cls:'red'});
   if(p.endDate) getDay(p.endDate).ms.push({icon:'✓', label:'Fin de cure', cls:'green'});
 
@@ -8675,7 +8675,7 @@ async function generatePDF() {
     return (new Date(scores[scores.length-1].date) - new Date(scores[0].date)) >= 7*24*3600*1000;
   });
 
-  // Build timeline day map — only days with actual completed questionnaires (excl. consent)
+  // Build timeline day map - only days with actual completed questionnaires (excl. consent)
   const dayMap = {};
   function getDay(d) { if(!dayMap[d]) dayMap[d]={ms:[],qs:[]}; return dayMap[d]; }
 
@@ -8716,7 +8716,7 @@ async function generatePDF() {
     const W = 210, H = 297, margin = 18, cW = 210-36;
     let y = 0;
 
-    // Colors — print-friendly blues
+    // Colors - print-friendly blues
     const blue = [24, 95, 165];
     const lightBlue = [230, 241, 251];
     const dark = [20, 30, 50];
@@ -8858,7 +8858,7 @@ async function generatePDF() {
         y += 10;
       });
 
-      // Questionnaire pills — rows of max 5, centered
+      // Questionnaire pills - rows of max 5, centered
       if(day.qs.length) {
         const pillW = 30, pillGap = 3, maxPerRow = Math.min(5, Math.floor(cW/(pillW+pillGap)));
         const chunks = [];
@@ -8897,7 +8897,7 @@ async function generatePDF() {
         doc.setFillColor(...blue); doc.setTextColor(255,255,255);
         doc.roundedRect(margin, y, cW, 8, 1, 1, 'F');
         doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text('15D — PROFIL PAR DIMENSION', margin+5, y+5.5);
+        doc.text('15D - PROFIL PAR DIMENSION', margin+5, y+5.5);
         y += 12;
 
         const first15 = resp15D[0];
@@ -8955,7 +8955,7 @@ async function generatePDF() {
 
         // Légende date + score global
         doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...mid);
-        doc.text('Score 0–1 par dimension — 1 = meilleure qualité de vie', W/2, y, {align:'center'});
+        doc.text('Score 0–1 par dimension - 1 = meilleure qualité de vie', W/2, y, {align:'center'});
         y += 5;
         if(!isSame15) {
           const scoreJ1 = resp15D[0].score, scoreLast = resp15D[resp15D.length-1].score;
@@ -8963,7 +8963,7 @@ async function generatePDF() {
           const interp15 = qi15.interpretDelta ? qi15.interpretDelta(delta15) : null;
           const col15 = interp15 ? (interp15.color==='green'?[22,107,60]:interp15.color==='red'?[160,50,50]:[80,100,130]) : mid;
           doc.setTextColor(...col15);
-          doc.text('Score global : J1 = '+scoreJ1+' → Dernière = '+scoreLast+(interp15?' — '+interp15.label:''), W/2, y, {align:'center'});
+          doc.text('Score global : J1 = '+scoreJ1+' → Dernière = '+scoreLast+(interp15?' - '+interp15.label:''), W/2, y, {align:'center'});
           y += 4;
         }
         y += 8;
@@ -9047,7 +9047,7 @@ async function generatePDF() {
         var _dColor = _deltaInterp ? (_deltaInterp.color==='green'?[22,107,60]:_deltaInterp.color==='red'?[160,50,50]:[80,100,130]) : (delta<0?[22,107,60]:delta>0?[160,50,50]:[80,100,130]);
         doc.setFontSize(7); doc.setFont('helvetica','normal');
         doc.setTextColor(_dColor[0],_dColor[1],_dColor[2]);
-        doc.text('J1: '+first+' → Final: '+last+' — '+_deltaLabel+(interp?' ('+interp.label+')':''), xPos+chartW/2, rowY+chartH+4, {align:'center'});
+        doc.text('J1: '+first+' → Final: '+last+' - '+_deltaLabel+(interp?' ('+interp.label+')':''), xPos+chartW/2, rowY+chartH+4, {align:'center'});
 
         col++;
         if(col >= 2) { col=0; rowY += chartH+12; }
@@ -9256,8 +9256,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="modal fade">
     <div class="mh">
       <div>
-        <div class="mh-title" id="sd-title">—</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="sd-date">—</div>
+        <div class="mh-title" id="sd-title">-</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="sd-date">-</div>
       </div>
       <button class="close-btn" onclick="closeModal('m-score-detail')">✕</button>
     </div>
@@ -9265,10 +9265,10 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div style="display:flex;align-items:center;gap:16px;padding:14px;background:var(--surface2);border-radius:var(--r-sm);margin-bottom:16px">
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:2px">Score total</div>
-          <div style="font-size:32px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="sd-score">—</div>
+          <div style="font-size:32px;font-weight:700;font-family:'IBM Plex Mono',monospace" id="sd-score">-</div>
         </div>
         <div style="border-left:1px solid var(--border);padding-left:14px">
-          <span class="badge" id="sd-label" style="font-size:13px;padding:5px 12px">—</span>
+          <span class="badge" id="sd-label" style="font-size:13px;padding:5px 12px">-</span>
         </div>
       </div>
       <div id="sd-detail"></div>
@@ -9282,7 +9282,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="pq-header">
     <div>
       <div class="pq-header-title" id="pq-title">Questionnaire</div>
-      <div class="pq-header-sub">NeuroStim — Suivi rTMS</div>
+      <div class="pq-header-sub">NeuroStim - Suivi rTMS</div>
     </div>
   </div>
   <div class="pq-body" id="pq-body">
@@ -9419,7 +9419,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <!-- MODAL: RGPD ERASE -->
 <div id="m-rgpd-erase" class="overlay">
   <div class="modal sm fade">
-    <div class="mh"><div class="mh-title">Effacement complet — RGPD Art. 17</div><button class="close-btn" onclick="closeModal('m-rgpd-erase')">✕</button></div>
+    <div class="mh"><div class="mh-title">Effacement complet - RGPD Art. 17</div><button class="close-btn" onclick="closeModal('m-rgpd-erase')">✕</button></div>
     <div class="mb">
       <div style="padding:12px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:var(--r-sm);margin-bottom:14px;font-size:12px;color:var(--red)">
         ⚠ Cette action est irréversible. Toutes les données du patient seront définitivement supprimées.
@@ -9437,7 +9437,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 <!-- MODAL: RGPD EXPORT -->
 <div id="m-rgpd-export" class="overlay">
   <div class="modal sm fade">
-    <div class="mh"><div class="mh-title">Export données patient — RGPD Art. 20</div><button class="close-btn" onclick="closeModal('m-rgpd-export')">✕</button></div>
+    <div class="mh"><div class="mh-title">Export données patient - RGPD Art. 20</div><button class="close-btn" onclick="closeModal('m-rgpd-export')">✕</button></div>
     <div class="mb">
       <p class="text-muted" style="margin-bottom:14px">Télécharger toutes les données d'un patient au format JSON (portabilité des données).</p>
       <div class="fg"><label>Code du patient</label><input type="text" id="rgpd-export-code" placeholder="ex: MAR-DUP-15031978" autocomplete="off"></div>
@@ -9461,7 +9461,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="mb">
       <div id="pwd-first-login-warning" style="display:none" class="warn-box" style="margin-bottom:14px">
-        Première connexion — veuillez changer le mot de passe provisoire qui vous a été attribué.
+        Première connexion - veuillez changer le mot de passe provisoire qui vous a été attribué.
       </div>
       <div class="fg"><label>Mot de passe actuel</label><input type="password" id="pwd-current" placeholder="••••••••" autocomplete="current-password"></div>
       <div class="fg"><label>Nouveau mot de passe</label><input type="password" id="pwd-new" placeholder="••••••••" oninput="checkPwdStrength(this.value)"></div>
