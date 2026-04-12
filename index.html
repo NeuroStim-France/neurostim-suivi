@@ -631,7 +631,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-00h15</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-00h45</span>
       </div>
     </div>
   </div>
@@ -1381,7 +1381,9 @@ body.role-saisie .analyse-only { display:none !important; }
               <option value="remediation">🧠 Remédiation cognitive</option>
               <option value="groupe">👥 Thérapie de groupe</option>
               <option value="monitoring">📈 Monitoring simple</option>
-              <option value="douleur">🩹 Suivi douleur</option>          </div>
+              <option value="douleur">🩹 Suivi douleur</option>
+            </select>
+          </div>
           <div id="ps2-parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
           <div class="g2" style="margin-top:8px">
             <div class="fg"><label>Date de démarrage *</label><input type="date" id="ps2-parcours-start" autocomplete="off"></div>
@@ -1657,7 +1659,10 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="remediation">🧠 Remédiation cognitive</option>
           <option value="groupe">👥 Thérapie de groupe</option>
           <option value="monitoring">📈 Monitoring simple</option>
-          <option value="douleur">🩹 Suivi douleur</option>      <!-- Sous-options dynamiques selon le type -->
+          <option value="douleur">🩹 Suivi douleur</option>
+        </select>
+      </div>
+      <!-- Sous-options dynamiques selon le type -->
       <div id="parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
 
       <!-- Dates & durée -->
