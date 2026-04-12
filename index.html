@@ -631,7 +631,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-23h45</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-00h15</span>
       </div>
     </div>
   </div>
@@ -4453,10 +4453,13 @@ function renderPQCGUScreen(qi) {
   const body = document.getElementById('pq-body');
   if(!body) return;
   // Hide existing pq elements without destroying them
-  ['pq-progress','pq-progress-text','pq-instructions','pq-question','pq-options','pq-nav'].forEach(function(id) {
+  ['pq-progress','pq-progress-text','pq-instructions','pq-question','pq-options'].forEach(function(id) {
     const el = document.getElementById(id);
     if(el) el.style.display = 'none';
   });
+  // Hide nav (class only, no id)
+  const navEl = body.querySelector('.pq-nav');
+  if(navEl) navEl.style.display = 'none';
   // Remove any previous CGU overlay
   const prev = document.getElementById('pq-cgu-overlay');
   if(prev) prev.remove();
@@ -4524,24 +4527,21 @@ async function pqCGUAccept() {
     history.push({action:'cgu_accepted', user:'patient', date:pqState.date, detail:'CGU acceptées'});
     await patRef.update({history});
   } catch(e) { console.error('CGU save error:', e); }
-  // Remove CGU overlay and restore pq-body elements
+  // Remove CGU overlay
   const cguOverlay = document.getElementById('pq-cgu-overlay');
   if(cguOverlay) cguOverlay.remove();
-  ['pq-progress','pq-progress-text','pq-instructions','pq-question','pq-options','pq-nav'].forEach(function(id) {
-    const el = document.getElementById(id);
-    if(el) el.style.display = '';
-  });
-  // Move to next questionnaire
-  if(pqState.remainingQs && pqState.remainingQs.length > 0) {
-    pqStartNext();
-  } else {
-    // Show done screen
-    document.getElementById('pq-body').style.display = 'none';
-    const doneScreen = document.getElementById('pq-done-screen');
-    if(doneScreen) doneScreen.style.display = 'block';
-    const closeBtn = document.getElementById('pq-close-btn');
-    if(closeBtn) closeBtn.style.display = 'block';
-  }
+  // Always show done screen — CGU is standalone, patient closes page after
+  document.getElementById('pq-body').style.display = 'none';
+  const doneScreen = document.getElementById('pq-done-screen');
+  if(doneScreen) doneScreen.style.display = 'block';
+  const doneTitle = document.querySelector('.pq-done-title');
+  if(doneTitle) doneTitle.textContent = 'CGU acceptées ✓';
+  const doneSub = document.querySelector('.pq-done-sub');
+  if(doneSub) doneSub.textContent = 'Merci. Vous pouvez refermer cette page.';
+  const nextBtn = document.getElementById('pq-next-q-btn');
+  if(nextBtn) nextBtn.style.display = 'none';
+  const closeBtn = document.getElementById('pq-close-btn');
+  if(closeBtn) closeBtn.style.display = 'block';
 }
 
 function renderPQConsentScreen(qi) {
