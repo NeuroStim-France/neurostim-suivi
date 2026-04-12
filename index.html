@@ -257,12 +257,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15);display:flex;flex-direction:column;min-height:0}
 .modal.sm{max-width:460px}
-.mh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);z-index:1;border-radius:14px 14px 0 0}
+.mh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);border-radius:14px 14px 0 0}
 .mh-title{font-size:15px;font-weight:600;letter-spacing:-.1px}
-.mb{padding:16px 20px;overflow-y:auto;flex:1;min-height:0}
-.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;background:var(--surface);border-radius:0 0 14px 14px}
+.mb{padding:16px 20px;overflow-y:auto;flex:1 1 auto;min-height:0;overscroll-behavior:contain}
+.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex:0 0 auto;background:var(--surface);border-radius:0 0 14px 14px;position:static !important}
 .close-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;border-radius:4px;display:flex;align-items:center}.close-btn:hover{color:var(--text);background:var(--surface2)}
 
 /* BOXES */
@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-21h45</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-22h30</span>
       </div>
     </div>
   </div>
@@ -1538,10 +1538,14 @@ body.role-saisie .analyse-only { display:none !important; }
         Faites défiler jusqu'en bas pour activer le bouton d'acceptation ↓
       </div>
     </div>
-    <div class="mf">
+    <div class="mf" style="flex-direction:column;gap:8px">
       <button id="cgu-accept-btn" class="btn btn-primary btn-full" onclick="saveCGUAcceptance()" disabled style="opacity:0.5">
         ✓ J'ai lu et j'accepte les Conditions Générales d'Utilisation
       </button>
+      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
+        <button class="btn btn-ghost btn-sm write-only" onclick="showQRFromCGU()" style="font-size:12px;color:var(--accent)">📷 QR Code — faire signer sur tablette</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('m-cgu').style.display='none'">Annuler</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3132,7 +3136,6 @@ function openCGUModal(patientId, date) {
       document.getElementById('cgu-scroll-hint').style.display = 'none';
     }
   };
-  document.body.classList.add('patient-lock');
   modal.style.display = 'flex';
 }
 
@@ -3169,7 +3172,6 @@ async function saveCGUAcceptance() {
   // Close modal and refresh
   const modal = document.getElementById('m-cgu');
   if(modal) modal.style.display = 'none';
-  document.body.classList.remove('patient-lock');
   if(NS.currentPatient?.id === currentQ.patientId) {
     const fresh = await patRef.get();
     NS.currentPatient = {id: currentQ.patientId, ...fresh.data()};
@@ -4010,6 +4012,12 @@ function showQR(patientId,qName,date) {
   document.getElementById('qr-link').value=url;
   document.getElementById('qr-qname').textContent=qName;
   openModal('m-qr');
+}
+
+function showQRFromCGU() {
+  if(!currentQ.patientId || !currentQ.qName) return;
+  document.getElementById('m-cgu').style.display = 'none';
+  showQR(currentQ.patientId, currentQ.qName, currentQ.date);
 }
 
 function showQRFromQ() {
