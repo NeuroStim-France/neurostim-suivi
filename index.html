@@ -627,7 +627,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.09-10h35</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-11h00</span>
       </div>
     </div>
   </div>
@@ -969,9 +969,7 @@ body.role-saisie .analyse-only { display:none !important; }
               <option value="remediation">🧠 Remédiation</option>
               <option value="groupe">👥 Groupe</option>
               <option value="monitoring">📈 Monitoring</option>
-            </select>
-          </div>
-          <div class="fg" style="margin:0;flex:1;min-width:140px"><label>Intervention</label>
+              <option value="douleur">🩹 Douleur</option>
             <select id="coh-intervention" onchange="loadCohorte()">
               <option value="all">Toutes</option>
             </select>
@@ -1379,8 +1377,7 @@ body.role-saisie .analyse-only { display:none !important; }
               <option value="remediation">🧠 Remédiation cognitive</option>
               <option value="groupe">👥 Thérapie de groupe</option>
               <option value="monitoring">📈 Monitoring simple</option>
-            </select>
-          </div>
+              <option value="douleur">🩹 Suivi douleur</option>          </div>
           <div id="ps2-parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
           <div class="g2" style="margin-top:8px">
             <div class="fg"><label>Date de démarrage *</label><input type="date" id="ps2-parcours-start" autocomplete="off"></div>
@@ -1524,6 +1521,31 @@ body.role-saisie .analyse-only { display:none !important; }
 
 
 <!-- MODAL: CONSENTEMENT rTMS -->
+<!-- MODAL: CGU -->
+<div id="m-cgu" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;overflow-y:auto">
+  <div class="modal fade" style="max-width:680px">
+    <div class="mh" style="background:var(--accent);border-radius:14px 14px 0 0">
+      <div>
+        <div class="mh-title" style="color:#fff;font-size:16px">📋 Conditions Générales d'Utilisation</div>
+        <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:2px">Veuillez lire et accepter les CGU pour continuer</div>
+      </div>
+    </div>
+    <div class="mb">
+      <div id="cgu-scroll-area" style="height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;background:var(--surface2);font-size:13px;line-height:1.7;color:var(--text)">
+        <div id="cgu-text-area"></div>
+      </div>
+      <div id="cgu-scroll-hint" style="text-align:center;font-size:12px;color:var(--text3);margin:10px 0">
+        Faites défiler jusqu'en bas pour activer le bouton d'acceptation ↓
+      </div>
+    </div>
+    <div class="mf">
+      <button id="cgu-accept-btn" class="btn btn-primary btn-full" onclick="saveCGUAcceptance()" disabled style="opacity:0.5">
+        ✓ J'ai lu et j'accepte les Conditions Générales d'Utilisation
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="m-consent" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;overflow-y:auto">
   <div class="modal fade" style="max-width:720px">
     <div class="mh" style="background:var(--accent);border-radius:14px 14px 0 0">
@@ -1627,10 +1649,7 @@ body.role-saisie .analyse-only { display:none !important; }
           <option value="remediation">🧠 Remédiation cognitive</option>
           <option value="groupe">👥 Thérapie de groupe</option>
           <option value="monitoring">📈 Monitoring simple</option>
-        </select>
-      </div>
-
-      <!-- Sous-options dynamiques selon le type -->
+          <option value="douleur">🩹 Suivi douleur</option>      <!-- Sous-options dynamiques selon le type -->
       <div id="parcours-suboptions" style="display:none;overflow:hidden;box-sizing:border-box;width:100%"></div>
 
       <!-- Dates & durée -->
@@ -1940,6 +1959,70 @@ const QUESTIONNAIRES = {
     maxScore:56,
     interpret:(s)=>({label:s+" pts",color:"gray"})
   },
+  'CGU': {
+    name: 'CGU',
+    fullName: 'Conditions Générales d\'Utilisation - NeuroStim',
+    type: 'cgu',
+    domain: 'Consentement',
+    instructions: 'Veuillez lire attentivement les Conditions Générales d\'Utilisation ci-dessous avant de les accepter.',
+    cguText: `<h3 style="font-size:15px;font-weight:700;margin-bottom:12px">CONDITIONS GÉNÉRALES D'UTILISATION</h3>
+<p style="font-size:12px;color:#666;margin-bottom:16px">Application de suivi clinique et d'envoi de questionnaires - NeuroStim</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">1. Objet</h4>
+<p>Les présentes Conditions Générales d'Utilisation (CGU) ont pour objet de définir les modalités d'utilisation de l'application de suivi clinique et d'envoi de questionnaires (ci-après « l'Application »), utilisée dans le cadre de la prise en charge de patients bénéficiant notamment de traitements de neurostimulation (rTMS).</p>
+<p style="margin-top:8px">L'Application permet : la collecte de données cliniques via des questionnaires, le suivi longitudinal des patients, l'amélioration de la qualité des soins, et, le cas échéant, l'exploitation de données à des fins de recherche dans un cadre réglementaire approprié.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">2. Éditeur de l'Application</h4>
+<p>L'Application est éditée par <strong>NeuroStim</strong>.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">3. Accès à l'Application</h4>
+<p><strong>Accès patients :</strong> Les patients accèdent à l'Application via un lien sécurisé transmis par email ou SMS, sans nécessité de création de compte. L'accès est personnel, limité dans le temps et sécurisé par un identifiant unique.</p>
+<p style="margin-top:8px"><strong>Accès professionnels de santé :</strong> L'accès est réservé aux professionnels habilités (médecins, infirmiers, personnel autorisé), via un compte sécurisé avec authentification.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">4. Données collectées</h4>
+<p>L'Application collecte des données d'identification (adresse email, numéro de téléphone) et des données de santé (réponses aux questionnaires cliniques, scores psychométriques, données de suivi thérapeutique). Seules les données strictement nécessaires aux finalités poursuivies sont collectées.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">5. Finalités du traitement</h4>
+<p>Les données sont collectées pour le suivi médical, l'adaptation des prises en charge thérapeutiques, l'amélioration de la qualité des soins, la coordination entre professionnels, et le cas échéant la recherche clinique (cadre réglementaire MR-004).</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">6. Base légale du traitement</h4>
+<p>Les traitements reposent sur l'exécution d'une mission de soins (art. 9.2.h du RGPD) et le consentement explicite du patient pour certains traitements spécifiques.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">7. Hébergement des données</h4>
+<p>Les données sont hébergées auprès d'un prestataire certifié <strong>Hébergeur de Données de Santé (HDS)</strong>, au sein de l'Union Européenne.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">8. Sécurité des données</h4>
+<p>Des mesures techniques et organisationnelles appropriées sont mises en œuvre : chiffrement des données, séparation des données identifiantes et cliniques, authentification sécurisée, gestion des habilitations, journalisation des accès.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">9. Durée de conservation</h4>
+<p>Les données sont conservées pendant la durée nécessaire à la prise en charge médicale, puis archivées conformément aux obligations légales applicables aux données de santé.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">10. Droits des utilisateurs</h4>
+<p>Conformément au RGPD, vous disposez des droits d'accès, de rectification, d'effacement (dans les limites légales), de limitation, d'opposition et de portabilité. Ces droits peuvent être exercés en contactant le responsable de traitement.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">11. Consentement</h4>
+<p>Certains traitements nécessitent votre consentement explicite. Ce consentement peut être retiré à tout moment sans affecter la licéité des traitements antérieurs.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">12. Utilisation à des fins de recherche</h4>
+<p>Les données peuvent être utilisées à des fins de recherche uniquement après pseudonymisation, dans le respect des référentiels applicables (MR-004), avec information préalable. Aucune donnée directement identifiante n'est utilisée.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">13. Destinataires des données</h4>
+<p>Les données sont accessibles uniquement aux professionnels de santé impliqués, aux personnes habilitées pour la recherche, et aux sous-traitants techniques strictement encadrés. Aucune donnée n'est vendue ni cédée à des tiers.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">14. Cookies et traceurs</h4>
+<p>L'Application peut utiliser des traceurs strictement nécessaires à son fonctionnement. Aucun cookie à visée publicitaire n'est utilisé.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">15. Responsabilité</h4>
+<p>L'Application constitue un outil d'aide au suivi mais ne remplace en aucun cas la relation médicale. Les décisions thérapeutiques relèvent exclusivement des professionnels de santé.</p>
+
+<h4 style="font-size:13px;font-weight:700;margin:14px 0 6px">16. Droit applicable</h4>
+<p>Les présentes CGU sont soumises au droit français.</p>`,
+    questions: [],
+    options: [],
+    maxScore: 0,
+    interpret: (s) => s === 0 ? {label: 'CGU acceptées', color: 'green'} : {label: 'CGU non acceptées', color: 'red'}
+  },
+
   'Consentement rTMS': {
     name: 'Consentement rTMS',
     fullName: 'Consentement éclairé - Stimulation Magnétique Transcrânienne répétitive (rTMS)',
@@ -2110,6 +2193,7 @@ const Q_DESC = {
   'Maudsley':'résistance thérapeutique','MADRS':'dépression','AHRS':'hallucinations',
   'SANS':'symptômes négatifs','QCD':'douleur','FIQ':'fibromyalgie',
   'DSM5':'addiction','EVA craving':'craving','OCDS':'alcool',
+  'CGU':'conditions générales d\'utilisation',
   'Consentement rTMS':'consentement',
   'SDS':'invalidité / Sheehan',
   'DIVA-5-SR':'TDAH auto-questionnaire',
@@ -2219,7 +2303,7 @@ function genSchedule(p) {
   const globalJ1 = protos.reduce((min,pr) => pr.startDate < min ? pr.startDate : min, protos[0].startDate);
 
   // Consent slot at global J1
-  sched.push({date:globalJ1, questionnaires:['Consentement rTMS'], hetero:[], done:[], type:'consent', label:'Consentement'});
+  sched.push({date:globalJ1, questionnaires:['CGU','Consentement rTMS'], hetero:[], done:[], type:'consent', label:'Consentement'});
 
   // Merge all J1 questionnaires per unique startDate
   const byStart = {};
@@ -2611,7 +2695,7 @@ function renderPatientDetail() {
     const rtmsBadges = _protos.map(pr =>
       '<span class="badge b-blue">🧠 '+(PROTOCOLS[pr.name]?.name||pr.name)+(pr.interrupted?'<span style="color:var(--red);font-size:10px"> ⛔</span>':'')+'</span>'
     );
-    const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈'};
+    const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈',douleur:'🩹'};
     const parcoursBadges = _parcours.filter(parc=>parc.status!=='interrompu').map(parc => {
       const icon = PARCOURS_ICONS[parc.type] || '🗺️';
       const label = {medicament:'Médicament',cpap:'CPAP/OAM',psychotherapie:'Psychothérapie',remediation:'Remédiation',groupe:'Thérapie groupe',monitoring:'Monitoring'}[parc.type] || parc.type;
@@ -2697,13 +2781,13 @@ function renderTimeline() {
           +'<div class="tl-item-name">'+qLabel(q)+'</div>'
           +(ign.includes(q)
             ?'<div class="tl-item-status" style="font-size:11px;color:var(--text3)">- Ignoré</div>'
-            :isDone&&q==='Consentement rTMS'&&resp
-            ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé')+'</div>'
+            :isDone&&(q==='Consentement rTMS'||q==='CGU')&&resp
+            ?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">'+(q==='CGU'?(resp.accepted?'✓ CGU acceptées':'✗ CGU non acceptées'):(resp.accepted?'✓ Consentement donné':'✗ Consentement refusé'))+'</div>'
             :isDone&&resp&&resp.score!==undefined&&resp.score!==null&&resp.score!==99
             ?'<div class="tl-item-score" style="color:var(--'+col+');cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">'+((q==='PEM')?(resp.score+'%'):((qi&&qi.scoreLabel ? (typeof resp.score==='number'?parseFloat(resp.score).toFixed(4):resp.score)+' '+qi.scoreLabel : resp.score+'/'+(qi&&qi.maxScore||'?'))+' - '+lbl))+'</div>'
              +(resp.answers&&resp.answers.length?'<div style="font-size:10px;color:var(--accent);margin-top:3px;cursor:pointer" onclick="openScoreDetail(' + "'"+q+"'" + ',' + "'"+s.date+"'" + ')">📋 Voir les réponses</div>':'')
             :'')
-          +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
+          +(isDone&&!ign.includes(q)&&q!=='Consentement rTMS'&&q!=='CGU'&&(!resp||resp.score===undefined)?'<div class="tl-item-status done" style="font-size:11px;color:var(--green)">✓ Complété</div>':'')
           +(!isDone&&NS.userProfile&&NS.userProfile.role!=='lecture'?'<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
               +((isToday||isPast)?'<button class="btn btn-xs '+(isPast?'btn-danger':'btn-primary')+' write-only" onclick="startQ(\''+p.id+'\',\''+q+'\',\''+s.date+'\')">'+(isHet?'📋 Remplir':'▶ Démarrer')+'</button>':'')
               +((!isToday&&!isPast)?'<button class="btn btn-xs btn-ghost write-only" style="color:var(--accent);font-size:10px" onclick="moveQToToday(\''+p.id+'\',\''+q+'\',\''+s.date+'\')" title="Avancer à aujourd\'hui">📅 Répondre maintenant</button>':'')
@@ -3015,6 +3099,10 @@ function startQ(patientId,qName,date) {
   const qi=QUESTIONNAIRES[qName]; if(!qi) return;
   document.getElementById('q-title').textContent=qi.fullName||qName;
   document.getElementById('q-instructions').textContent=qi.instructions||'';
+  if(qi.type==='cgu') {
+    openCGUModal(patientId, date||todayStr());
+    return;
+  }
   if(qi.type==='consent') {
     openConsentModal(patientId, date||todayStr());
     return;
@@ -3023,6 +3111,70 @@ function startQ(patientId,qName,date) {
   openModal('m-questionnaire');
   // Mark body as in-questionnaire to disable close button
   document.body.classList.add('in-questionnaire');
+}
+
+function openCGUModal(patientId, date) {
+  currentQ = {patientId, qName:'CGU', date, answers:[], currentIdx:-1};
+  const qi = QUESTIONNAIRES['CGU'];
+  const modal = document.getElementById('m-cgu');
+  if(!modal) return;
+  document.getElementById('cgu-text-area').innerHTML = qi.cguText;
+  document.getElementById('cgu-accept-btn').disabled = true;
+  document.getElementById('cgu-accept-btn').style.opacity = '0.5';
+  document.getElementById('cgu-scroll-hint').style.display = 'block';
+  // Re-enable accept button when user scrolls to bottom
+  const scrollArea = document.getElementById('cgu-scroll-area');
+  scrollArea.scrollTop = 0;
+  scrollArea.onscroll = function() {
+    if(scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 20) {
+      document.getElementById('cgu-accept-btn').disabled = false;
+      document.getElementById('cgu-accept-btn').style.opacity = '1';
+      document.getElementById('cgu-scroll-hint').style.display = 'none';
+    }
+  };
+  document.body.classList.add('patient-lock');
+  modal.style.display = 'flex';
+}
+
+async function saveCGUAcceptance() {
+  const p = {id: currentQ.patientId};
+  const date = currentQ.date;
+  const patRef = db.doc('patients/'+p.id);
+  const patSnap = await patRef.get();
+  if(!patSnap.exists) return;
+  const patData = patSnap.data();
+  const responses = {...(patData.responses||{})};
+  const key = date+'_CGU';
+  responses[key] = {
+    questionnaire: 'CGU',
+    date,
+    score: 0,
+    accepted: true,
+    acceptedAt: new Date().toISOString(),
+    userAgent: navigator.userAgent
+  };
+  const schedule = (patData.schedule||[]).map(s => {
+    if(s.date === date && (s.questionnaires||[]).includes('CGU')) {
+      const done = [...(s.done||[])];
+      if(!done.includes('CGU')) done.push('CGU');
+      return {...s, done};
+    }
+    return s;
+  });
+  await patRef.update({responses, schedule});
+  // Log acceptance in history
+  const history = patSnap.data().history || [];
+  history.push({action:'cgu_accepted', user:'patient', date: new Date().toISOString().split('T')[0], detail:'CGU acceptées le '+new Date().toLocaleString('fr-FR')});
+  await patRef.update({history});
+  // Close modal and refresh
+  const modal = document.getElementById('m-cgu');
+  if(modal) modal.style.display = 'none';
+  document.body.classList.remove('patient-lock');
+  if(NS.currentPatient?.id === currentQ.patientId) {
+    const fresh = await patRef.get();
+    NS.currentPatient = {id: currentQ.patientId, ...fresh.data()};
+    renderTimeline();
+  }
 }
 
 function openConsentModal(patientId, date) {
@@ -3321,9 +3473,22 @@ async function qFinish() {
 
 function openAddPatient() {
   newPat = {step:1, protocols:[{name:'', startDate:'', endDate:''}], mode:'cure', parcoursState:null, parcoursConfig:null};
+  // Reset step 1 fields
   ['p-prenom','p-nom','p-dob'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const cp=document.getElementById('code-prev'); if(cp){cp.textContent='XXX-XXX-AAAAMMJJ';cp.style.opacity='.4';}
+  // Reset step 2 — mode buttons and areas
   const sa=document.getElementById('sched-area'); if(sa) sa.style.display='none';
+  const protoListArea=document.getElementById('proto-list-area'); if(protoListArea) protoListArea.innerHTML='';
+  const postcureArea=document.getElementById('postcure-startdate-area'); if(postcureArea) postcureArea.style.display='none';
+  const ps2Parc=document.getElementById('ps2-parcours-area'); if(ps2Parc) ps2Parc.style.display='none';
+  const postcureStart=document.getElementById('p-postcure-start'); if(postcureStart) postcureStart.value='';
+  // Reset cabinet to first option
+  const cabSel=document.getElementById('p-cabinet'); if(cabSel) cabSel.selectedIndex=0;
+  // Force mode reset by temporarily setting a different prevMode
+  const _prev = '__reset__';
+  const modeBtn=document.getElementById('mode-cure-btn'); if(modeBtn) modeBtn.className='btn btn-primary btn-sm';
+  const modeBtn2=document.getElementById('mode-postcure-btn'); if(modeBtn2) modeBtn2.className='btn btn-secondary btn-sm';
+  const modeBtn3=document.getElementById('mode-parcours-btn'); if(modeBtn3) modeBtn3.className='btn btn-secondary btn-sm';
   renderPatStep();
   openModal('m-add-patient');
 }
@@ -3335,7 +3500,7 @@ function renderPatStep() {
   });
   document.getElementById('btn-prev-pat').style.display=newPat.step>1?'inline-flex':'none';
   document.getElementById('btn-next-pat').textContent=newPat.step<3?'Suivant →':'✓ Créer le patient';
-  if(newPat.step===2) { setPatientMode(newPat.mode||'cure'); }
+  if(newPat.step===2) { newPat._prevMode = null; setPatientMode(newPat.mode||'cure'); }
   if(newPat.step===3) renderPatSummary();
 }
 
@@ -3358,7 +3523,7 @@ function renderPatSummary() {
     document.getElementById('c-details').style.display='none';
     document.getElementById('c-postcure-details').style.display='';
     const pc = newPat.parcoursConfig || {};
-    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Groupe',monitoring:'📈 Monitoring'};
+    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Groupe',monitoring:'📈 Monitoring',douleur:'🩹 Douleur'};
     document.getElementById('c-prots2').textContent = (PARCOURS_LABELS[pc.type]||pc.type||'-') + (pc.contextes&&pc.contextes.length?' · '+pc.contextes.join(', '):'');
     document.getElementById('c-postcure-start').textContent = fmtDate(pc.startDate);
     const durEl = document.getElementById('c-postcure-details');
@@ -3570,14 +3735,17 @@ function onPs2ParcoursTypeChange() {
     let html='<div class="fg"><label>Rythme</label><select id="ps2-rem-rythme" onchange="newPat.parcoursState.subtype.rythme=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">-</option><option value="1/semaine">1×/semaine</option><option value="1/2semaines">1×/2 semaines</option><option value="1/mois">1×/mois</option></select></div>';
     if(type==='groupe') html+='<div class="fg"><label>Description (optionnel)</label><input type="text" autocomplete="off" placeholder="Ex: Groupe TCC" onchange="newPat.parcoursState.subtype.desc=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"></div>';
     subEl.innerHTML=html;
+  } else if(type==='douleur') {
+    subEl.innerHTML='<div class="fg"><label>Type de douleur (optionnel)</label><select id="ps2-douleur-type" onchange="newPat.parcoursState.subtype.douleurType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px"><option value="">- Choisir -</option>'+['Douleur neuropathique','Douleur nociplastique','Douleur nociceptive','Céphalées chroniques','Fibromyalgie','Douleur mixte','Autre'].map(function(v){return'<option>'+v+'</option>';}).join('')+'</select></div>';
   }
 }
 
 function setPatientMode(mode) {
-  const prevMode = newPat.mode;
+  const prevMode = newPat._prevMode !== undefined ? newPat._prevMode : newPat.mode;
   newPat.mode = mode;
-  // Reset protocols when switching mode to avoid carryover between modes
-  if(prevMode !== mode) {
+  newPat._prevMode = mode;
+  // Reset protocols when switching mode OR on first render (prevMode null)
+  if(prevMode !== mode || prevMode === null) {
     newPat.protocols = [{name:'', startDate:'', endDate:''}];
   }
   document.getElementById('mode-cure-btn').className = 'btn btn-sm ' + (mode==='cure' ? 'btn-primary' : 'btn-secondary');
@@ -3956,8 +4124,8 @@ async function openEditPatient(id) {
   const activeParcours = (p.parcours||[]).filter(parc => parc.status !== 'interrompu');
   const hasRtms = normalizeProtocols(p).length > 0;
   const isParcourOnly = activeParcours.length > 0 && !hasRtms;
-  const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈'};
-  const PARCOURS_LABELS = {medicament:'Médicament',cpap:'CPAP/OAM',psychotherapie:'Psychothérapie',remediation:'Remédiation',groupe:'Thérapie groupe',monitoring:'Monitoring'};
+  const PARCOURS_ICONS = {medicament:'💊',cpap:'🛏️',psychotherapie:'🗣️',remediation:'🧠',groupe:'👥',monitoring:'📈',douleur:'🩹'};
+  const PARCOURS_LABELS = {medicament:'Médicament',cpap:'CPAP/OAM',psychotherapie:'Psychothérapie',remediation:'Remédiation',groupe:'Thérapie groupe',monitoring:'Monitoring',douleur:'Douleur'};
 
   const parcoursSection = document.getElementById('edit-parcours-section');
   const protocolsSection = document.getElementById('edit-protocols-section');
@@ -4261,6 +4429,74 @@ function showPatientQScreen() {
   renderPQQuestion();
 }
 
+function renderPQCGUScreen(qi) {
+  const body = document.getElementById('pq-body');
+  if(!body) return;
+  body.innerHTML =
+    '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:12px">Veuillez lire les Conditions Générales d\'Utilisation avant de les accepter.</div>' +
+    '<div id="pq-cgu-scroll" style="height:340px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;font-size:13px;line-height:1.6;color:#333">' +
+    qi.cguText +
+    '</div>' +
+    '<div id="pq-cgu-hint" style="text-align:center;font-size:12px;color:#999;margin:10px 0">Faites défiler jusqu\'en bas pour activer le bouton d\'acceptation</div>' +
+    '<button id="pq-cgu-btn" class="btn btn-primary" style="width:100%;margin-top:8px;opacity:0.5" disabled onclick="pqCGUAccept()">✓ J\'ai lu et j\'accepte les CGU</button>';
+  // Enable button on scroll to bottom
+  const scrollEl = document.getElementById('pq-cgu-scroll');
+  scrollEl.addEventListener('scroll', function() {
+    if(scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 20) {
+      const btn = document.getElementById('pq-cgu-btn');
+      if(btn) { btn.disabled = false; btn.style.opacity = '1'; }
+      const hint = document.getElementById('pq-cgu-hint');
+      if(hint) hint.style.display = 'none';
+    }
+  });
+}
+
+async function pqCGUAccept() {
+  try {
+    const patRef = db.doc('patients/'+pqState.patientId);
+    const patSnap = await patRef.get();
+    const patData = patSnap.data();
+    const responses = {...(patData.responses||{})};
+    const key = pqState.date+'_CGU';
+    responses[key] = {
+      questionnaire: 'CGU',
+      date: pqState.date,
+      score: 0,
+      accepted: true,
+      acceptedAt: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    };
+    if(!pqState.knownDone) pqState.knownDone = [];
+    if(!pqState.knownDone.includes('CGU')) pqState.knownDone.push('CGU');
+    const schedule = (patData.schedule||[]).map(s => {
+      if(s.date === pqState.date) {
+        const done = [...(s.done||[])];
+        pqState.knownDone.forEach(q => { if(!done.includes(q)) done.push(q); });
+        const remainingQs = (s.questionnaires||[]).filter(q => !done.includes(q) && !(s.ignored||[]).includes(q));
+        pqState.remainingQs = remainingQs;
+        return {...s, done};
+      }
+      return s;
+    });
+    await patRef.update({responses, schedule});
+    // Log in history
+    const history = patData.history || [];
+    history.push({action:'cgu_accepted', user:'patient', date:pqState.date, detail:'CGU acceptées'});
+    await patRef.update({history});
+  } catch(e) { console.error('CGU save error:', e); }
+  // Move to next questionnaire
+  if(pqState.remainingQs && pqState.remainingQs.length > 0) {
+    pqStartNext();
+  } else {
+    // Show done screen
+    document.getElementById('pq-body').style.display = 'none';
+    const doneScreen = document.getElementById('pq-done-screen');
+    if(doneScreen) doneScreen.style.display = 'block';
+    const closeBtn = document.getElementById('pq-close-btn');
+    if(closeBtn) closeBtn.style.display = 'block';
+  }
+}
+
 function renderPQConsentScreen(qi) {
   pqState.consentAnswers = new Array(qi.questions.length).fill(undefined);
   pqState.consentFinalAnswer = undefined;
@@ -4559,6 +4795,11 @@ function pqStartNext() {
   document.getElementById('pq-done-screen').style.display='none';
   const qi = QUESTIONNAIRES[nextQ];
   document.getElementById('pq-title').textContent = qi ? (qi.fullName||nextQ) : nextQ;
+  // CGU type: show scrollable CGU with accept button
+  if(qi && qi.type === 'cgu') {
+    renderPQCGUScreen(qi);
+    return;
+  }
   // Consent type: use dedicated patient consent flow
   if(qi && qi.type === 'consent') {
     renderPQConsentScreen(qi);
@@ -7056,6 +7297,7 @@ let PARCOURS_CONFIG = {
     {code:'TDAH',     label:'TDAH',                                        cat:'Neurodév.'},
     {code:'TCA',      label:'Conduites alimentaires',                      cat:'Comportement'},
     {code:'SUBST',    label:'Usage de substances',                         cat:'Addiction'},
+    {code:'DOUL',     label:'Douleur chronique',                           cat:'Douleur'},
     {code:'ADAPT',    label:'Trouble de l\'adaptation',                    cat:'Autre'},
     {code:'AUTRE',    label:'Autre',                                       cat:'Autre'},
   ],
@@ -7078,6 +7320,7 @@ let PARCOURS_CONFIG = {
     'TDAH':      {principal:'ASRS v1.1', freqP:'mensuel', secondaire:'DIVA5-SR',  freqS:'mensuel', optionnels:[]},
     'TCA':       {principal:'EDE-Q',     freqP:'mensuel', secondaire:'SCOFF',     freqS:'mensuel', optionnels:['BITE']},
     'SUBST':     {principal:'ASSIST',    freqP:'mensuel', secondaire:'AUDIT',     freqS:'mensuel', optionnels:['DUDIT','DSM5']},
+    'DOUL':      {principal:'QCD',       freqP:'mensuel', secondaire:'FIQ',       freqS:'mensuel', optionnels:['EVA craving','EQ-5D-5L']},
     'ADAPT':     {principal:'ADNM-20',   freqP:'mensuel', secondaire:'PSS',       freqS:'mensuel', optionnels:['PHQ-9','GAD-7']},
     'AUTRE':     {principal:'',          freqP:'mensuel', secondaire:'',          freqS:'mensuel', optionnels:[]},
   },
@@ -7213,6 +7456,13 @@ function onParcoursTypeChange() {
       +renderRythmField('groupe');
   } else if(type === 'monitoring') {
     html = '<div class="info-box" style="font-size:12px">Monitoring libre : choisissez les questionnaires et leur fréquence dans la section ci-dessous.</div>';
+  } else if(type === 'douleur') {
+    html = '<div class="fg"><label>Type de douleur (optionnel)</label>'
+      +'<select id="douleur-type" onchange="parcoursState.subtype.douleurType=this.value" style="width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:inherit;font-size:13px">'
+      +'<option value="">- Choisir -</option>'
+      +['Douleur neuropathique','Douleur nociplastique','Douleur nociceptive','Céphalées chroniques','Fibromyalgie','Douleur mixte','Autre']
+      .map(v => '<option value="'+v+'">'+v+'</option>').join('')
+      +'</select></div>';
   }
   // Only set innerHTML if html was built via string (not DOM direct)
   if(html) subEl.innerHTML = html;
@@ -7604,7 +7854,7 @@ function openInterruptCure() {
   const sel = document.getElementById('interrupt-protocol-sel');
   if(sel) {
     const parcoursList = (p.parcours||[]).filter(parc=>parc.status!=='interrompu');
-    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Thérapie groupe',monitoring:'📈 Monitoring'};
+    const PARCOURS_LABELS = {medicament:'💊 Médicament',cpap:'🛏️ CPAP/OAM',psychotherapie:'🗣️ Psychothérapie',remediation:'🧠 Remédiation',groupe:'👥 Thérapie groupe',monitoring:'📈 Monitoring',douleur:'🩹 Douleur'};
     sel.innerHTML = '<option value="all">Tous les suivis actifs</option>'
       + (protos.length ? '<optgroup label="Cure rTMS">'
           + protos.map(pr => '<option value="rtms_'+pr.name+'">'+(PROTOCOLS[pr.name]?.name||pr.name)+'</option>').join('')
@@ -7911,6 +8161,7 @@ function buildQSelectOptions(selId, includeHetero) {
     + sorted.map(function(k) {
         const qi = QUESTIONNAIRES[k];
         if(!qi || !qi.questions || !qi.questions.length) return '';
+        if(qi.type === 'cgu' || qi.type === 'consent') return ''; // not manually addable
         if(!includeHetero && qi.type === 'hetero') return '';
         const tag = qi.type === 'hetero' ? ' (hétéro)' : '';
         const domain = qi.domain ? ' - ' + qi.domain : '';
@@ -8651,7 +8902,7 @@ async function generatePDF() {
     if(!s||!s.date) return;
     const done = s.done || [];
     done.forEach(function(qn) {
-      if(qn === 'Consentement rTMS') return; // skip consent
+      if(qn === 'Consentement rTMS' || qn === 'CGU') return; // skip consent/CGU
       const r = responses[s.date+'_'+qn];
       if(!r||r.score===undefined||r.score===null) return;
       if(!scoresByQ[qn]) scoresByQ[qn] = [];
@@ -8686,14 +8937,14 @@ async function generatePDF() {
 
   schedule.forEach(function(s) {
     if(!s||!s.date) return;
-    const done = (s.done||[]).filter(function(qn){ return qn !== 'Consentement rTMS'; });
+    const done = (s.done||[]).filter(function(qn){ return qn !== 'Consentement rTMS' && qn !== 'CGU'; });
     if(!done.length) return; // skip days with no real questionnaires
     done.forEach(function(qn) {
       const day = getDay(s.date);
       if(day.qs.some(function(q){return q.name===qn;})) return;
       const r = responses[s.date+'_'+qn];
       const score = (r&&r.score!==undefined&&r.score!==null)?r.score:null;
-      if(score===null && qn!=='Consentement rTMS') return; // skip unanswered questionnaires
+      if(score===null && qn!=='Consentement rTMS' && qn!=='CGU') return; // skip unanswered
       const qi = QUESTIONNAIRES[qn];
       const interp = (score!==null&&qi&&qi.interpret)?qi.interpret(score):null;
       day.qs.push({name:qn, score:score, qi:qi, interp:interp});
