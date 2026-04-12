@@ -257,12 +257,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15);display:flex;flex-direction:column;min-height:0}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15);display:grid;grid-template-rows:auto 1fr auto}
 .modal.sm{max-width:460px}
-.mh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface);border-radius:14px 14px 0 0}
+.mh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:14px 14px 0 0}
 .mh-title{font-size:15px;font-weight:600;letter-spacing:-.1px}
-.mb{padding:16px 20px;overflow-y:auto;flex:1 1 auto;min-height:0;overscroll-behavior:contain}
-.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex:0 0 auto;background:var(--surface);border-radius:0 0 14px 14px;position:static !important}
+.mb{padding:16px 20px;overflow-y:auto;min-height:0}
+.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--surface);border-radius:0 0 14px 14px}
 .close-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 6px;border-radius:4px;display:flex;align-items:center}.close-btn:hover{color:var(--text);background:var(--surface2)}
 
 /* BOXES */
@@ -480,6 +480,10 @@ body.role-saisie .analyse-only { display:none !important; }
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+<script>
+// Hide login immediately if QR token in URL to prevent flash
+(function(){try{var p=new URLSearchParams(window.location.search);if(p.get('token')){var ls=document.getElementById('login-screen');if(!ls){document.addEventListener('DOMContentLoaded',function(){var e=document.getElementById('login-screen');if(e)e.style.display='none';var a=document.getElementById('app');if(a)a.style.display='none';});window.__qrHide=true;}else{ls.style.display='none';}}}catch(e){}})();
+</script>
 
 
 <!-- LOGIN -->
@@ -627,7 +631,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-22h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.12-23h15</span>
       </div>
     </div>
   </div>
@@ -2400,6 +2404,8 @@ function sLabel(q,s) { return QUESTIONNAIRES[q]?.interpret?.(s)?.label||''; }
 
 // AUTH
 auth.onAuthStateChanged(async user=>{
+  // If QR token present, skip normal auth flow
+  if(new URLSearchParams(window.location.search).get('token')) return;
   if(user) {
     NS.user=user;
     const snap=await db.doc('users/'+user.uid).get();
@@ -4446,22 +4452,40 @@ function showPatientQScreen() {
 function renderPQCGUScreen(qi) {
   const body = document.getElementById('pq-body');
   if(!body) return;
+  // Dynamic height: viewport minus headers/buttons
+  const scrollH = Math.min(Math.max(window.innerHeight - 280, 200), 400);
   body.innerHTML =
-    '<div style="font-size:13px;font-weight:600;color:#333;margin-bottom:12px">Veuillez lire les Conditions Générales d\'Utilisation avant de les accepter.</div>' +
-    '<div id="pq-cgu-scroll" style="height:340px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;font-size:13px;line-height:1.6;color:#333">' +
+    '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px">Veuillez lire les Conditions Générales d\'Utilisation avant de les accepter.</div>' +
+    '<div id="pq-cgu-scroll" style="height:' + scrollH + 'px;overflow-y:auto;border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;font-size:13px;line-height:1.6;color:#333">' +
     qi.cguText +
     '</div>' +
-    '<div id="pq-cgu-hint" style="text-align:center;font-size:12px;color:#999;margin:10px 0">Faites défiler jusqu\'en bas pour activer le bouton d\'acceptation</div>' +
-    '<button id="pq-cgu-btn" class="btn btn-primary" style="width:100%;margin-top:8px;opacity:0.5" disabled onclick="pqCGUAccept()">✓ J\'ai lu et j\'accepte les CGU</button>';
-  // Enable button on scroll to bottom
+    '<div id="pq-cgu-hint" style="text-align:center;font-size:12px;color:#999;margin:10px 0">Faites défiler jusqu\'en bas pour activer le bouton ↓</div>' +
+    '<button id="pq-cgu-btn" class="btn btn-primary" style="width:100%;margin-top:8px;padding:16px;font-size:15px;opacity:0.5" disabled onclick="pqCGUAccept()">✓ J\'ai lu et j\'accepte les CGU</button>';
+
+  function checkScrollEnd(el) {
+    // Allow 30px tolerance for mobile rendering differences
+    return el.scrollTop + el.clientHeight >= el.scrollHeight - 30;
+  }
+
+  function enableBtn() {
+    const btn = document.getElementById('pq-cgu-btn');
+    if(btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    const hint = document.getElementById('pq-cgu-hint');
+    if(hint) hint.style.display = 'none';
+  }
+
   const scrollEl = document.getElementById('pq-cgu-scroll');
+  // Check immediately if content fits without scrolling
+  setTimeout(function() {
+    if(checkScrollEnd(scrollEl)) enableBtn();
+  }, 200);
+
   scrollEl.addEventListener('scroll', function() {
-    if(scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - 20) {
-      const btn = document.getElementById('pq-cgu-btn');
-      if(btn) { btn.disabled = false; btn.style.opacity = '1'; }
-      const hint = document.getElementById('pq-cgu-hint');
-      if(hint) hint.style.display = 'none';
-    }
+    if(checkScrollEnd(scrollEl)) enableBtn();
+  });
+  // iOS Safari: also check on touchend
+  scrollEl.addEventListener('touchend', function() {
+    setTimeout(function() { if(checkScrollEnd(scrollEl)) enableBtn(); }, 100);
   });
 }
 
