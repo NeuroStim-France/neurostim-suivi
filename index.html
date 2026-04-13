@@ -631,7 +631,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-11h00</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-11h30</span>
       </div>
     </div>
   </div>
@@ -1957,11 +1957,11 @@ const QUESTIONNAIRES = {
   'EVA craving': {
     name:'EVA craving', fullName:'Échelle Visuelle Analogique - Craving',
     type:'auto', domain:'Addiction',
-    instructions:'Estimez votre "craving" (envie irrépressible et difficilement contrôlable) par rapport à la substance pour laquelle vous êtes traité. Côté l\'intensité du craving le plus intense que vous avez ressentit sur les 24 dernires heures',
+    instructions:'Le craving est l\'envie irrépressible et difficilement contrôlable de consommer la substance pour laquelle vous êtes traité. Évaluez l\'intensité du craving le plus fort que vous avez ressenti au cours des dernières 24 heures, sur une échelle de 0 à 10.',
     options:['0 = Pas de craving du tout (0)','1.0 (1)','2.0 (2)','3.0 (3)','4.0 (4)','5.0 (5)','6.0 (6)','7.0 (7)','8.0 (8)','9.0 (9)','10 = Un craving si intense qu\'il était impossible de résister (10)'],
-    questions:['Mon craving, sur une échelle de 0 à 10 sur les dernières 24h, était à :'],
+    questions:['Mon envie irrépressible de consommer (craving), sur les dernières 24h, était à :'],
     maxScore:10,
-    interpret:(s)=>({label:s+" pts",color:"gray"})
+    interpret:(s)=>({label:s+' pts',color:'gray'})
   },
   'OCDS': {
     name:'OCDS', fullName:'Obsessive Compulsive Drinking Scale',
