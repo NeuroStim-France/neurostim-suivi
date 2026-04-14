@@ -631,7 +631,7 @@ body.role-saisie .analyse-only { display:none !important; }
         <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px;color:var(--text3)" onclick="showPage('legal',document.querySelector('[onclick*=legal]'))">📄 CGU &amp; Mentions légales</button>
       </div>
       <div style="margin-top:6px;text-align:center">
-        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-11h30</span>
+        <span id="app-version-badge" style="font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;opacity:.6;cursor:default" title="Version de l'application">b2026.04.13-12h30</span>
       </div>
     </div>
   </div>
@@ -974,6 +974,9 @@ body.role-saisie .analyse-only { display:none !important; }
               <option value="groupe">👥 Groupe</option>
               <option value="monitoring">📈 Monitoring</option>
               <option value="douleur">🩹 Douleur</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0;flex:1;min-width:140px"><label>Intervention</label>
             <select id="coh-intervention" onchange="loadCohorte()">
               <option value="all">Toutes</option>
             </select>
@@ -3577,8 +3580,15 @@ function openAddPatient() {
   const postcureArea=document.getElementById('postcure-startdate-area'); if(postcureArea) postcureArea.style.display='none';
   const ps2Parc=document.getElementById('ps2-parcours-area'); if(ps2Parc) ps2Parc.style.display='none';
   const postcureStart=document.getElementById('p-postcure-start'); if(postcureStart) postcureStart.value='';
-  // Reset cabinet to first option
-  const cabSel=document.getElementById('p-cabinet'); if(cabSel) cabSel.selectedIndex=0;
+  // Pre-fill cabinet with current sidebar selection
+  const cabSel=document.getElementById('p-cabinet');
+  const currentCab=document.getElementById('cabinet-sel')?.value;
+  if(cabSel) {
+    if(currentCab) {
+      const opt = Array.from(cabSel.options).find(o=>o.value===currentCab||o.text===currentCab);
+      if(opt) cabSel.value = opt.value; else cabSel.selectedIndex=0;
+    } else { cabSel.selectedIndex=0; }
+  }
   // Force mode reset by temporarily setting a different prevMode
   const _prev = '__reset__';
   const modeBtn=document.getElementById('mode-cure-btn'); if(modeBtn) modeBtn.className='btn btn-primary btn-sm';
@@ -3939,7 +3949,7 @@ async function createPatient() {
     const prenom=document.getElementById('p-prenom').value.trim();
     const nom=document.getElementById('p-nom').value.trim();
     const dob=document.getElementById('p-dob').value;
-    const cabinet=document.getElementById('cabinet-sel').value;
+    const cabinet = document.getElementById('p-cabinet')?.value || document.getElementById('cabinet-sel').value;
     const code=genCode(prenom,nom,dob);
     const validProtos = newPat.protocols.filter(p=>p.name);
     const snap=await db.collection('patients').get();
@@ -5660,7 +5670,7 @@ function downloadExcelTemplate() {
 async function loadCabinetsList() {
   const el = document.getElementById('cabinets-list'); if(!el) return;
   const snap = await db.doc('config/cabinets').get();
-  let cabinets = [{name:'NeuroStim Bastille',address:'',phone:''},{name:'NeuroStim Etoile',address:'',phone:''},{name:'NeuroStim Luxembourg',address:'',phone:''}];
+  let cabinets = [{name:'NeuroStim Bastille',address:'',phone:''},{name:'NeuroStim Étoile',address:'',phone:''},{name:'NeuroStim Luxembourg',address:'',phone:''}];
   if(snap.exists && snap.data().list) {
     const raw = snap.data().list;
     cabinets = raw.map(function(c){ return typeof c==='string' ? {name:c,address:'',phone:''} : c; });
